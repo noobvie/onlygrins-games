@@ -1,0 +1,12 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# local build artifacts (none yet — games are plain static files)
+node_modules/
+dist/
+.tmp/
+
+# keep the workspace file tracked; ignore per-user VSCode state
+.vscode/
