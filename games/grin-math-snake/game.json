@@ -1,0 +1,19 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "grin-math-snake",
+  "title": "Grin Math Snake",
+  "category": "math",
+  "short_description": "Glide a number-snake and eat + − × ÷ tokens to hit the target — eat right and grow, eat wrong and lose a heart.",
+  "description": "A colorful arcade math game for ~age 10. Your snake IS a number (it starts at 10) and grows or shrinks as it eats. Drifting operator tokens (+5, −3, ×2, ÷2) change your value — steer to make your number EXACTLY the target shown at the top. Hit it to level up with a bigger snake and a bigger target. Overshoot the target, drop to zero, or try a division that doesn't come out even and you choke and lose a heart. Teaches addition, subtraction, multiplication, division and a bit of planning under gentle time pressure. Finishing posts a score to the leaderboard for GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "width": 960,
+  "height": 600,
+  "controls": "Mouse / touch to steer the snake (it glides toward your pointer). Or use Arrow keys / WASD. Eat tokens to change your number to the target.",
+  "tags": ["grin", "education", "math", "arcade", "snake", "grade-1", "grade-2", "grade-3", "grade-4", "grade-5"],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:grin-math-snake"
+}

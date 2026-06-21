@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Arcade Host — OnlyGrins games dev harness</title>
+<style>
+  :root {
+    --bg: #0e1116;
+    --panel: #161b22;
+    --panel-2: #1c2230;
+    --border: #2a3140;
+    --text: #d6dde8;
+    --muted: #8b95a7;
+    --accent: #5ee0a0;
+    --accent-dim: #2f6e52;
+    --warn: #ffcc66;
+    --err: #ff6b6b;
+    --in: #79b8ff;   /* messages FROM the game */
+    --out: #c792ea;  /* responses FROM the host */
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    display: grid; grid-template-rows: auto 1fr; height: 100vh;
+  }
+
+  header {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  header h1 { font-size: 14px; margin: 0; font-weight: 600; letter-spacing: .2px; }
+  header h1 .dot { color: var(--accent); }
+  header .grow { flex: 1; }
+  label.field { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; }
+  input[type=text], input[type=number] {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 8px; font: 12px var(--mono);
+  }
+  input[type=text] { width: 260px; }
+  input[type=number] { width: 66px; }
+  button {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 11px; font-size: 12px; cursor: pointer;
+  }
+  button:hover { border-color: var(--accent-dim); }
+  button.primary { background: var(--accent-dim); border-color: var(--accent); color: #eafff4; }
+  .toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); cursor: pointer; user-select: none; }
+
+  main { display: grid; grid-template-columns: 1fr 460px; min-height: 0; }
+
+  /* ---- stage (the game) ---- */
+  .stage {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 18px; overflow: auto; min-width: 0;
+    background:
+      radial-gradient(circle at 1px 1px, #1b2230 1px, transparent 0) 0 0 / 22px 22px;
+  }
+  .frame {
+    background: #000; border: 1px solid var(--border); border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5); overflow: hidden; position: relative;
+  }
+  .frame iframe { display: block; border: 0; background: #fff; }
+  .frame .badge {
+    position: absolute; top: 8px; left: 8px; z-index: 2;
+    font: 11px var(--mono); color: var(--muted); background: rgba(0,0,0,.55);
+    padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border);
+  }
+  .stage .empty { color: var(--muted); text-align: center; max-width: 360px; }
+  .stage .empty code { color: var(--accent); }
+
+  /* ---- console ---- */
+  .console { display: grid; grid-template-rows: auto auto 1fr; border-left: 1px solid var(--border); background: var(--panel); min-height: 0; }
+  .console .bar {
+    display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .console .bar .title { font-weight: 600; font-size: 12px; }
+  .console .bar .grow { flex: 1; }
+  .console .bar .count { font: 11px var(--mono); color: var(--muted); }
+
+  .state { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 9px 12px; border-bottom: 1px solid var(--border); background: var(--panel-2); }
+  .state .kv { font: 11px var(--mono); color: var(--muted); }
+  .state .kv b { color: var(--text); font-weight: 600; }
+  .state .kv.best b { color: var(--accent); }
+
+  .log { overflow: auto; padding: 6px 0; font: 12px var(--mono); }
+  .row { padding: 6px 12px; border-bottom: 1px dashed #20262f; }
+  .row .head { display: flex; align-items: baseline; gap: 8px; }
+  .row .t { color: var(--muted); font-size: 10px; min-width: 64px; }
+  .row .arrow { font-weight: 700; }
+  .row.in  .arrow { color: var(--in); }
+  .row.out .arrow { color: var(--out); }
+  .row.note .arrow { color: var(--warn); }
+  .row .type { color: var(--text); font-weight: 600; }
+  .row.in  .type { color: var(--in); }
+  .row.out .type { color: var(--out); }
+  .row .payload { color: var(--muted); margin: 3px 0 0 72px; white-space: pre-wrap; word-break: break-word; }
+  .row .payload .k { color: #9db4d0; }
+  .pill { font-size: 10px; padding: 1px 7px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); }
+  .pill.ok { color: var(--accent); border-color: var(--accent-dim); }
+  .pill.no { color: var(--err); border-color: #5a2a2a; }
+  .empty-log { color: var(--muted); padding: 18px 14px; font-family: system-ui; }
+</style>
+</head>
+<body>
+  <header>
+    <h1><span class="dot">●</span> Arcade Host <span style="color:var(--muted);font-weight:400">— dev harness</span></h1>
+    <label class="field">game
+      <input id="gamePath" type="text" value="templates/starter-game" title="path under the repo root, e.g. games/grin-coin-counter" />
+    </label>
+    <label class="field">w <input id="w" type="number" value="960" /></label>
+    <label class="field">h <input id="h" type="number" value="600" /></label>
+    <button id="load" class="primary">Load ▸</button>
+    <label class="toggle"><input id="autoreload" type="checkbox" /> auto-reload</label>
+    <span class="grow"></span>
+    <label class="toggle"><input id="loggedIn" type="checkbox" checked /> logged in</label>
+    <label class="toggle"><input id="vip" type="checkbox" /> VIP (skip ads)</label>
+  </header>
+
+  <main>
+    <section class="stage">
+      <div id="empty" class="empty">
+        <p>No game loaded.</p>
+        <p>Set a path (e.g. <code>games/grin-coin-counter</code>) and hit <b>Load</b>.<br/>
+           This host mocks the platform: it answers every <code>ArcadeSDK</code> call and logs it on the right →</p>
+      </div>
+      <div id="frameWrap" class="frame" style="display:none">
+        <span id="badge" class="badge"></span>
+        <iframe id="game" title="game"></iframe>
+      </div>
+    </section>
+
+    <section class="console">
+      <div class="bar">
+        <span class="title">SDK console</span>
+        <span class="grow"></span>
+        <span id="count" class="count">0 events</span>
+        <button id="clear">clear</button>
+      </div>
+      <div class="state">
+        <span class="kv">session: <b id="sSession">idle</b></span>
+        <span class="kv">level: <b id="sLevel">—</b></span>
+        <span class="kv">scores: <b id="sScores">0</b></span>
+        <span class="kv best">best: <b id="sBest">—</b></span>
+      </div>
+      <div id="log" class="log"><div class="empty-log">Waiting for the game to call the SDK…</div></div>
+    </section>
+  </main>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---- the platform protocol (mirrors public/sdk/arcade-sdk.js) ----
+  var SOURCE = 'ctl_arcade_game';
+  var RESPONSE = {
+    ctl_arcade_save_score:         'ctl_arcade_score_saved',
+    ctl_arcade_start_session:      'ctl_arcade_session_started',
+    ctl_arcade_end_session:        'ctl_arcade_session_ended',
+    ctl_arcade_start_level:        'ctl_arcade_level_started',
+    ctl_arcade_restart_level:      'ctl_arcade_level_restarted',
+    ctl_arcade_end_level:          'ctl_arcade_level_ended',
+    ctl_arcade_show_interlevel_ad: 'ctl_arcade_ad_shown',
+    ctl_arcade_share_event:        'ctl_arcade_event_shared',
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var logEl = $('log'), countEl = $('count');
+  var state = { events: 0, best: null, scores: 0, session: false, level: null };
+
+  function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]); }); }
+
+  function fmtPayload(obj) {
+    if (obj == null || (typeof obj === 'object' && !Object.keys(obj).length)) return '';
+    var json = JSON.stringify(obj, null, 0);
+    // light key highlighting
+    return esc(json).replace(/&quot;([^&]+?)&quot;:/g, '<span class="k">"$1"</span>:');
+  }
+
+  function clock() {
+    var d = new Date();
+    return d.toLocaleTimeString([], { hour12: false }) + '.' + String(d.getMilliseconds()).padStart(3, '0');
+  }
+
+  function add(dir, type, payload, pill) {
+    if (state.events === 0) logEl.innerHTML = '';
+    state.events++;
+    countEl.textContent = state.events + (state.events === 1 ? ' event' : ' events');
+    var arrow = dir === 'in' ? '◄ game' : (dir === 'out' ? 'host ►' : '•');
+    var pillHtml = pill ? ' <span class="pill ' + pill.cls + '">' + esc(pill.text) + '</span>' : '';
+    var row = document.createElement('div');
+    row.className = 'row ' + dir;
+    row.innerHTML =
+      '<div class="head"><span class="t">' + clock() + '</span>' +
+      '<span class="arrow">' + arrow + '</span>' +
+      '<span class="type">' + esc(type) + '</span>' + pillHtml + '</div>' +
+      (fmtPayload(payload) ? '<div class="payload">' + fmtPayload(payload) + '</div>' : '');
+    logEl.appendChild(row);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function refreshState() {
+    $('sSession').textContent = state.session ? 'active' : 'idle';
+    $('sLevel').textContent = state.level == null ? '—' : state.level;
+    $('sScores').textContent = state.scores;
+    $('sBest').textContent = state.best == null ? '—' : state.best;
+  }
+
+  // ---- respond to a game's SDK call exactly like the Laravel bridge ----
+  function handle(msg, win) {
+    var type = msg.type, data = msg.data || {};
+    var respType = RESPONSE[type];
+    if (!respType) return; // not an SDK message
+
+    add('in', type, data);
+
+    var resp = { type: respType, _id: msg._id, success: true };
+    var pill = { cls: 'ok', text: 'ok' };
+
+    switch (type) {
+      case 'ctl_arcade_start_session': state.session = true; break;
+      case 'ctl_arcade_end_session':   state.session = false; break;
+      case 'ctl_arcade_start_level':
+      case 'ctl_arcade_restart_level': state.level = data.level != null ? data.level : state.level; break;
+      case 'ctl_arcade_end_level':     break;
+
+      case 'ctl_arcade_save_score': {
+        var score = Number(data.score) || 0;
+        if (!$('loggedIn').checked) {
+          resp.success = false; resp.error = 'not_authenticated'; resp.isPersonalBest = false;
+          pill = { cls: 'no', text: 'sign-in required' };
+        } else {
+          state.scores++;
+          var pb = state.best == null || score > state.best;
+          if (pb) state.best = score;
+          resp.score = score; resp.isPersonalBest = pb;
+          pill = { cls: 'ok', text: pb ? 'personal best!' : 'saved' };
+        }
+        break;
+      }
+
+      case 'ctl_arcade_show_interlevel_ad': {
+        if ($('vip').checked) { resp.skipped = true; resp.ad_code = null; pill = { cls: 'ok', text: 'skipped (VIP)' }; }
+        else { resp.ad_code = '<!-- mock interlevel ad: ' + (data.placement || 'default') + ' -->'; pill = { cls: 'ok', text: 'ad shown' }; }
+        break;
+      }
+      case 'ctl_arcade_share_event': break;
+    }
+
+    refreshState();
+    win.postMessage(resp, '*');
+    add('out', respType, resp, pill);
+  }
+
+  window.addEventListener('message', function (e) {
+    var d = e.data;
+    if (!d || typeof d !== 'object' || d.source !== SOURCE) return;
+    handle(d, e.source || (frame.contentWindow));
+  });
+
+  // ---- loading / reload ----
+  var frame = $('game'), frameWrap = $('frameWrap'), empty = $('empty'), badge = $('badge');
+  var pollTimer = null, lastModified = null;
+
+  function gameUrl() {
+    var p = $('gamePath').value.trim().replace(/^\/+|\/+$/g, '');
+    return '/' + p + '/index.html';
+  }
+
+  function load() {
+    var url = gameUrl();
+    frame.width = $('w').value; frame.height = $('h').value;
+    frame.src = url + '?_t=' + Date.now();
+    frameWrap.style.display = 'block'; empty.style.display = 'none';
+    badge.textContent = url + '  ·  ' + $('w').value + '×' + $('h').value;
+    // reset host state for a clean run
+    state.session = false; state.level = null;
+    refreshState();
+    lastModified = null;
+  }
+
+  function clearLog() {
+    state.events = 0; countEl.textContent = '0 events';
+    logEl.innerHTML = '<div class="empty-log">Cleared. Waiting for SDK calls…</div>';
+  }
+
+  // live-reload: poll the game's index.html Last-Modified, reload on change
+  function startPoll() {
+    stopPoll();
+    pollTimer = setInterval(async function () {
+      try {
+        var r = await fetch(gameUrl(), { method: 'HEAD', cache: 'no-store' });
+        var lm = r.headers.get('Last-Modified') || r.headers.get('ETag');
+        if (lastModified && lm && lm !== lastModified) { add('note', 'file changed → reload', { url: gameUrl() }); load(); }
+        lastModified = lm || lastModified;
+      } catch (_) { /* server not running / file:// — ignore */ }
+    }, 1000);
+  }
+  function stopPoll() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
+
+  $('load').addEventListener('click', load);
+  $('clear').addEventListener('click', clearLog);
+  $('gamePath').addEventListener('keydown', function (e) { if (e.key === 'Enter') load(); });
+  $('autoreload').addEventListener('change', function (e) { e.target.checked ? startPoll() : stopPoll(); });
+
+  // deep-link: arcade-host.html?game=games/grin-coin-counter&w=800&h=600
+  var qs = new URLSearchParams(location.search);
+  if (qs.get('game')) $('gamePath').value = qs.get('game');
+  if (qs.get('w')) $('w').value = qs.get('w');
+  if (qs.get('h')) $('h').value = qs.get('h');
+  if (qs.has('autoload') || qs.get('game')) load();
+
+  refreshState();
+})();
+</script>
+</body>
+</html>

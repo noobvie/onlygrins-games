@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#143226"/>
+      <stop offset="1" stop-color="#0c1a14"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.0" r="0.9">
+      <stop offset="0" stop-color="#1d4a36"/>
+      <stop offset="1" stop-color="#0c1a14" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <rect width="800" height="450" fill="url(#glow)"/>
+
+  <!-- title -->
+  <text x="56" y="120" fill="#e8fff4" font-size="56" font-weight="800">Grin Coin Counter</text>
+  <text x="58" y="162" fill="#9fc7b3" font-size="24" font-weight="500">Add the coins to hit the target — ツ math!</text>
+
+  <!-- target chip -->
+  <g filter="url(#sh)">
+    <rect x="56" y="196" rx="14" ry="14" width="250" height="64" fill="#11271d" stroke="#1f4634" stroke-width="2"/>
+    <text x="78" y="237" fill="#9fc7b3" font-size="20">make</text>
+    <text x="150" y="240" fill="#ffcc66" font-size="34" font-weight="800">16.50</text>
+    <text x="262" y="240" fill="#5ee0a0" font-size="28" font-weight="800">ツ</text>
+  </g>
+
+  <!-- coins -->
+  <g filter="url(#sh)">
+    <!-- 10 -->
+    <circle cx="560" cy="150" r="62" fill="#f4c64a" stroke="#0c1a14" stroke-width="4"/>
+    <text x="560" y="150" fill="#0c1a14" font-size="34" font-weight="800" text-anchor="middle">10</text>
+    <text x="560" y="180" fill="#0c1a14" font-size="18" font-weight="700" text-anchor="middle" opacity="0.85">ツ</text>
+    <!-- 5 -->
+    <circle cx="678" cy="220" r="54" fill="#f0992e" stroke="#0c1a14" stroke-width="4"/>
+    <text x="678" y="220" fill="#0c1a14" font-size="30" font-weight="800" text-anchor="middle">5</text>
+    <text x="678" y="247" fill="#0c1a14" font-size="16" font-weight="700" text-anchor="middle" opacity="0.85">ツ</text>
+    <!-- 1 -->
+    <circle cx="520" cy="288" r="48" fill="#5ee0a0" stroke="#0c1a14" stroke-width="4"/>
+    <text x="520" y="289" fill="#0c1a14" font-size="28" font-weight="800" text-anchor="middle">1</text>
+    <text x="520" y="313" fill="#0c1a14" font-size="15" font-weight="700" text-anchor="middle" opacity="0.85">ツ</text>
+    <!-- 0.5 -->
+    <circle cx="620" cy="330" r="42" fill="#7fb6ff" stroke="#0c1a14" stroke-width="4"/>
+    <text x="620" y="330" fill="#0c1a14" font-size="22" font-weight="800" text-anchor="middle">0.5</text>
+    <text x="620" y="351" fill="#0c1a14" font-size="13" font-weight="700" text-anchor="middle" opacity="0.85">ツ</text>
+  </g>
+
+  <!-- footer tag -->
+  <g>
+    <rect x="56" y="372" rx="16" ry="16" width="232" height="40" fill="#0e2017" stroke="#1f4634" stroke-width="1.5"/>
+    <text x="76" y="398" fill="#5ee0a0" font-size="18" font-weight="700">＋  decimals · ages 9–11</text>
+  </g>
+</svg>

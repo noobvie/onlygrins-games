@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Starter Game — OnlyGrins</title>
+
+<!-- Platform SDK: absolute path the OnlyGrins arcade serves. When absent
+     (opened as a plain file, or during local dev) the game still plays — the
+     helper below no-ops scoring gracefully. -->
+<script src="/sdk/arcade-sdk.js"></script>
+<!-- Our helper, bundled WITH the game (relative) so it works everywhere:
+     file:// double-click, the dev host, and the real platform. -->
+<script src="edu-sdk.js"></script>
+
+<style>
+  :root { --bg:#0c1a14; --card:#11271d; --line:#1f4634; --grin:#5ee0a0; --grin-dim:#2f6e52; --text:#e8fff4; --muted:#9fc7b3; --bad:#ff7a7a; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; }
+  body {
+    background: radial-gradient(120% 120% at 50% 0%, #143226 0%, var(--bg) 60%);
+    color:var(--text); font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    display:flex; align-items:center; justify-content:center; min-height:100%; padding:24px;
+  }
+  .card {
+    width:min(620px,100%); background:var(--card); border:1px solid var(--line);
+    border-radius:16px; padding:28px 30px; box-shadow:0 18px 50px rgba(0,0,0,.45);
+  }
+  .top { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+  .top .logo { font-size:22px; }
+  .top h1 { font-size:16px; margin:0; font-weight:600; letter-spacing:.3px; }
+  .top .spacer { flex:1; }
+  .top .score { font:13px ui-monospace,Consolas,monospace; color:var(--muted); }
+  .top .score b { color:var(--grin); }
+
+  .progress { display:flex; gap:6px; margin-bottom:22px; }
+  .progress span { height:5px; flex:1; border-radius:5px; background:#173425; }
+  .progress span.done { background:var(--grin); }
+  .progress span.cur { background:var(--grin-dim); }
+
+  .q { font-size:21px; font-weight:600; margin:0 0 20px; }
+  .opts { display:grid; gap:11px; }
+  .opt {
+    text-align:left; background:#0e2017; color:var(--text); border:1px solid var(--line);
+    border-radius:11px; padding:14px 16px; font-size:15px; cursor:pointer; transition:.12s;
+  }
+  .opt:hover:not(:disabled) { border-color:var(--grin-dim); transform:translateY(-1px); }
+  .opt:disabled { cursor:default; opacity:.9; }
+  .opt.right { border-color:var(--grin); background:#103b29; }
+  .opt.wrong { border-color:var(--bad); background:#3a1717; }
+
+  .explain { margin-top:16px; padding:13px 15px; border-left:3px solid var(--grin-dim);
+    background:#0e2017; border-radius:8px; color:var(--muted); font-size:14px; display:none; }
+  .explain.show { display:block; }
+
+  .foot { margin-top:22px; display:flex; align-items:center; gap:12px; }
+  .foot .spacer { flex:1; }
+  button.next {
+    background:var(--grin-dim); color:#eafff4; border:1px solid var(--grin);
+    border-radius:10px; padding:11px 20px; font-size:15px; cursor:pointer; font-weight:600;
+  }
+  button.next:disabled { opacity:.4; cursor:not-allowed; }
+  .hosted { font:12px ui-monospace,Consolas,monospace; color:var(--muted); }
+  .hosted b { color:var(--grin); }
+
+  /* final screen */
+  .final { text-align:center; }
+  .final .big { font-size:44px; font-weight:700; color:var(--grin); margin:6px 0; }
+  .final p { color:var(--muted); }
+  .final .pb { color:var(--grin); font-weight:600; }
+</style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="top">
+      <span class="logo">🎓</span>
+      <h1>Quiz Template — replace these questions</h1>
+      <span class="spacer"></span>
+      <span class="score">score <b id="scoreVal">0</b></span>
+    </div>
+    <div class="progress" id="progress"></div>
+    <div id="stage"></div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---- content: swap these out for your own lesson (sample kid quiz) ----
+  var QUESTIONS = [
+    {
+      q: 'What is 7 × 8?',
+      opts: ['54', '56', '63', '49'],
+      answer: 1,
+      why: '7 × 8 = 56. Tip: 7 × 8 is the same as 8 + 8 + 8 + 8 + 8 + 8 + 8.'
+    },
+    {
+      q: 'Which of these is a living thing?',
+      opts: ['A rock', 'A bicycle', 'An oak tree', 'A cloud'],
+      answer: 2,
+      why: 'A tree grows, needs water and sunlight, and makes seeds — so it is living.'
+    },
+    {
+      q: 'Which word is spelled correctly?',
+      opts: ['freind', 'frend', 'friend', 'friynd'],
+      answer: 2,
+      why: '"friend" — remember the rhyme: a friend is there to the end ("...end").'
+    }
+  ];
+  var POINTS_RIGHT = 100;
+
+  // ---- state ----
+  var i = 0, score = 0, answered = false;
+  var stage = document.getElementById('stage');
+  var progressEl = document.getElementById('progress');
+  var scoreVal = document.getElementById('scoreVal');
+
+  function renderProgress() {
+    progressEl.innerHTML = '';
+    QUESTIONS.forEach(function (_, idx) {
+      var s = document.createElement('span');
+      s.className = idx < i ? 'done' : (idx === i ? 'cur' : '');
+      progressEl.appendChild(s);
+    });
+  }
+
+  function renderQuestion() {
+    answered = false;
+    renderProgress();
+    var item = QUESTIONS[i];
+    EduSDK.startLesson(i + 1, { question: item.q }); // ← SDK: level start
+
+    var opts = item.opts.map(function (o, idx) {
+      return '<button class="opt" data-idx="' + idx + '">' + o + '</button>';
+    }).join('');
+
+    stage.innerHTML =
+      '<p class="q">' + item.q + '</p>' +
+      '<div class="opts">' + opts + '</div>' +
+      '<div class="explain" id="explain">' + item.why + '</div>' +
+      '<div class="foot">' +
+        '<span class="hosted" id="hosted"></span>' +
+        '<span class="spacer"></span>' +
+        '<button class="next" id="next" disabled>' + (i === QUESTIONS.length - 1 ? 'Finish ▸' : 'Next ▸') + '</button>' +
+      '</div>';
+
+    document.getElementById('hosted').innerHTML =
+      EduSDK.isHosted() ? 'SDK: <b>connected</b> — calls go to the host →' : 'SDK: standalone (scoring no-ops)';
+
+    Array.prototype.forEach.call(stage.querySelectorAll('.opt'), function (btn) {
+      btn.addEventListener('click', function () { choose(Number(btn.dataset.idx)); });
+    });
+    document.getElementById('next').addEventListener('click', nextQuestion);
+  }
+
+  function choose(idx) {
+    if (answered) return;
+    answered = true;
+    var item = QUESTIONS[i];
+    var btns = stage.querySelectorAll('.opt');
+    Array.prototype.forEach.call(btns, function (b) { b.disabled = true; });
+    btns[item.answer].classList.add('right');
+    if (idx !== item.answer) {
+      btns[idx].classList.add('wrong');
+    } else {
+      score += POINTS_RIGHT;
+      scoreVal.textContent = score;
+    }
+    document.getElementById('explain').classList.add('show');
+    document.getElementById('next').disabled = false;
+    EduSDK.finishLesson(i + 1, { correct: idx === item.answer, choice: idx }); // ← SDK: level end
+  }
+
+  function nextQuestion() {
+    if (i < QUESTIONS.length - 1) {
+      i++;
+      EduSDK.adBreak('interlevel').then(renderQuestion); // ← SDK: optional ad between questions
+    } else {
+      finish();
+    }
+  }
+
+  function finish() {
+    renderProgress();
+    Array.prototype.forEach.call(progressEl.children, function (c) { c.className = 'done'; });
+    stage.innerHTML =
+      '<div class="final">' +
+        '<p>Quiz complete!</p>' +
+        '<div class="big">' + score + '</div>' +
+        '<p>out of ' + (QUESTIONS.length * POINTS_RIGHT) + ' points</p>' +
+        '<p id="result">Saving your score…</p>' +
+      '</div>';
+
+    EduSDK.submitScore(score, { quiz: 'sample', questions: QUESTIONS.length }) // ← SDK: save score
+      .then(function (res) {
+        var el = document.getElementById('result');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — added to the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — score not saved (play on OnlyGrins to compete).';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.'
+            : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); }); // ← SDK: end session
+  }
+
+  // ---- boot ----
+  EduSDK.begin({ game: 'starter-game' }).then(renderQuestion); // ← SDK: start session
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grin Coin Counter</title>
+
+<!-- Platform SDK: absolute path the OnlyGrins arcade serves. When absent
+     (opened as a plain file, or during local dev) the game still plays — the
+     helper below no-ops scoring gracefully. -->
+<script src="/sdk/arcade-sdk.js"></script>
+<!-- Our helper, bundled WITH the game (relative) so it works everywhere:
+     file:// double-click, the dev host, and the real platform. -->
+<script src="edu-sdk.js"></script>
+
+<style>
+  :root { --bg:#0c1a14; --panel:#11271d; --panel2:#0e2017; --line:#1f4634; --grin:#5ee0a0;
+          --grin-dim:#2f6e52; --text:#e8fff4; --muted:#9fc7b3; --warn:#ffcc66; --bad:#ff7a7a; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; height:100%; overflow:hidden; }
+  body {
+    background: radial-gradient(120% 120% at 50% 0%, #143226 0%, var(--bg) 60%);
+    color:var(--text); font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; user-select:none;
+    display:flex; align-items:center; justify-content:center; height:100vh;
+  }
+  #game { width:min(900px,100%); height:100%; display:flex; flex-direction:column; padding:14px 18px; }
+
+  /* HUD */
+  .hud { display:flex; align-items:center; gap:14px; }
+  .hud .chip { font:700 14px ui-monospace,Consolas,monospace; background:var(--panel); border:1px solid var(--line);
+               border-radius:20px; padding:6px 14px; }
+  .hud .chip b { color:var(--grin); }
+  .hud .spacer { flex:1; }
+  .dots { display:flex; gap:5px; }
+  .dots i { width:9px; height:9px; border-radius:50%; background:#173425; display:block; }
+  .dots i.done { background:var(--grin); } .dots i.cur { background:var(--grin-dim); }
+
+  /* target */
+  .target { text-align:center; margin:14px 0 8px; }
+  .target .lbl { color:var(--muted); font-size:14px; }
+  .target .amt { font-size:46px; font-weight:800; color:var(--warn); letter-spacing:.5px; }
+  .target .amt .u { font-size:30px; color:var(--grin); margin-left:6px; }
+
+  /* basket / progress */
+  .basket { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px 16px; }
+  .basket .row { display:flex; align-items:baseline; gap:8px; }
+  .basket .have { font:700 22px ui-monospace,monospace; }
+  .basket .have b { color:var(--grin); }
+  .basket .need { color:var(--muted); font-size:13px; margin-left:auto; }
+  .bar { height:10px; border-radius:8px; background:#0c1a14; margin-top:9px; overflow:hidden; }
+  .bar > div { height:100%; width:0; background:linear-gradient(90deg,var(--grin-dim),var(--grin)); transition:width .2s; }
+  .bar.over > div { background:linear-gradient(90deg,#b35,var(--bad)); }
+  .picked { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; min-height:26px; }
+  .picked .p { font:700 12px ui-monospace,monospace; background:var(--panel2); border:1px solid var(--line);
+               border-radius:16px; padding:3px 9px; cursor:pointer; }
+  .picked .p:hover { border-color:var(--bad); color:var(--bad); }
+  .picked .empty { color:var(--muted); font-size:13px; }
+
+  /* coin tray */
+  .tray { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:16px 0; }
+  .coin {
+    width:90px; height:90px; border-radius:50%; border:3px solid; cursor:pointer; color:#0c1a14;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:800;
+    transition:transform .08s; box-shadow:0 6px 0 #0006;
+  }
+  .coin:active { transform:translateY(3px); box-shadow:0 3px 0 #0006; }
+  .coin .v { font-size:21px; } .coin .u { font-size:13px; opacity:.85; margin-top:-2px; }
+
+  .controls { display:flex; gap:10px; justify-content:center; margin-top:auto; padding-top:8px; }
+  button.btn { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:11px;
+               padding:11px 18px; font-size:15px; font-weight:600; cursor:pointer; }
+  button.btn.primary { background:var(--grin-dim); border-color:var(--grin); color:#eafff4; }
+  button.btn:disabled { opacity:.4; cursor:not-allowed; }
+  .msg { text-align:center; min-height:22px; margin-top:8px; font-weight:600; }
+  .msg.good { color:var(--grin); } .msg.bad { color:var(--bad); } .msg.hint { color:var(--muted); font-weight:400; }
+
+  /* overlays */
+  .screen { position:fixed; inset:0; z-index:10; display:flex; align-items:center; justify-content:center;
+            padding:24px; background:#0c1a14e0; backdrop-filter:blur(2px); }
+  .card { width:min(560px,100%); background:var(--panel); border:1px solid var(--line); border-radius:16px;
+          padding:30px; text-align:center; box-shadow:0 18px 50px #0008; }
+  .card h1 { margin:0 0 8px; font-size:25px; }
+  .card p { color:var(--muted); margin:8px 0; }
+  .fact { background:var(--panel2); border-left:3px solid var(--grin-dim); border-radius:8px; padding:12px 14px;
+          text-align:left; font-size:14px; color:var(--muted); margin:16px 0; }
+  .fact b { color:var(--grin); }
+  button.go { margin-top:8px; background:var(--grin-dim); color:#eafff4; border:1px solid var(--grin);
+              border-radius:12px; padding:13px 30px; font-size:17px; font-weight:700; cursor:pointer; }
+  .big { font-size:46px; font-weight:800; color:var(--grin); margin:4px 0; }
+  .result { color:var(--muted); min-height:22px; } .result .pb { color:var(--grin); font-weight:700; }
+  .sdk { font:12px ui-monospace,monospace; color:var(--muted); margin-top:12px; } .sdk b { color:var(--grin); }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="hud">
+    <span class="chip">round <b id="round">1</b>/8</span>
+    <span class="chip">score <b id="score">0</b></span>
+    <span class="spacer"></span>
+    <span class="dots" id="dots"></span>
+  </div>
+
+  <div class="target">
+    <div class="lbl">make exactly</div>
+    <div class="amt"><span id="targetVal">0</span><span class="u">ツ</span></div>
+  </div>
+
+  <div class="basket">
+    <div class="row">
+      <span class="have">you have <b id="haveVal">0</b> ツ</span>
+      <span class="need" id="needVal"></span>
+    </div>
+    <div class="bar" id="bar"><div></div></div>
+    <div class="picked" id="picked"><span class="empty">tap coins below to add them up…</span></div>
+  </div>
+
+  <div class="tray" id="tray"></div>
+
+  <div class="msg hint" id="msg">Pick coins that add up to the target. Tap a coin in your basket to remove it.</div>
+
+  <div class="controls">
+    <button class="btn" id="clearBtn">Clear</button>
+    <button class="btn primary" id="checkBtn" disabled>Check ✓</button>
+  </div>
+</div>
+
+<!-- start -->
+<div class="screen" id="startScreen">
+  <div class="card">
+    <h1>🪙 Grin Coin Counter</h1>
+    <p>Add up grin coins (<b style="color:var(--grin)">ツ</b>) to match the target amount — exactly!</p>
+    <p>It gets trickier each round: whole grin → tenths → hundredths. Fewer coins, bigger bonus.</p>
+    <div class="fact">💡 <b>Fun fact:</b> a grin can be split into tiny pieces — all the way down to one
+      <b>nanogrin</b> = 0.000000001 ツ (that's a billionth!). Today we'll count down to the hundredth.</div>
+    <button class="go" id="startBtn">Start ▸</button>
+    <div class="sdk" id="sdkState"></div>
+  </div>
+</div>
+
+<!-- end -->
+<div class="screen" id="endScreen" style="display:none">
+  <div class="card">
+    <h1>Nice counting! 🎉</h1>
+    <div class="big" id="finalScore">0</div>
+    <p>rounds solved: <b id="solved">0</b>/8 · perfect (first try): <b id="perfect">0</b></p>
+    <p class="result" id="result"></p>
+    <button class="go" id="againBtn">Play again ▸</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+
+  // Work in integer MILLIGRIN (1 grin = 1000) to avoid decimal rounding bugs.
+  var MILLI = 1000, ROUNDS = 8;
+
+  // coin denominations (milligrin) + colors
+  var COINS = {
+    10000: '#f4c64a', 5000: '#f0992e', 2000: '#54c6c0', 1000: '#5ee0a0',
+    500: '#7fb6ff', 250: '#c792ea', 100: '#9b8cff', 50: '#ef8fc0', 10: '#cfd8e0'
+  };
+  var WHOLE = [10000, 5000, 2000, 1000];
+  var TENTHS = [500, 100];
+  var HUNDREDTHS = [250, 50, 10];
+
+  // 8 rounds: ramp difficulty + precision
+  function roundConfig(i) {
+    if (i < 2) return { decimals: 0, coins: WHOLE, step: 1000, lo: 3, hi: 12 };          // whole grin
+    if (i < 4) return { decimals: 1, coins: WHOLE.concat(TENTHS), step: 100, lo: 25, hi: 99 };  // tenths
+    if (i < 6) return { decimals: 2, coins: WHOLE.concat(TENTHS, [250, 50]), step: 50, lo: 25, hi: 159 }; // 0.05 steps
+    return { decimals: 2, coins: WHOLE.concat(TENTHS, HUNDREDTHS), step: 50, lo: 20, hi: 120 }; // cents available
+  }
+
+  var state;
+
+  function fmt(units, decimals) { return (units / MILLI).toFixed(decimals); }
+
+  function randInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+
+  function newRound() {
+    var cfg = roundConfig(state.round);
+    state.cfg = cfg;
+    state.target = randInt(cfg.lo, cfg.hi) * cfg.step; // multiple of step → always solvable
+    state.basket = [];
+    state.attempts = 0;
+
+    $('round').textContent = state.round + 1;
+    $('targetVal').textContent = fmt(state.target, cfg.decimals);
+    renderDots();
+    renderTray();
+    renderBasket();
+    setMsg('hint', 'Pick coins that add up to ' + fmt(state.target, cfg.decimals) + ' ツ.');
+    EduSDK.startLesson(state.round + 1, { target: state.target / MILLI }); // SDK: round/level start
+  }
+
+  function renderDots() {
+    var html = '';
+    for (var i = 0; i < ROUNDS; i++) html += '<i class="' + (i < state.round ? 'done' : (i === state.round ? 'cur' : '')) + '"></i>';
+    $('dots').innerHTML = html;
+  }
+
+  function renderTray() {
+    $('tray').innerHTML = '';
+    state.cfg.coins.forEach(function (u) {
+      var c = document.createElement('button');
+      c.className = 'coin';
+      c.style.background = COINS[u];
+      c.style.borderColor = '#0c1a14';
+      c.innerHTML = '<span class="v">' + fmt(u, state.cfg.decimals) + '</span><span class="u">ツ</span>';
+      c.addEventListener('click', function () { addCoin(u); });
+      $('tray').appendChild(c);
+    });
+  }
+
+  function total() { return state.basket.reduce(function (s, u) { return s + u; }, 0); }
+
+  function renderBasket() {
+    var t = total(), dec = state.cfg.decimals;
+    $('haveVal').textContent = fmt(t, dec);
+    var diff = state.target - t;
+    $('needVal').textContent = diff > 0 ? ('need ' + fmt(diff, dec) + ' ツ more')
+                              : diff < 0 ? ('over by ' + fmt(-diff, dec) + ' ツ') : 'exact!';
+    var pct = Math.min(100, Math.round(t / state.target * 100));
+    $('bar').firstElementChild.style.width = pct + '%';
+    $('bar').classList.toggle('over', t > state.target);
+
+    var p = $('picked');
+    if (!state.basket.length) { p.innerHTML = '<span class="empty">tap coins below to add them up…</span>'; }
+    else {
+      p.innerHTML = '';
+      state.basket.forEach(function (u, idx) {
+        var chip = document.createElement('span');
+        chip.className = 'p'; chip.textContent = fmt(u, dec) + ' ✕';
+        chip.title = 'remove';
+        chip.addEventListener('click', function () { removeCoin(idx); });
+        p.appendChild(chip);
+      });
+    }
+    $('checkBtn').disabled = t === 0;
+  }
+
+  function addCoin(u) { state.basket.push(u); renderBasket(); }
+  function removeCoin(idx) { state.basket.splice(idx, 1); renderBasket(); }
+
+  function setMsg(kind, text) { var m = $('msg'); m.className = 'msg ' + kind; m.textContent = text; }
+
+  function check() {
+    var t = total(), dec = state.cfg.decimals;
+    state.attempts++;
+    if (t === state.target) {
+      var firstTry = state.attempts === 1;
+      var fewCoins = state.basket.length <= minCoins(state.target, state.cfg.coins);
+      var pts = 100 + (firstTry ? 50 : 0) + (fewCoins ? 50 : 0);
+      state.score += pts; state.solved++; if (firstTry) state.perfect++;
+      $('score').textContent = state.score;
+      var bonus = (firstTry ? ' first try!' : '') + (fewCoins ? ' fewest coins!' : '');
+      setMsg('good', '✓ Correct! +' + pts + bonus);
+      EduSDK.finishLesson(state.round + 1, { correct: true, attempts: state.attempts }); // SDK: level end
+      state.round++;
+      setTimeout(function () { state.round >= ROUNDS ? endGame() : newRound(); }, 1100);
+    } else if (t > state.target) {
+      setMsg('bad', 'Too much by ' + fmt(t - state.target, dec) + ' ツ — basket cleared, try again.');
+      state.basket = []; renderBasket();
+    } else {
+      setMsg('bad', 'Not enough — add ' + fmt(state.target - t, dec) + ' ツ more.');
+    }
+  }
+
+  // smallest number of coins to make `target` from `coins` (greedy works for these denominations)
+  function minCoins(target, coins) {
+    var sorted = coins.slice().sort(function (a, b) { return b - a; }), n = 0, rem = target;
+    sorted.forEach(function (c) { while (rem >= c) { rem -= c; n++; } });
+    return rem === 0 ? n : 999;
+  }
+
+  function startGame() {
+    state = { round: 0, score: 0, solved: 0, perfect: 0 };
+    $('score').textContent = '0';
+    $('startScreen').style.display = 'none';
+    $('endScreen').style.display = 'none';
+    newRound();
+  }
+
+  function endGame() {
+    $('finalScore').textContent = state.score;
+    $('solved').textContent = state.solved;
+    $('perfect').textContent = state.perfect;
+    $('result').textContent = 'Saving your score…';
+    $('endScreen').style.display = 'flex';
+    EduSDK.submitScore(state.score, { game: 'grin-coin-counter', solved: state.solved, perfect: state.perfect }) // SDK: save score
+      .then(function (res) {
+        var el = $('result');
+        if (res && res.success) el.innerHTML = res.isPersonalBest ? '<span class="pb">🏆 New personal best!</span>' : 'Saved to the leaderboard.';
+        else if (res && res.offline) el.textContent = 'Standalone mode — play on OnlyGrins to save your score.';
+        else el.textContent = (res && res.error === 'not_authenticated') ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+      });
+  }
+
+  // wiring
+  $('checkBtn').addEventListener('click', check);
+  $('clearBtn').addEventListener('click', function () { if (state) { state.basket = []; renderBasket(); setMsg('hint', 'Basket cleared.'); } });
+  $('startBtn').addEventListener('click', function () { EduSDK.adBreak('pre-game').then(startGame); }); // SDK: optional ad
+  $('againBtn').addEventListener('click', function () { EduSDK.adBreak('interlevel').then(startGame); });
+
+  EduSDK.begin({ game: 'grin-coin-counter' }).then(function () { // SDK: start session
+    $('sdkState').innerHTML = EduSDK.isHosted() ? 'SDK: <b>connected</b>' : 'SDK: standalone (scoring no-ops)';
+  });
+  window.addEventListener('pagehide', function () { EduSDK.end(); }); // SDK: end session
+})();
+</script>
+</body>
+</html>

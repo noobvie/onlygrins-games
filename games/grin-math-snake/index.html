@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Grin Math Snake — OnlyGrins</title>
+
+<!-- Platform SDK (absolute path the arcade serves). Absent when opened as a
+     bare file or in local dev — the helper below no-ops scoring gracefully. -->
+<script src="/sdk/arcade-sdk.js"></script>
+<!-- Our helper, bundled WITH the game so it works everywhere. -->
+<script src="edu-sdk.js"></script>
+
+<style>
+  :root{
+    --add:#3ee87a; --sub:#ff8a5c; --mul:#c77dff; --div:#5ad8ff;
+    --ink:#f4fbff; --muted:#bfe6ff;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;overflow:hidden;background:#0a0a1f;
+    font-family:"Baloo 2",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink); user-select:none;}
+  #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+  /* the play field keeps a 16:9 box, scaled to fit any screen */
+  #stage{position:relative;width:100%;max-width:177.78vh;max-height:100vh;aspect-ratio:16/9;}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block;border-radius:14px;
+    box-shadow:0 0 0 2px rgba(255,255,255,.06), 0 30px 80px rgba(0,0,0,.6);}
+
+  /* ---------- HUD ---------- */
+  .hud{position:absolute;inset:0;pointer-events:none;font-weight:700;}
+  .hud .row{position:absolute;left:0;right:0;display:flex;align-items:center;
+    justify-content:space-between;padding:14px 20px;gap:12px;}
+  .pill{background:rgba(8,12,40,.55);backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,.16);
+    border-radius:999px;padding:7px 15px;font-size:clamp(13px,2.2vh,20px);display:flex;align-items:center;gap:8px;
+    text-shadow:0 2px 8px rgba(0,0,0,.5);white-space:nowrap;}
+  .pill .lbl{color:var(--muted);font-weight:600;font-size:.8em;}
+  #lives{letter-spacing:2px;font-size:clamp(15px,2.6vh,24px);}
+
+  /* big bouncy target */
+  #targetWrap{position:absolute;top:9%;left:50%;transform:translateX(-50%);text-align:center;}
+  #targetWrap .cap{font-size:clamp(12px,2vh,18px);color:var(--muted);letter-spacing:3px;font-weight:600;}
+  #target{font-size:clamp(40px,11vh,110px);line-height:1;font-weight:800;
+    background:linear-gradient(180deg,#fff,#9be7ff);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 18px rgba(120,220,255,.55));}
+  #target.pop{animation:pop .35s ease;}
+  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
+
+  /* level timer bar */
+  #timerBar{position:absolute;left:0;bottom:0;height:7px;width:100%;
+    background:linear-gradient(90deg,var(--add),var(--div));transform-origin:left;
+    box-shadow:0 0 16px rgba(90,216,255,.7);border-radius:0 0 14px 14px;transition:transform .12s linear;}
+
+  /* race result banner */
+  #banner{position:absolute;top:44%;left:50%;transform:translate(-50%,-50%) scale(.7);
+    font-size:clamp(28px,7vh,66px);font-weight:800;opacity:0;text-align:center;pointer-events:none;
+    text-shadow:0 4px 22px rgba(0,0,0,.65);}
+  #banner.show{animation:banner 1.5s ease forwards;}
+  @keyframes banner{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}
+    18%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}
+    75%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+
+  /* ---------- overlays ---------- */
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;gap:18px;background:rgba(6,8,30,.72);backdrop-filter:blur(4px);border-radius:14px;
+    padding:24px;pointer-events:auto;}
+  .screen.hidden{display:none;}
+  .title{font-size:clamp(34px,9vh,84px);font-weight:800;line-height:.95;
+    background:linear-gradient(90deg,#3ee87a,#5ad8ff,#c77dff,#ff8a5c);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 4px 22px rgba(120,200,255,.45));animation:hue 8s linear infinite;}
+  @keyframes hue{to{filter:drop-shadow(0 4px 22px rgba(120,200,255,.45)) hue-rotate(360deg);}}
+  .sub{font-size:clamp(15px,2.6vh,22px);color:var(--muted);max-width:32ch;font-weight:600;line-height:1.45;}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:clamp(13px,2.2vh,18px);}
+  .chip{padding:6px 13px;border-radius:999px;font-weight:800;color:#06122a;box-shadow:0 6px 18px rgba(0,0,0,.35);}
+  .btn{pointer-events:auto;cursor:pointer;border:none;font-family:inherit;font-weight:800;
+    font-size:clamp(18px,3.4vh,28px);color:#06122a;padding:14px 38px;border-radius:999px;
+    background:linear-gradient(180deg,#7dffb0,#3ee87a);box-shadow:0 10px 0 #1f9c57,0 18px 30px rgba(0,0,0,.4);
+    transition:transform .08s, box-shadow .08s;}
+  .btn:active{transform:translateY(6px);box-shadow:0 4px 0 #1f9c57,0 8px 16px rgba(0,0,0,.4);}
+  .btn.ghost{background:rgba(255,255,255,.12);color:var(--ink);box-shadow:0 6px 0 rgba(0,0,0,.3);
+    font-size:clamp(15px,2.6vh,20px);padding:10px 26px;}
+  .modes{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+  .modeBtn{pointer-events:auto;cursor:pointer;font-family:inherit;font-weight:800;
+    font-size:clamp(14px,2.4vh,19px);color:var(--ink);padding:10px 20px;border-radius:999px;
+    background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.18);transition:.12s;}
+  .modeBtn.sel{background:linear-gradient(180deg,#ffe27a,#ffc83d);color:#06122a;border-color:#fff;
+    box-shadow:0 0 0 3px rgba(255,210,90,.35);}
+  .grades{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:40ch;}
+  .gradeBtn{pointer-events:auto;cursor:pointer;border:none;font-family:inherit;font-weight:800;
+    color:#06122a;border-radius:18px;padding:14px 18px;min-width:130px;text-align:center;
+    box-shadow:0 9px 0 rgba(0,0,0,.32),0 14px 26px rgba(0,0,0,.35);transition:transform .08s,box-shadow .08s;}
+  .gradeBtn:active{transform:translateY(6px);box-shadow:0 3px 0 rgba(0,0,0,.32);}
+  .gradeBtn .g{font-size:clamp(18px,3vh,24px);line-height:1.1;}
+  .gradeBtn .b{font-size:clamp(11px,1.8vh,14px);font-weight:700;opacity:.8;}
+  .big{font-size:clamp(40px,9vh,72px);font-weight:800;color:#ffe27a;filter:drop-shadow(0 0 16px rgba(255,210,90,.5));}
+  .small{font-size:clamp(12px,2vh,15px);color:var(--muted);opacity:.8;font-weight:600;}
+  .small b{color:#9be7ff;}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage">
+  <canvas id="game"></canvas>
+
+  <div class="hud">
+    <div class="row" style="top:0">
+      <span class="pill"><span class="lbl">LEVEL</span><b id="level">1</b></span>
+      <span class="pill" id="lives">❤️❤️❤️</span>
+      <span class="pill"><span class="lbl">SCORE</span><b id="score">0</b></span>
+    </div>
+    <div id="targetWrap">
+      <div class="cap" id="targetCap">REACH</div>
+      <div id="target">15</div>
+    </div>
+    <div id="timerBar"></div>
+    <div id="banner"></div>
+  </div>
+
+  <!-- start screen -->
+  <div class="screen" id="startScreen">
+    <div class="title">Grin&nbsp;Math&nbsp;Snake</div>
+    <div class="sub">You are a grin-coin snake! Eat <b>+ − × ÷</b> tokens to make your number hit the <b>TARGET</b> — sometimes <b>grow up ▲</b> to it, sometimes <b>shrink down ▼</b> to it. Shoot past it and you lose a heart!</div>
+    <div class="legend">
+      <span class="chip" style="background:var(--add)">+ add</span>
+      <span class="chip" style="background:var(--sub)">− take</span>
+      <span class="chip" style="background:var(--mul)">× times</span>
+      <span class="chip" style="background:var(--div)">÷ share</span>
+    </div>
+    <div class="cap" style="color:var(--muted);letter-spacing:3px;font-size:clamp(12px,2vh,18px)">MODE</div>
+    <div class="modes" id="modeBtns">
+      <button class="modeBtn sel" data-mode="solo">🎯 Solo</button>
+      <button class="modeBtn" data-mode="race">🆚 Race the Grin-bot</button>
+    </div>
+    <div class="cap" style="color:var(--muted);letter-spacing:3px;font-size:clamp(12px,2vh,18px)">CHOOSE YOUR GRADE</div>
+    <div class="grades" id="gradeBtns"></div>
+    <div class="small">Steer with your <b>mouse / finger</b> or <b>arrow keys</b>. <span id="hostLine"></span></div>
+  </div>
+
+  <!-- game over screen -->
+  <div class="screen hidden" id="overScreen">
+    <div class="title" id="overTitle">Game Over</div>
+    <div class="big" id="overScore">0</div>
+    <div class="sub" id="overMsg">Nice math!</div>
+    <button class="btn" id="againBtn">▶ Play again</button>
+    <button class="btn ghost" id="changeBtn">Change grade</button>
+    <div class="small" id="saveLine">&nbsp;</div>
+  </div>
+</div></div>
+
+<script>
+(function(){
+'use strict';
+
+// ===================== setup / constants =====================
+var canvas = document.getElementById('game');
+var ctx = canvas.getContext('2d');
+var W = 1280, H = 720;            // internal resolution (16:9)
+canvas.width = W; canvas.height = H;
+
+var OPS = {
+  '+': {color:'#3ee87a', glow:'#9dffc6'},
+  '−': {color:'#ff8a5c', glow:'#ffc4a8'},
+  '×': {color:'#c77dff', glow:'#e6c6ff'},
+  '÷': {color:'#5ad8ff', glow:'#bfeeff'}
+};
+// Grade bands — SAME game, the chosen grade just swaps the operators,
+// number ranges and target cap. (Subject = catalog category; grade = in-game.)
+// `bot` = the soft AI opponent's difficulty for that grade. Weaker (slower,
+// longer reaction, more mistakes) for the younger grades so it stays beatable.
+//   speed = fraction of the player's speed · react = secs between decisions
+//   mistake = chance it grabs a sub-optimal token (wastes time, never chokes)
+var GRADES = [
+  { id:'1-2', label:'Grades 1–2', blurb:'+ and − to 20', color:'#3ee87a',
+    ops:['+','−'], cap:20, startMin:3, startMax:12, n:{'+':[1,9],'−':[1,6]},
+    bot:{ speed:0.78, react:1.4, mistake:0.5 } },
+  { id:'3',   label:'Grade 3',   blurb:'+ − × to 100',  color:'#5ad8ff',
+    ops:['+','−','×'], cap:100, startMin:4, startMax:30, n:{'+':[1,12],'−':[1,9],'×':[2,3]},
+    bot:{ speed:0.84, react:1.1, mistake:0.36 } },
+  { id:'4',   label:'Grade 4',   blurb:'+ − × ÷ to 200', color:'#c77dff',
+    ops:['+','−','×','÷'], cap:200, startMin:6, startMax:50, n:{'+':[1,12],'−':[1,9],'×':[2,4],'÷':[2,4]},
+    bot:{ speed:0.9, react:0.9, mistake:0.26 } },
+  { id:'5',   label:'Grade 5',   blurb:'all four, bigger', color:'#ff8a5c',
+    ops:['+','−','×','÷'], cap:300, startMin:8, startMax:80, n:{'+':[1,15],'−':[1,12],'×':[2,6],'÷':[2,6]},
+    bot:{ speed:0.94, react:0.72, mistake:0.18 } }
+];
+var grade = GRADES[2];   // default until the player picks (Grade 4)
+var mode = 'solo';       // 'solo' | 'race' (vs the Grin-bot)
+var bot = null;          // the AI opponent snake (race mode only)
+var SEG_GAP = 16;                 // px between body segments along the path
+var BASE_SPEED = 240;            // px/sec, grows a touch per level
+
+// ===================== audio (tiny, self-contained) =====================
+var AC = null;
+function beep(freq, dur, type, vol){
+  try{
+    if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)();
+    var o = AC.createOscillator(), g = AC.createGain();
+    o.type = type||'square'; o.frequency.value = freq;
+    g.gain.value = (vol==null?0.06:vol);
+    o.connect(g); g.connect(AC.destination);
+    var t = AC.currentTime; o.start(t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+(dur||0.12));
+    o.stop(t+(dur||0.12));
+  }catch(e){}
+}
+function sfxEat(){ beep(520,0.08,'square',0.05); beep(780,0.09,'square',0.04); }
+function sfxWin(){ [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){beep(f,0.13,'triangle',0.06);}, i*90); }); }
+function sfxBad(){ beep(180,0.22,'sawtooth',0.07); beep(120,0.28,'sawtooth',0.05); }
+
+// ===================== game state =====================
+var state = 'start';   // 'start' | 'play' | 'over'
+var level, score, lives, value, target, roundStart, dir, timeLeft, levelTime;
+var snake, tokens, particles, confetti, shake, aim, lastEatFlash;
+var keys = {};
+function randInt(a,b){ a=Math.ceil(a); b=Math.floor(b); if(b<a) b=a; return a+Math.floor(Math.random()*(b-a+1)); }
+
+function reset(){
+  level=1; score=0; lives=3;
+  particles=[]; confetti=[]; shake=0;
+  startLevel(true);
+}
+
+function startLevel(first){
+  var round = pickRound(level);
+  roundStart = round.start; target = round.target; dir = round.dir;
+  value = roundStart;
+  levelTime = Math.max(45, 90 - level*4);     // generous, eases off a little per level
+  timeLeft = levelTime;
+  tokens = [];
+  if(!snake || first){
+    snake = makeSnake(W/2, H*0.66, -Math.PI/2);
+  } else {
+    snake.x=W/2; snake.y=H*0.66; snake.angle=-Math.PI/2;
+    snake.path = [{x:snake.x, y:snake.y}];
+  }
+  if(mode==='race'){
+    if(!bot || first) bot = makeSnake(W/2, H*0.30, Math.PI/2);
+    bot.x=W/2; bot.y=H*0.30; bot.angle=Math.PI/2;
+    bot.path=[{x:bot.x, y:bot.y}];
+    bot.value=roundStart; bot.tok=null; bot.think=grade.bot.react*0.6;
+  }
+  for(var i=0;i<7;i++) spawnToken();
+  if(round.seed) spawnToken(round.seed.op, round.seed.n);   // put the elegant ×/÷ move on the board
+  ensureSolvable();
+  EduSDK.startLesson(level, {target:target, from:value, dir:dir, mode:mode});
+  syncHud(true);
+}
+
+// Build a round: a random START and TARGET, and a direction.
+//  dir +1 = GROW up to the target (+, × shine; −, ÷ are traps)
+//  dir -1 = SHRINK down to the target (−, ÷ shine; +, × overshoot)
+// Sometimes seeds the exact ×/÷ token so those operators are genuinely usable.
+function pickRound(lv){
+  var g=grade;
+  var ceil = Math.min(g.cap, Math.round(g.startMax + (g.cap-g.startMax)*Math.min(1,(lv+1)/8)));
+  var hasMul = g.ops.indexOf('×')>=0, hasDiv = g.ops.indexOf('÷')>=0;
+  var grow = Math.random() < 0.6;            // 60% grow, 40% shrink
+  var start, target, seed=null;
+  if(grow){
+    start = randInt(g.startMin, Math.max(g.startMin, Math.floor(ceil*0.5)));
+    if(hasMul && Math.random()<0.55){
+      var k = randInt(2, Math.max(2, Math.min(4, Math.floor(ceil/Math.max(2,start)))));
+      target = start*k;
+      if(target>start && target<=ceil) seed={op:'×', n:k}; else target = randInt(Math.min(start+3,ceil), ceil);
+    } else {
+      target = randInt(Math.min(start+3,ceil), ceil);
+    }
+  } else {
+    target = randInt(g.startMin, Math.max(g.startMin+1, Math.floor(ceil*0.4)));
+    if(hasDiv && Math.random()<0.6){
+      var d = randInt(2, 4);
+      start = target*d;
+      if(start<=ceil && start>target) seed={op:'÷', n:d}; else start = randInt(Math.min(target+3,ceil), ceil);
+    } else {
+      start = randInt(Math.min(target+3,ceil), ceil);
+    }
+  }
+  if(target===start) target = grow ? Math.min(ceil, start+3) : Math.max(1, start-3);
+  return { start:start, target:target, dir: grow?1:-1, seed:seed };
+}
+
+// ===================== snake =====================
+function makeSnake(x, y, angle){
+  return { x:x, y:y, angle:angle, path:[{x:x,y:y}], value:grade.startMin, tok:null, think:0 };
+}
+function snakeLen(val){ return 4 + Math.round(Math.min(val, 60)); } // segments grow with value
+
+// ===================== tokens =====================
+function spawnToken(forceOp, forceN){
+  var op = forceOp || randOp();
+  var n = (forceN!=null) ? forceN : pickN(op);
+  var t = {
+    op:op, n:n,
+    x: 80 + Math.random()*(W-160),
+    y: 150 + Math.random()*(H-260),
+    vx: (Math.random()*2-1)*40, vy:(Math.random()*2-1)*40,
+    r: 30, born: performance.now(), wobble: Math.random()*6.28
+  };
+  // don't spawn on top of the snake head
+  if(Math.hypot(t.x-snake.x, t.y-snake.y) < 160){ t.x = (t.x+W/2)%(W-160)+80; }
+  tokens.push(t);
+  return t;
+}
+function randOp(){ var pool = grade.ops.concat(['+']); return pool[Math.floor(Math.random()*pool.length)]; } // bias '+' to stay solvable
+function pickN(op){ var r = grade.n[op] || [1,9]; return r[0] + Math.floor(Math.random()*(r[1]-r[0]+1)); }
+function applyOp(v, op, n){
+  if(op==='+') return v+n;
+  if(op==='−') return v-n;
+  if(op==='×') return v*n;
+  if(op==='÷') return (v % n === 0) ? v/n : null; // null = doesn't divide evenly (choke)
+}
+// did result r shoot PAST the target (in the round's direction)?  → illegal
+function passed(r){ return dir>0 ? r>target : r<target; }
+// a legal move: integer, stays >0, doesn't pass the target
+function safeMove(v, op, n){ var r=applyOp(v,op,n); return r!==null && r>0 && !passed(r); }
+// a legal move that also gets CLOSER to the target (toward it in the round's dir)
+function progresses(v, op, n){ var r=applyOp(v,op,n); return r!==null && r>0 && !passed(r) && (dir>0 ? r>v : r<v); }
+
+// guarantee at least one token can make progress toward the target
+function ensureSolvable(){
+  if(value===target) return;
+  if(tokens.some(function(t){ return progresses(value,t.op,t.n); })) return;
+  // inject a guaranteed step: '+' when growing, '−' when shrinking
+  var op = dir>0 ? '+' : '−';
+  var need = Math.abs(target - value);
+  var k = need;
+  if(k>12){                                   // big gap → a partial step
+    var maxk = dir>0 ? 9 : Math.min(9, value-1);
+    k = randInt(1, Math.max(1, maxk));
+  }
+  tokens.sort(function(a,b){return a.born-b.born;});
+  var t = tokens[0] || spawnToken(op, k);
+  t.op=op; t.n=k; t.born=performance.now();
+}
+
+// ===================== input =====================
+function pointTo(cx,cy){ aim = {x:cx, y:cy}; }
+function relPos(e){
+  var rect = canvas.getBoundingClientRect();
+  var px = (e.touches?e.touches[0].clientX:e.clientX) - rect.left;
+  var py = (e.touches?e.touches[0].clientY:e.clientY) - rect.top;
+  return { x: px/rect.width*W, y: py/rect.height*H };
+}
+canvas.addEventListener('mousemove', function(e){ var p=relPos(e); pointTo(p.x,p.y); });
+canvas.addEventListener('touchstart', function(e){ e.preventDefault(); var p=relPos(e); pointTo(p.x,p.y); }, {passive:false});
+canvas.addEventListener('touchmove', function(e){ e.preventDefault(); var p=relPos(e); pointTo(p.x,p.y); }, {passive:false});
+window.addEventListener('keydown', function(e){ keys[e.key]=true; });
+window.addEventListener('keyup', function(e){ keys[e.key]=false; });
+
+// ===================== game flow =====================
+function loseHeart(reason){
+  lives--; sfxBad(); shake = 18; lastEatFlash = {bad:true, t:performance.now()};
+  syncHud();
+  burst(snake.x, snake.y, '#ff5c7a', 26);
+  if(lives<=0){ gameOver(); return; }
+  // reset this level's number so the puzzle is retry-able
+  value = roundStart;
+  timeLeft = levelTime;
+  ensureSolvable();
+}
+
+// a round ends when someone hits the target. playerWon=true → player got there
+// first (solo always); false → the Grin-bot beat you to it (race mode).
+function winRound(playerWon){
+  state='between';
+  if(playerWon){
+    sfxWin();
+    score += 200 + Math.round(timeLeft*8);   // base + time bonus
+    burst(snake.x, snake.y, '#ffe27a', 40);
+    rainConfetti();
+    banner(mode==='race' ? 'You beat the Grin-bot! 🏆' : 'Target! 🎉', '#ffe27a');
+    EduSDK.finishLesson(level, {target:target, score:score, mode:mode});
+    level++;                                 // win → ramp up
+  } else {
+    sfxBad(); shake=16; lives--; syncHud();
+    burst(bot.x, bot.y, '#9be7ff', 26);
+    banner('Grin-bot got there first! 🤖', '#9be7ff');
+    if(lives<=0){ setTimeout(gameOver, 700); return; }
+    // keep the same level (no ramp) — you'll get a fresh target to race for
+  }
+  setTimeout(function(){
+    EduSDK.adBreak('interlevel').then(function(){
+      if(state==='over') return;
+      startLevel(false);
+      state='play';
+    });
+  }, 750);
+}
+
+function eat(t){
+  var r = applyOp(value, t.op, t.n);
+  // remove token + spawn a fresh one to keep the field full
+  tokens.splice(tokens.indexOf(t),1);
+  spawnToken();
+
+  if(r===null){ loseHeart('choke'); pulseTarget(); return; }   // ÷ not even
+  if(r<=0){ loseHeart('zero'); return; }                       // wiped out
+  if(passed(r)){ loseHeart('overshoot'); return; }             // shot past the target
+
+  // safe move
+  value = r;
+  sfxEat();
+  score += 10;
+  burst(t.x, t.y, OPS[t.op].glow, 16);
+  syncHud();
+  ensureSolvable();
+  if(value===target){ pulseTarget(); winRound(true); }
+}
+
+// ===================== the soft AI opponent (Grin-bot) =====================
+// Picks a SAFE token (never chokes), steers to it, eats it. Weakness comes from
+// reaction delay, capped speed and a mistake chance — all tuned per grade.
+function botChoose(){
+  var cand=[];
+  tokens.forEach(function(t){
+    if(!safeMove(bot.value, t.op, t.n)) return;  // only ever consider legal moves
+    cand.push({t:t, r:applyOp(bot.value, t.op, t.n)});
+  });
+  if(!cand.length) return null;
+  if(Math.random() < grade.bot.mistake){
+    return cand[Math.floor(Math.random()*cand.length)].t;  // sub-optimal: wastes time
+  }
+  cand.sort(function(a,b){ return Math.abs(a.r-target)-Math.abs(b.r-target); }); // closest to target
+  return cand[0].t;
+}
+function botUpdate(dt){
+  var cfg=grade.bot;
+  bot.think -= dt;
+  // (re)choose a token to chase
+  if(!bot.tok || tokens.indexOf(bot.tok)<0 || bot.think<=0){
+    bot.tok = botChoose();
+    bot.think = cfg.react;
+  }
+  // steer toward the chosen token
+  if(bot.tok){
+    var desired = Math.atan2(bot.tok.y-bot.y, bot.tok.x-bot.x);
+    var d = desired - bot.angle;
+    while(d>Math.PI) d-=6.283; while(d<-Math.PI) d+=6.283;
+    var maxTurn = 3.6*dt; bot.angle += Math.max(-maxTurn, Math.min(maxTurn, d));
+  }
+  var sp = (BASE_SPEED + level*6) * cfg.speed;
+  bot.x += Math.cos(bot.angle)*sp*dt; bot.y += Math.sin(bot.angle)*sp*dt;
+  if(bot.x<0) bot.x+=W; if(bot.x>W) bot.x-=W;
+  if(bot.y<0) bot.y+=H; if(bot.y>H) bot.y-=H;
+  var bh=bot.path[0];
+  if(!bh || Math.hypot(bot.x-bh.x, bot.y-bh.y)>3) bot.path.unshift({x:bot.x,y:bot.y});
+  var maxP = snakeLen(bot.value)*SEG_GAP/3 + 40;
+  if(bot.path.length>maxP) bot.path.length=Math.floor(maxP);
+  // eat its target token
+  if(bot.tok && Math.hypot(bot.x-bot.tok.x, bot.y-bot.tok.y) < bot.tok.r+18){
+    var r=applyOp(bot.value, bot.tok.op, bot.tok.n);
+    var i=tokens.indexOf(bot.tok); if(i>=0){ tokens.splice(i,1); spawnToken(); }
+    bot.tok=null; bot.think=cfg.react;
+    if(r!==null && r>0 && !passed(r)){
+      bot.value=r;
+      burst(bot.x, bot.y, '#bfeeff', 10);
+      ensureSolvable();
+      if(bot.value===target){ winRound(false); }
+    }
+  }
+}
+
+function gameOver(){
+  state='over'; sfxBad();
+  document.getElementById('overScore').textContent = score;
+  document.getElementById('overTitle').textContent = level>3 ? 'Math Champ! 🏆' : 'Game Over';
+  document.getElementById('overMsg').textContent =
+    grade.label + ' — you reached level ' + level + ' and scored ' + score + ' points.';
+  document.getElementById('overScreen').classList.remove('hidden');
+  var saveLine = document.getElementById('saveLine');
+  saveLine.innerHTML = 'Saving your score…';
+  EduSDK.submitScore(score, {level:level, grade:grade.id, mode:mode})
+    .then(function(res){
+      if(res && res.success) saveLine.innerHTML = res.isPersonalBest
+        ? '🏆 New personal best — on the leaderboard!'
+        : 'Score saved to the leaderboard.';
+      else if(res && res.offline) saveLine.innerHTML = 'Standalone mode — play on OnlyGrins to save your score.';
+      else saveLine.innerHTML = (res&&res.error==='not_authenticated')
+        ? 'Sign in on OnlyGrins to save your score.' : '&nbsp;';
+    })
+    .then(function(){ return EduSDK.end({score:score, level:level}); });
+}
+
+// ===================== particles / confetti =====================
+function burst(x,y,color,count){
+  for(var i=0;i<count;i++){
+    var a=Math.random()*6.28, s=60+Math.random()*220;
+    particles.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,color:color,r:2+Math.random()*4});
+  }
+}
+function rainConfetti(){
+  var cols=['#3ee87a','#5ad8ff','#c77dff','#ff8a5c','#ffe27a','#ff5c7a'];
+  for(var i=0;i<90;i++){
+    confetti.push({x:Math.random()*W,y:-20-Math.random()*200,vx:(Math.random()*2-1)*60,
+      vy:120+Math.random()*180,rot:Math.random()*6.28,vr:(Math.random()*2-1)*8,
+      w:7+Math.random()*7,h:10+Math.random()*8,color:cols[i%cols.length],life:1.4});
+  }
+}
+
+// ===================== HUD =====================
+var elTarget=document.getElementById('target'), elScore=document.getElementById('score'),
+    elLevel=document.getElementById('level'), elLives=document.getElementById('lives'),
+    elTimer=document.getElementById('timerBar'), elCap=document.getElementById('targetCap');
+function syncHud(retarget){
+  elScore.textContent = score;
+  elLevel.textContent = level;
+  elLives.textContent = '❤️'.repeat(Math.max(0,lives)) || '💀';
+  if(retarget){
+    elTarget.textContent = target;
+    elCap.textContent = dir>0 ? 'GROW TO ▲' : 'SHRINK TO ▼';
+  }
+}
+function pulseTarget(){ elTarget.classList.remove('pop'); void elTarget.offsetWidth; elTarget.classList.add('pop'); }
+
+// ===================== update =====================
+function update(dt){
+  if(state!=='play') return;
+
+  // timer
+  timeLeft -= dt;
+  elTimer.style.transform = 'scaleX(' + Math.max(0, timeLeft/levelTime) + ')';
+  if(timeLeft<=0){ loseHeart('time'); }
+
+  // steering
+  var sp = BASE_SPEED + level*8;
+  var desired = snake.angle;
+  if(keys['ArrowLeft']||keys['a']||keys['A']) { aim=null; desired = snake.angle - 3.0*dt; turnTo(desired,dt,true); }
+  if(keys['ArrowRight']||keys['d']||keys['D']){ aim=null; desired = snake.angle + 3.0*dt; turnTo(desired,dt,true); }
+  if(keys['ArrowUp']||keys['w']||keys['W'])   { aim=null; }
+  if(aim){
+    desired = Math.atan2(aim.y-snake.y, aim.x-snake.x);
+    turnTo(desired,dt,false);
+  }
+
+  // move head
+  snake.x += Math.cos(snake.angle)*sp*dt;
+  snake.y += Math.sin(snake.angle)*sp*dt;
+  // wrap around the edges (kid-friendly — no wall death)
+  if(snake.x<0) snake.x+=W; if(snake.x>W) snake.x-=W;
+  if(snake.y<0) snake.y+=H; if(snake.y>H) snake.y-=H;
+
+  // record path for the body to follow
+  var head=snake.path[0];
+  if(!head || Math.hypot(snake.x-head.x, snake.y-head.y) > 3){
+    snake.path.unshift({x:snake.x,y:snake.y});
+  }
+  var maxPath = snakeLen(value)*SEG_GAP/3 + 40;
+  if(snake.path.length>maxPath) snake.path.length=Math.floor(maxPath);
+
+  // the Grin-bot opponent moves itself (race mode only)
+  if(mode==='race' && bot){ botUpdate(dt); }
+
+  // tokens drift + bounce
+  tokens.forEach(function(t){
+    t.x+=t.vx*dt; t.y+=t.vy*dt; t.wobble+=dt*3;
+    if(t.x<60||t.x>W-60) t.vx*=-1;
+    if(t.y<120||t.y>H-80) t.vy*=-1;
+    t.x=Math.max(60,Math.min(W-60,t.x)); t.y=Math.max(120,Math.min(H-80,t.y));
+  });
+
+  // eat check (head vs token) — skip if the round already ended this frame
+  if(state==='play') for(var i=tokens.length-1;i>=0;i--){
+    var t=tokens[i];
+    if(Math.hypot(snake.x-t.x, snake.y-t.y) < t.r+18){ eat(t); break; }
+  }
+
+  // keep ~7 tokens
+  while(tokens.length<7) spawnToken();
+
+  // particles
+  for(var p=particles.length-1;p>=0;p--){
+    var q=particles[p]; q.x+=q.vx*dt; q.y+=q.vy*dt; q.vx*=0.92; q.vy*=0.92; q.life-=dt*1.6;
+    if(q.life<=0) particles.splice(p,1);
+  }
+  for(var c=confetti.length-1;c>=0;c--){
+    var f=confetti[c]; f.x+=f.vx*dt; f.y+=f.vy*dt; f.rot+=f.vr*dt; f.life-=dt*0.5;
+    if(f.y>H+30||f.life<=0) confetti.splice(c,1);
+  }
+  if(shake>0) shake-=dt*40;
+}
+// the snake's head: a grin coin with the ツ grin as its face.
+// Player = gold coin; the Grin-bot = silver coin, so kids tell them apart.
+var COIN = {
+  gold:   { rim:'#caa024', glow:'#ffe27a', face:['#fff3b0','#ffd34d','#f0a82e'], grin:'#1f7a4d' },
+  silver: { rim:'#7d8a99', glow:'#cfe0f0', face:['#f4f8fc','#c7d2dd','#94a3b3'], grin:'#3f5a72' }
+};
+function drawGrinCoin(x, y, r, kind){
+  var c = COIN[kind||'gold'];
+  ctx.save();
+  ctx.shadowColor=c.glow; ctx.shadowBlur=20;
+  // coin rim
+  ctx.fillStyle=c.rim;
+  ctx.beginPath(); ctx.arc(x,y,r,0,6.28); ctx.fill();
+  ctx.shadowBlur=0;
+  // coin face (radial)
+  var g=ctx.createRadialGradient(x-r*0.3,y-r*0.3,r*0.2, x,y,r);
+  g.addColorStop(0,c.face[0]); g.addColorStop(0.55,c.face[1]); g.addColorStop(1,c.face[2]);
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.arc(x,y,r*0.82,0,6.28); ctx.fill();
+  // shine
+  ctx.fillStyle='rgba(255,255,255,.55)';
+  ctx.beginPath(); ctx.arc(x-r*0.32, y-r*0.34, r*0.18, 0, 6.28); ctx.fill();
+  // the grin (ツ looks like a happy face)
+  ctx.fillStyle=c.grin;
+  ctx.font='800 '+Math.round(r*1.15)+'px "Baloo 2",system-ui,sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('ツ', x, y+r*0.06);
+  ctx.restore();
+}
+
+// the snake's current number, drawn BIG as a glowing "hat" above the head
+function drawNumberHat(hx, hy, headR, val, bad){
+  var txt = String(val);
+  var bob = Math.sin(bgT*30)*3;                 // gentle bounce
+  var fs = Math.round(headR*1.7 + 26);          // BIG font, grows a little with the snake
+  ctx.font = '800 '+fs+'px "Baloo 2",system-ui,sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  var tw = ctx.measureText(txt).width;
+  var padX = fs*0.45, padY = fs*0.22;
+  var bw = tw + padX*2, bh = fs + padY*2;
+  var bx = hx, by = hy - headR - bh*0.55 - 16 + bob;
+
+  // stalk connecting the hat to the head (so it reads as the snake's hat)
+  ctx.fillStyle = bad ? '#ff4d6d' : '#ffffff';
+  ctx.beginPath();
+  ctx.moveTo(bx-9, by+bh/2-4); ctx.lineTo(bx+9, by+bh/2-4);
+  ctx.lineTo(hx, hy-headR+2); ctx.closePath(); ctx.fill();
+
+  // badge
+  ctx.save();
+  ctx.shadowColor = bad ? '#ff4d6d' : '#7be3ff'; ctx.shadowBlur = 22;
+  roundRect(bx-bw/2, by-bh/2, bw, bh, bh*0.34);
+  ctx.fillStyle = bad ? '#ff4d6d' : '#ffffff'; ctx.fill();
+  ctx.restore();
+  // colored ring
+  ctx.lineWidth = 4; ctx.strokeStyle = bad ? '#ffd0d8' : '#5ad8ff';
+  roundRect(bx-bw/2, by-bh/2, bw, bh, bh*0.34); ctx.stroke();
+
+  // the number
+  ctx.fillStyle = bad ? '#ffffff' : '#0a1230';
+  ctx.fillText(txt, bx, by+1);
+}
+function roundRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+function turnTo(desired,dt,abs){
+  if(abs){ snake.angle=desired; return; }
+  var d = desired - snake.angle;
+  while(d> Math.PI) d-=6.283; while(d<-Math.PI) d+=6.283;
+  var maxTurn = 4.2*dt;
+  snake.angle += Math.max(-maxTurn, Math.min(maxTurn, d));
+}
+
+// ===================== render =====================
+var bgT=0;
+
+// draw one snake (player or bot) — body trail + grin-coin head + number hat + name
+function drawSnake(s, val, coin, bad, name){
+  var segs = snakeLen(val);
+  var headR = 16 + Math.min(val,60)*0.18;
+  for(var i=segs;i>=0;i--){
+    var idx=Math.min(s.path.length-1, Math.round(i*SEG_GAP/3));
+    var pt=s.path[idx]; if(!pt) continue;
+    var f=i/segs, r=headR*(1-f*0.45);
+    ctx.save();
+    if(coin==='silver'){            // bot = cool blue-grey trail
+      ctx.shadowColor='#9fb4c8'; ctx.shadowBlur=12;
+      ctx.fillStyle='hsl(210,16%,'+(64-f*16)+'%)';
+    } else {                        // player = rainbow trail
+      var hue=(200 + i*14 + bgT*120)%360;
+      ctx.shadowColor='hsl('+hue+',90%,60%)'; ctx.shadowBlur=14;
+      ctx.fillStyle='hsl('+hue+',85%,'+(58-f*12)+'%)';
+    }
+    ctx.beginPath(); ctx.arc(pt.x,pt.y,r,0,6.28); ctx.fill();
+    ctx.restore();
+  }
+  drawGrinCoin(s.x, s.y, headR, coin);
+  if(name){
+    ctx.fillStyle='rgba(255,255,255,.9)'; ctx.font='800 '+Math.round(headR*0.7)+'px "Baloo 2",system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(name, s.x, s.y + headR + headR*0.6);
+  }
+  drawNumberHat(s.x, s.y, headR, val, bad);
+}
+
+function banner(txt, color){
+  var b=document.getElementById('banner');
+  b.textContent=txt; b.style.color=color||'#fff';
+  b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
+}
+
+function render(){
+  bgT+=0.004;
+  // animated gradient backdrop
+  var g=ctx.createLinearGradient(0,0,W,H);
+  var h1=(Math.sin(bgT)*30+220);
+  g.addColorStop(0,'hsl('+(h1)+',70%,12%)');
+  g.addColorStop(0.5,'hsl('+((h1+40)%360)+',75%,9%)');
+  g.addColorStop(1,'hsl('+((h1+80)%360)+',70%,13%)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  // floating bubbles
+  ctx.save();
+  for(var b=0;b<22;b++){
+    var bx=(b*131 + bgT*60*((b%3)+1))%W;
+    var by=(b*97 + Math.sin(bgT+b)*30 + 80*(b%5));
+    ctx.globalAlpha=0.05; ctx.fillStyle='#aee9ff';
+    ctx.beginPath(); ctx.arc(bx, by%H, 6+(b%4)*5, 0, 6.28); ctx.fill();
+  }
+  ctx.restore();
+
+  if(!snake || !tokens){ return; }   // nothing to draw until a game has started
+
+  ctx.save();
+  if(shake>0){ ctx.translate((Math.random()*2-1)*shake, (Math.random()*2-1)*shake); }
+
+  // tokens
+  tokens.forEach(function(t){
+    var c=OPS[t.op];
+    var pr = t.r + Math.sin(t.wobble)*2;
+    ctx.save();
+    ctx.shadowColor=c.glow; ctx.shadowBlur=22;
+    ctx.fillStyle=c.color;
+    ctx.beginPath(); ctx.arc(t.x,t.y,pr,0,6.28); ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(255,255,255,.35)';
+    ctx.beginPath(); ctx.arc(t.x-pr*0.3,t.y-pr*0.3,pr*0.35,0,6.28); ctx.fill();
+    ctx.fillStyle='#06122a'; ctx.font='800 '+Math.round(pr*0.95)+'px "Baloo 2",system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(t.op+t.n, t.x, t.y+1);
+    ctx.restore();
+  });
+
+  // the Grin-bot first (so the player's snake draws on top), then the player
+  if(mode==='race' && bot){
+    drawSnake(bot, bot.value, 'silver', false, 'Grin-bot');
+  }
+  drawSnake(snake, value, 'gold',
+            !!(lastEatFlash && lastEatFlash.bad && performance.now()-lastEatFlash.t<250),
+            mode==='race' ? 'You' : null);
+
+  // particles
+  particles.forEach(function(q){
+    ctx.globalAlpha=Math.max(0,q.life); ctx.fillStyle=q.color;
+    ctx.beginPath(); ctx.arc(q.x,q.y,q.r,0,6.28); ctx.fill();
+  });
+  ctx.globalAlpha=1;
+  ctx.restore();
+
+  // confetti (drawn over everything, ignores shake)
+  confetti.forEach(function(f){
+    ctx.save(); ctx.globalAlpha=Math.max(0,Math.min(1,f.life)); ctx.translate(f.x,f.y); ctx.rotate(f.rot);
+    ctx.fillStyle=f.color; ctx.fillRect(-f.w/2,-f.h/2,f.w,f.h); ctx.restore();
+  });
+}
+
+// ===================== main loop =====================
+var last=performance.now();
+function frame(now){
+  var dt=Math.min(0.05,(now-last)/1000); last=now;
+  update(dt);
+  render();
+  requestAnimationFrame(frame);
+}
+
+// ===================== boot / buttons =====================
+function show(id){ document.getElementById(id).classList.remove('hidden'); }
+function hide(id){ document.getElementById(id).classList.add('hidden'); }
+
+// mode toggle (Solo / Race the Grin-bot)
+Array.prototype.forEach.call(document.querySelectorAll('#modeBtns .modeBtn'), function(btn){
+  btn.addEventListener('click', function(){
+    mode = btn.dataset.mode;
+    Array.prototype.forEach.call(document.querySelectorAll('#modeBtns .modeBtn'), function(b){
+      b.classList.toggle('sel', b===btn);
+    });
+  });
+});
+
+// build the grade picker from GRADES
+var gradeBtns = document.getElementById('gradeBtns');
+GRADES.forEach(function(g){
+  var b = document.createElement('button');
+  b.className = 'gradeBtn';
+  b.style.background = g.color;
+  b.innerHTML = '<div class="g">'+g.label+'</div><div class="b">'+g.blurb+'</div>';
+  b.addEventListener('click', function(){ startGame(g); });
+  gradeBtns.appendChild(b);
+});
+
+function startGame(g){
+  grade = g;
+  hide('startScreen'); hide('overScreen');
+  reset(); state='play';
+}
+
+document.getElementById('againBtn').addEventListener('click', function(){
+  startGame(grade);   // replay the same grade
+});
+document.getElementById('changeBtn').addEventListener('click', function(){
+  hide('overScreen'); show('startScreen'); state='start';
+});
+
+document.getElementById('hostLine').innerHTML =
+  EduSDK.isHosted() ? 'Scores save to the leaderboard.' : 'Standalone — scores won\'t save.';
+
+EduSDK.begin({game:'grin-math-snake'});
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

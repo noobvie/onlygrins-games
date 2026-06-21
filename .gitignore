@@ -10,3 +10,7 @@ dist/
 
 # keep the workspace file tracked; ignore per-user VSCode state
 .vscode/
+
+# dev-only mirror of the platform SDK (tools/dev-serve.sh copies it here so
+# /sdk/arcade-sdk.js resolves locally). Never commit the vendor file.
+/sdk/

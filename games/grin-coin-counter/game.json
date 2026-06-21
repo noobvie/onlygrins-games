@@ -1,0 +1,27 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "grin-coin-counter",
+  "title": "Grin Coin Counter",
+  "category": "math",
+  "short_description": "Add up grin coins (ツ) to match the target — a money & decimals game.",
+  "description": "A coin-counting math game for ~10-year-olds. Pick grin coins (ツ) that add up exactly to the target amount. Eight rounds ramp from whole grin to tenths to hundredths, teaching addition, place value, and decimals (with a nanogrin fun-fact). Fewer coins and first-try answers earn bonus points that feed your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "width": 960,
+  "height": 600,
+  "controls": "Mouse / tap. Tap coins to add them to your basket, tap a basket chip to remove it, then Check.",
+  "tags": [
+    "math",
+    "decimals",
+    "counting",
+    "money",
+    "grin",
+    "kids"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:grin-coin-counter"
+}

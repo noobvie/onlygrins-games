@@ -1,0 +1,19 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "starter-game",
+  "title": "Starter Game",
+  "category": "education",
+  "short_description": "Copyable skeleton: a 3-question kids quiz wired to the Arcade SDK.",
+  "description": "The starter template every OnlyGrins educational game is forked from. Demonstrates the full SDK lifecycle — session, levels, an interlevel ad, and a final score — around a tiny multiple-choice quiz with sample math/science/language questions for ~age 10. Copy this folder with tools/new-game.sh, rename the slug, and replace the questions/art.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "width": 960,
+  "height": 600,
+  "controls": "Mouse / tap to choose an answer.",
+  "tags": ["grin", "education", "template"],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": false,
+  "is_featured": false,
+  "import_id": "edu:starter-game"
+}
