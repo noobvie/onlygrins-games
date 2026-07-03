@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Circuit Circus — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="science" data-seed="circuit-circus"></script>
+
+<style>
+  :root{
+    --bg1:#2e0a10; --bg2:#401218; --bg3:#160408;
+    --card:#341016; --line:#8a3a48; --text:#fff0f0; --muted:#e0a8b0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --gold:#ffd166; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(150deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--gold),var(--bad),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#2a0810;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--gold);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .arena{background:#260a10;border:2px solid var(--line);border-radius:16px;padding:14px;
+    text-align:center;margin-bottom:12px;overflow:hidden;}
+  .task{font-size:clamp(15px,2.8vw,19px);font-weight:800;color:var(--muted);}
+  .rig{font-size:clamp(18px,3.6vw,27px);font-weight:800;margin:8px 0 10px;line-height:1.6;}
+  .rig .bulb{display:inline-block;animation:flicker 1.6s infinite;}
+  @keyframes flicker{0%,100%{opacity:1}45%{opacity:1}50%{opacity:.4}55%{opacity:1}}
+  .timerbar{height:10px;border-radius:6px;background:#160408;overflow:hidden;}
+  .timerbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--gold),var(--bad));}
+  .answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .answers.three{grid-template-columns:repeat(3,1fr);}
+  .ans{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:19px;
+    padding:14px 8px;border-radius:14px;color:#2a0810;background:var(--gold);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .ans small{display:block;font-size:13px;font-weight:700;opacity:.7;}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .ans.right{background:var(--green);} .ans.wrong{background:var(--bad);}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#2a0810;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#5a2030;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#a05a68;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🎪 Circuit Circus</h1>
+      <p class="sub">The big top goes dark in ten minutes and YOU are the circus electrician.
+        Work out what conducts, what insulates, and which circuits will actually light — because a
+        broken loop leaves the trapeze artist dangling in the dark, mid-flip. She has OPINIONS.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 3<small>conductor or insulator?</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 4<small>will the bulb light?</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 5<small>fix the fault!</small></button>
+      </div>
+      <p class="sub">12 rigging jobs · fast wiring = bonus points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Job 1/12</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="arena">
+        <div class="rig" id="rig"><span class="bulb">💡</span></div>
+        <div class="task" id="qtext">Will the bulb light?</div>
+        <div class="timerbar" style="margin-top:10px"><i id="timerFill"></i></div>
+      </div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🎪</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Next show ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Curated question bank. Each item: rig (big line), q, opts [{t,label2}], a (index into opts BEFORE shuffle), why.
+  var CONDUCTORS = [
+    ['a metal spoon', '🥄'], ['a copper coin', '🪙'], ['a paper clip', '📎'],
+    ['aluminium foil', '✨'], ['an iron nail', '🔩'], ['the strongman\'s door key', '🗝️']
+  ];
+  var INSULATORS = [
+    ['a rubber duck', '🦆'], ['a wooden peg', '🪵'], ['a plastic straw', '🥤'],
+    ['a glass marble', '🔮'], ['a pencil eraser', '🩹'], ['the clown\'s woolly sock', '🧦']
+  ];
+
+  var LIGHT_BANK = [
+    { rig: '🔋 ➜ 🔌 ➜ 💡 ➜ 🔌 ➜ 🔋  (switch CLOSED)', q: 'Battery, wires, bulb — a full loop with the switch closed. Will it light?', yes: true,  why: 'complete loop = flowing current' },
+    { rig: '🔋 ➜ 🔌 ➜ 💡 ➜ ⏸ …  (switch OPEN)',      q: 'Everything connected, but the switch is OPEN. Will it light?',            yes: false, why: 'an open switch breaks the loop' },
+    { rig: '🔋 ➜ 🔌 ➜ 💡 ➜ 🐭 …  (wire chewed!)',     q: 'The circus mouse chewed through one wire. Will it light?',                yes: false, why: 'a broken wire breaks the loop' },
+    { rig: '🔌 ➜ 💡 ➜ 🔌  (no battery!)',              q: 'Wires and a bulb but NO battery. Will it light?',                        yes: false, why: 'no battery, no push for the current' },
+    { rig: '🔋🔋 ➜ 🔌 ➜ 💡 ➜ 🔌 ➜ 🔋🔋',              q: 'TWO batteries and a complete loop. Will it light?',                      yes: true,  why: 'complete loop — and extra bright!' },
+    { rig: '🔋 ➜ 🎀 ➜ 💡 ➜ 🎀 ➜ 🔋  (rubber bands!)',  q: 'The loop is closed with RUBBER BANDS instead of wires. Will it light?',  yes: false, why: 'rubber is an insulator' },
+    { rig: '🔋 ➜ 🥄 ➜ 💡 ➜ 🔌 ➜ 🔋  (spoon wire!)',    q: 'One "wire" is a metal spoon, and the loop is complete. Will it light?',  yes: true,  why: 'metal conducts — the loop holds' },
+    { rig: '🔋 ➜ 🥤 ➜ 💡 ➜ 🔌 ➜ 🔋  (straw wire!)',    q: 'One "wire" is a plastic straw. Will it light?',                          yes: false, why: 'plastic is an insulator' }
+  ];
+
+  var FIX_BANK = [
+    { rig: '💡 dark · loop complete · battery flat 🪫', q: 'The loop is perfect but the battery is FLAT. What does the show need?',
+      opts: ['a fresh battery 🔋', 'a longer wire 🔌', 'a bigger bulb 💡'], a: 0, why: 'flat battery = no push' },
+    { rig: '💡 dark · loop complete · switch OPEN ⏸', q: 'Everything is wired right but the switch is open. What fixes it?',
+      opts: ['close the switch ▶️', 'add another bulb 💡', 'remove the battery 🔋'], a: 0, why: 'closing the switch completes the loop' },
+    { rig: '🔋 ➜ 🔌 ➜ 💡 …  ➜ ❓', q: 'One wire is missing between the bulb and the battery. What fixes it?',
+      opts: ['complete the loop 🔁', 'shake the battery 🫨', 'polish the bulb ✨'], a: 0, why: 'current only flows in a complete loop' },
+    { rig: '💡 shining · add 🔋 #2', q: 'The circuit works. You add a SECOND battery to the loop. The bulb gets…',
+      opts: ['brighter ☀️', 'dimmer 🌘', 'exactly the same 😐'], a: 0, why: 'more batteries push harder' },
+    { rig: '💡 shining · add 💡 #2 in the same loop', q: 'You add a SECOND bulb into the same single loop. Each bulb gets…',
+      opts: ['dimmer 🌘', 'brighter ☀️', 'invisible 🫥'], a: 0, why: 'two bulbs share one battery\'s push' },
+    { rig: '🔋 ➜ 🏋️ ➜ 💡 ➜ 🔌 ➜ 🔋', q: 'The strongman\'s solid IRON dumbbell is wired into the loop. The current…',
+      opts: ['flows through it ⚡', 'stops dead 🛑', 'turns to glitter ✨'], a: 0, why: 'iron is a conductor' },
+    { rig: '💡 dark · loop complete · switch CLOSED · battery fresh', q: 'Loop complete, switch closed, battery fresh — still dark. Most likely?',
+      opts: ['the bulb is broken 💔', 'the wire is too shiny ✨', 'the battery is shy 🙈'], a: 0, why: 'a blown bulb breaks the loop inside itself' },
+    { rig: '⛈️ outdoor cable check', q: 'Which of these would be SAFEST wrapped around a circus cable?',
+      opts: ['rubber 🧤', 'copper 🪙', 'iron 🔩'], a: 0, why: 'insulators keep current where it belongs' }
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 3, label: 'Grade 3', secs: 12, mode: 'conduct' },
+    { id: 4, label: 'Grade 4', secs: 12, mode: 'light' },
+    { id: 5, label: 'Grade 5', secs: 13, mode: 'fix' }
+  ];
+  var ROUNDS = 12;
+
+  var TADA = ['THE BIG TOP BLAZES WITH LIGHT! 🎪✨', 'The trapeze artist lands the flip AND a bow! 🤸',
+              'The crowd goes wild! A lion faints from joy! 🦁', 'Sparks of pure showbiz! ⚡🎩'];
+  var DARK = ['CLUNK. Total darkness. Someone is juggling blind. 🤹🌑', 'The trapeze artist is dangling mid-flip. She sees you. 👀',
+              'The ringmaster\'s megaphone works. Unfortunately. 📣', 'A clown honked sadly in the dark. Twice. 🤡'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var answer = '', timer = null, tLeft = 0, why = '', usedIdx = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function zap(){ tone(660,.1,'square',1320); setTimeout(function(){ tone(880,.15,'sine',1760); }, 100); }
+  function clunk(){ tone(110,.45,'sawtooth',50); }
+
+  function takeFrom(bank) {
+    // avoid repeating a bank item until the bank is exhausted
+    if (usedIdx.length >= bank.length) usedIdx = [];
+    var i;
+    do { i = Math.floor(Math.random() * bank.length); } while (usedIdx.indexOf(i) >= 0);
+    usedIdx.push(i);
+    return bank[i];
+  }
+
+  function setAnswers(opts, correct, cls) {
+    answer = correct;
+    var box = $('answers');
+    box.className = 'answers' + (cls ? ' ' + cls : '');
+    box.innerHTML = '';
+    opts.forEach(function (v) {
+      var b = document.createElement('button');
+      b.className = 'ans';
+      b.innerHTML = v;
+      b.dataset.v = v;
+      b.addEventListener('click', function(){ choose(b, v); });
+      box.appendChild(b);
+    });
+  }
+
+  function makeQuestion() {
+    if (grade.mode === 'conduct') {
+      var isC = Math.random() < 0.5;
+      var item = pick(isC ? CONDUCTORS : INSULATORS);
+      why = item[0] + ' is ' + (isC ? 'a conductor — current flows through it' : 'an insulator — current stops');
+      $('rig').innerHTML = '🔋 ➜ <span style="font-size:1.3em">' + item[1] + '</span> ➜ <span class="bulb">💡</span> ➜ 🔌 ➜ 🔋';
+      $('qtext').textContent = 'We wired ' + item[0] + ' into the loop. Does the current get through?';
+      setAnswers(shuffle(['CONDUCTS! current flows ⚡', 'INSULATES! current stops 🛑']),
+        isC ? 'CONDUCTS! current flows ⚡' : 'INSULATES! current stops 🛑');
+    } else if (grade.mode === 'light') {
+      var it = takeFrom(LIGHT_BANK);
+      why = it.why;
+      $('rig').innerHTML = it.rig;
+      $('qtext').textContent = it.q;
+      setAnswers(shuffle(['YES — it lights! 💡', 'NO — stays dark 🌑']),
+        it.yes ? 'YES — it lights! 💡' : 'NO — stays dark 🌑');
+    } else {
+      var f = takeFrom(FIX_BANK);
+      why = f.why;
+      $('rig').innerHTML = f.rig;
+      $('qtext').textContent = f.q;
+      setAnswers(shuffle(f.opts.slice()), f.opts[f.a], 'three');
+    }
+  }
+
+  function newQuestion() {
+    answered = false;
+    $('roundLbl').textContent = 'Job ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    makeQuestion();
+    tLeft = grade.secs;
+    clearInterval(timer);
+    timer = setInterval(function () {
+      tLeft -= 0.1;
+      $('timerFill').style.width = Math.max(0, tLeft / grade.secs * 100) + '%';
+      if (tLeft <= 0) timeUp();
+    }, 100);
+    EduSDK.startLesson(q + 1, { question: $('qtext').textContent });
+  }
+
+  function settle(correct, btn) {
+    clearInterval(timer);
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (b.dataset.v === answer) b.classList.add('right');
+    });
+    if (correct) {
+      streak++; nCorrect++;
+      var speedBonus = Math.round(tLeft / grade.secs * 40);
+      var pts = 100 + speedBonus + streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      zap();
+      $('toast').textContent = pick(TADA) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      if (btn) btn.classList.add('wrong');
+      clunk();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(DARK) + '  (' + why + ')';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1800);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 1800);
+    } else setTimeout(newQuestion, 1800);
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    settle(v === answer, btn);
+  }
+
+  function timeUp() {
+    if (answered) return;
+    answered = true;
+    settle(false, null);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 10 ? '🎪🏆' : nCorrect >= 6 ? '🎪💡' : '🎪🌑';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' rigging jobs done right. ' +
+      (nCorrect >= 10 ? 'Head Electrician of the Greatest Show on Earth!' :
+       nCorrect >= 6 ? 'The show went on. Mostly lit.' :
+       'The trapeze artist is STILL up there. She has written a song about you.');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0; usedIdx = [];
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'circuit-circus' });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "silly-sentence-salad",
+  "title": "Silly Sentence Salad",
+  "category": "language",
+  "short_description": "Un-toss jumbled sentences — wrong answers get read aloud by a very unimpressed robot.",
+  "description": "Someone tossed these sentences like a salad! Tap the word tiles to rebuild each sentence in the right order. Get it wrong and BEEP-3PO the robot reads your nonsense out loud in a perfectly serious robot voice, then judges you quietly. Grade bands ramp from short simple sentences to tricky clauses. Teaches word order, grammar and sentence structure, with first-try and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap. Tap words to move them between the salad and your sentence, then press Check.",
+  "tags": [
+    "language",
+    "grammar",
+    "strand-grammar",
+    "sentences",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:silly-sentence-salad"
+}

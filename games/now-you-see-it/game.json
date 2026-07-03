@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "now-you-see-it",
+  "title": "Now You See It",
+  "category": "memory",
+  "short_description": "Memorize the grid, then Professor Peekaboo throws a blanket over it and changes one thing — spot what's different when it lifts.",
+  "description": "Professor Peekaboo shows you a grid of things to memorize, then throws a blanket over it and secretly swaps ONE item. When the blanket lifts, tap what's different! It's a fast, replayable workout for visual memory and attention to detail, and faster spots score more. Grade bands ramp from a 3×3 grid with a generous peek, to a quicker 4×4, to a blink-and-you-miss-it 5×5 for grade 4–5. A free online visual memory and spot-the-difference game for kids in grades 1–5, with speed bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Watch the grid, then tap the single item that changed when it reappears.",
+  "tags": [
+    "memory",
+    "visual-memory",
+    "spot-the-difference",
+    "attention",
+    "strand-visual-memory",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:now-you-see-it"
+}

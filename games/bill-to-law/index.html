@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Bill to Law — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="civics" data-seed="bill-to-law"></script>
+
+<style>
+  :root{
+    --bg1:#1a1633; --bg2:#241f47; --bg3:#100d20;
+    --card:#1e1a3a; --line:#5a4a9a; --text:#eeeaff; --muted:#b8aae0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#1a1633;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .prog{display:flex;align-items:center;gap:4px;justify-content:center;font-size:20px;
+    background:#151230;border:2px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
+  .prog .step{opacity:.4;} .prog .step.done{opacity:1;}
+  .goal{text-align:center;font-weight:800;font-size:clamp(16px,3.2vw,22px);margin-bottom:10px;}
+  .goal .dish{font-size:40px;}
+  .cols{display:flex;gap:16px;flex-wrap:wrap;}
+  .col{flex:1;min-width:240px;}
+  .col h3{margin:0 0 8px;text-align:center;font-size:14px;letter-spacing:.5px;}
+  .col.prg h3{color:var(--green);} .col.bank h3{color:var(--orange);}
+  .list{min-height:60px;background:#151230;border:2px dashed var(--line);border-radius:14px;padding:8px;
+    display:flex;flex-direction:column;gap:8px;}
+  .col.prg .list{border-color:var(--green);border-style:solid;}
+  .item{cursor:pointer;border:2px solid var(--line);font-family:inherit;font-weight:800;font-size:15px;
+    padding:10px 12px;border-radius:12px;color:var(--text);background:#2a2450;box-shadow:0 3px 0 rgba(0,0,0,.35);
+    display:flex;align-items:center;gap:8px;}
+  .item .ic{font-size:24px;}
+  .item:active{transform:translateY(2px);}
+  .item .num{color:var(--muted);font-size:13px;min-width:18px;}
+  .list.empty-hint::after{content:'Tap steps below in order →';color:var(--muted);font-weight:700;font-size:13px;text-align:center;padding:8px;}
+  .runbar{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:16px;
+    padding:11px 24px;border-radius:12px;color:#1a1633;background:var(--green);box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#2a2450;color:var(--text);}
+  .btn:disabled{opacity:.4;cursor:default;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:16px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .item.okstep{background:var(--green);border-color:var(--green);color:#1a1633;}
+  .item.badstep{background:var(--bad);border-color:var(--bad);color:#1a1633;}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#8a7ac0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>📜 Bill to Law</h1>
+      <p class="sub">How does an idea become a real law? Step by step! Put the scrambled steps of each
+        civic process in the right order, then hit PASS IT. Democracy has an order of operations too —
+        skip a step and the whole thing gets stuck in committee!</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 2–3<small>3 steps</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 4<small>4–5 steps</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 5<small>6 steps, real process</small></button>
+      </div>
+      <p class="sub">8 processes · tap ⌫ to fix · streaks earn bonus stamps</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Process 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="prog" id="prog"></div>
+      <div class="goal">Put in order: <span class="dish" id="goalIc">📜</span> <span id="goalNm">How a bill becomes a law</span></div>
+      <div class="cols">
+        <div class="col prg">
+          <h3>▶ IN ORDER</h3>
+          <div class="list" id="progList"></div>
+        </div>
+        <div class="col bank">
+          <h3>🧩 STEPS (scrambled)</h3>
+          <div class="list" id="bankList"></div>
+        </div>
+      </div>
+      <div class="runbar">
+        <button class="btn" id="cookBtn">🏛️ Pass it</button>
+        <button class="btn ghost" id="undoBtn">⌫ Undo</button>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">📜</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">New processes ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Each process = ordered steps (index order IS the correct order).
+  var PROCESSES = [
+    { nm:'How a bill becomes a law', ic:'📜', steps:[
+      {ic:'💡',t:'Someone has an idea for a new law'},{ic:'📝',t:'A lawmaker writes it as a bill'},
+      {ic:'🗣️',t:'The lawmakers debate the bill'},{ic:'🗳️',t:'They vote on the bill'},
+      {ic:'✍️',t:'The leader signs it'},{ic:'📜',t:'It becomes a law everyone follows'} ] },
+    { nm:'How an election works', ic:'🗳️', steps:[
+      {ic:'🙋',t:'Candidates decide to run'},{ic:'📣',t:'They share their ideas with voters'},
+      {ic:'🗳️',t:'People vote on election day'},{ic:'🧮',t:'The votes are counted'},
+      {ic:'🏆',t:'The one with the most votes wins'},{ic:'🎖️',t:'The winner takes office'} ] },
+    { nm:'How a town fixes a problem', ic:'🚧', steps:[
+      {ic:'🕳️',t:'Neighbours notice a big pothole'},{ic:'✍️',t:'They sign a petition to the council'},
+      {ic:'🏛️',t:'The council discusses it at a meeting'},{ic:'💰',t:'They set aside money to fix it'},
+      {ic:'🚧',t:'Workers repair the road'},{ic:'🎉',t:'The street is safe again'} ] },
+    { nm:'How a court trial works', ic:'⚖️', steps:[
+      {ic:'📋',t:'Someone is accused of breaking a law'},{ic:'🏛️',t:'A trial is held in court'},
+      {ic:'🗣️',t:'Both sides tell their story'},{ic:'👥',t:'The jury listens carefully'},
+      {ic:'🤔',t:'The jury decides guilty or not'},{ic:'⚖️',t:'The judge gives a fair result'} ] },
+    { nm:'How a new park gets built', ic:'🏞️', steps:[
+      {ic:'💭',t:'Kids ask for a new park'},{ic:'🗣️',t:'They speak at a town meeting'},
+      {ic:'🗳️',t:'The council votes yes'},{ic:'📐',t:'Designers draw the plans'},
+      {ic:'🏗️',t:'Builders build it'},{ic:'🏞️',t:'Everyone enjoys the new park'} ] },
+    { nm:'How a class makes a rule', ic:'🏫', steps:[
+      {ic:'🙋',t:'A student suggests a class rule'},{ic:'🗣️',t:'The class talks it over'},
+      {ic:'✋',t:'Everyone votes with a show of hands'},{ic:'📊',t:'They count the votes'},
+      {ic:'📌',t:'The rule goes on the wall'},{ic:'🤝',t:'The class agrees to follow it'} ] },
+    { nm:'How a citizen helps their town', ic:'🤝', steps:[
+      {ic:'👀',t:'Notice something that needs help'},{ic:'📢',t:'Tell others and get support'},
+      {ic:'📝',t:'Make a plan together'},{ic:'🧹',t:'Do the work as a community'},
+      {ic:'🌟',t:'Make the town a little better'} ] },
+    { nm:'How a leader is chosen', ic:'🎖️', steps:[
+      {ic:'📜',t:'The old leader\'s term ends'},{ic:'🙋',t:'New candidates step forward'},
+      {ic:'🗳️',t:'Citizens cast their votes'},{ic:'🧮',t:'Officials count every vote'},
+      {ic:'🤝',t:'The new leader is welcomed in'} ] }
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 2, label: 'Grade 2–3', nSteps: 3 },
+    { id: 4, label: 'Grade 4',   nSteps: 5 },
+    { id: 5, label: 'Grade 5',   nSteps: 6 }
+  ];
+  var ROUNDS = 8;
+
+  var CHEER = ['PASSED! The gavel bangs. 🔨✨', 'Perfect order — that\'s how it works! 🏛️', 'Signed and sealed! 📜', 'Democracy in action! 🎉'];
+  var OOPS  = ['Stuck in committee — wrong order! 📋', 'Beep! Those steps got jumbled. Fix them. 🔀', 'That process has a snag. Reorder it! 🧩', 'Out of order — try again!'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nSolved = 0, answered = false;
+  var proc = null, steps = [], bank = [], program = [], used = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function blip(){ tone(680,.05,'square'); }
+  function ding(){ tone(523,.12,'sine'); setTimeout(function(){ tone(880,.2,'sine',1200); },110); }
+  function crash(){ tone(160,.4,'sawtooth',70); }
+
+  function makeRound() {
+    var choices = PROCESSES.filter(function (p) { return used.indexOf(p.nm) < 0 && p.steps.length >= grade.nSteps; });
+    if (!choices.length) { used = []; choices = PROCESSES.filter(function (p) { return p.steps.length >= grade.nSteps; }); }
+    proc = pick(choices); used.push(proc.nm);
+    steps = proc.steps.slice(0, grade.nSteps).map(function (s, i) { return { ic: s.ic, t: s.t, order: i }; });
+    bank = shuffle(steps.slice());
+    if (bank.every(function (s, i) { return s.order === i; })) bank = shuffle(bank);
+    program = [];
+  }
+
+  function drawProg() {
+    var el = $('prog'), html = '';
+    for (var i = 0; i < ROUNDS; i++) {
+      if (i === q) html += '<span class="step done">🏛️</span>';
+      else if (i < q) html += '<span class="step done">📜</span>';
+      else html += '<span class="step">·</span>';
+    }
+    el.innerHTML = html;
+  }
+
+  function render() {
+    var p = $('progList'); p.innerHTML = ''; p.className = 'list' + (program.length ? '' : ' empty-hint');
+    program.forEach(function (s, i) {
+      var d = document.createElement('div');
+      d.className = 'item'; d.innerHTML = '<span class="num">' + (i + 1) + '.</span><span class="ic">' +
+        s.ic + '</span><span>' + s.t + '</span>';
+      p.appendChild(d);
+    });
+    var b = $('bankList'); b.innerHTML = '';
+    bank.forEach(function (s, i) {
+      var d = document.createElement('button');
+      d.className = 'item'; d.dataset.i = i;
+      d.innerHTML = '<span class="ic">' + s.ic + '</span><span>' + s.t + '</span>';
+      d.addEventListener('click', function(){ addStep(i); });
+      b.appendChild(d);
+    });
+    $('cookBtn').disabled = bank.length > 0 || answered;
+  }
+
+  function addStep(i) { if (answered) return; program.push(bank[i]); bank.splice(i, 1); blip(); render(); }
+  function undo() { if (answered || !program.length) return; bank.push(program.pop()); render(); }
+
+  function newRound() {
+    answered = false;
+    makeRound();
+    $('roundLbl').textContent = 'Process ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('goalIc').textContent = proc.ic; $('goalNm').textContent = proc.nm;
+    drawProg();
+    render();
+    EduSDK.startLesson(q + 1, { process: proc.nm, steps: steps.length });
+  }
+
+  function passIt() {
+    if (answered || bank.length) return;
+    answered = true;
+    var correct = program.every(function (s, i) { return s.order === i; });
+    Array.prototype.forEach.call($('progList').children, function (el, i) {
+      el.classList.add(program[i].order === i ? 'okstep' : 'badstep');
+    });
+    if (correct) {
+      nSolved++; streak++;
+      var pts = 100 + streak * 15 + steps.length * 5;
+      score += pts;
+      $('scoreVal').textContent = score;
+      ding();
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+      EduSDK.finishLesson(q + 1, { solved: true });
+      next();
+    } else {
+      streak = 0;
+      crash();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' Green steps are right — fix the red ones!';
+      $('toast').className = 'toast bad';
+      setTimeout(function () {
+        answered = false;
+        bank = shuffle(program.slice()); program = [];
+        render();
+        $('toast').textContent = 'Try again — put the steps in order.';
+      }, 1600);
+      EduSDK.finishLesson(q + 1, { solved: false });
+    }
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1700);
+    if (q === Math.floor(ROUNDS / 2)) setTimeout(function(){ EduSDK.adBreak('interlevel').then(newRound); }, 1700);
+    else setTimeout(newRound, 1700);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nSolved >= 7 ? '📜🏆' : nSolved >= 4 ? '📜🏛️' : '📜📋';
+    $('finalLine').textContent = grade.label + ' — ' + nSolved + '/' + ROUNDS + ' processes passed. ' +
+      (nSolved >= 7 ? 'Speaker of the House! You know exactly how things get done.' :
+       nSolved >= 4 ? 'Good work — a couple of bills got stuck in committee.' :
+       'Every process has an order. Study the steps and try again!');
+    EduSDK.submitScore(score, { grade: grade.id, solved: nSolved })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nSolved = 0; used = [];
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newRound();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('cookBtn').addEventListener('click', passIt);
+  $('undoBtn').addEventListener('click', undo);
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'bill-to-law' });
+})();
+</script>
+</body>
+</html>

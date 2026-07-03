@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "bargain-bazaar",
+  "title": "Bargain Bazaar",
+  "category": "money",
+  "short_description": "Every stall swears it has the best deal — compare prices, discounts and 3-for-2 tricks and tap the true bargain before the shopkeepers fool you.",
+  "description": "Welcome to the world's noisiest market, where every stall SWEARS it has the best deal! Compare the prices, work out the discounts, and see through the sneaky '3-for-2' tricks to tap the stall that's the true bargain. It teaches real money smarts: comparing prices, calculating a percent off, and finding the best unit value. Grade bands ramp from simply picking the cheaper price, to working out sale discounts, to comparing value-per-item across multipacks. A free online money, discounts and best-value shopping game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 680,
+  "controls": "Mouse / tap the stall offering the best deal.",
+  "tags": [
+    "money",
+    "discounts",
+    "best-value",
+    "financial-literacy",
+    "strand-money-sense",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:bargain-bazaar"
+}

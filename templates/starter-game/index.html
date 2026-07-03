@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
 <title>Starter Game — OnlyGrins</title>
 
 <!-- Platform SDK: absolute path the OnlyGrins arcade serves. When absent
@@ -12,6 +13,11 @@
 <!-- Our helper, bundled WITH the game (relative) so it works everywhere:
      file:// double-click, the dev host, and the real platform. -->
 <script src="edu-sdk.js"></script>
+<!-- Generative background music (relative, ships with the game; no assets).
+     Set data-cat to this game's category and data-seed to its slug. new-game.sh
+     rewrites data-seed for you. DELETE this line for music games (their
+     gameplay IS the audio — they use sound effects only). -->
+<script src="bgm.js" data-cat="education" data-seed="starter-game"></script>
 
 <style>
   :root { --bg:#0c1a14; --card:#11271d; --line:#1f4634; --grin:#5ee0a0; --grin-dim:#2f6e52; --text:#e8fff4; --muted:#9fc7b3; --bad:#ff7a7a; }

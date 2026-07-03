@@ -1,0 +1,30 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "circuit-circus",
+  "title": "Circuit Circus",
+  "category": "science",
+  "short_description": "Wire the circus lights with complete circuits — a broken loop leaves the trapeze artist dangling in the dark, mid-flip.",
+  "description": "The big top goes dark in ten minutes and YOU are the circus electrician! Decide what conducts and what insulates, whether each circuit will light the bulb, and how to fix the ones that won't — because a broken loop leaves the trapeze artist dangling in the dark, mid-flip, and she has opinions about that. Grade bands ramp from conductors vs insulators, to will-it-light circuit reading with switches and broken wires, to fixing faults and predicting brighter or dimmer bulbs. A free online electricity and circuits science game for kids in grades 3–5, with speed and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap the right answer before the big-top timer runs out.",
+  "tags": [
+    "science",
+    "electricity",
+    "circuits",
+    "strand-physics",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:circuit-circus"
+}

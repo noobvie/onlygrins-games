@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "conditional-corgis",
+  "title": "Conditional Corgis",
+  "category": "coding",
+  "short_description": "Cooper the Corgi follows IF→THEN rules just like a computer — read his rulebook, see what he sees, and predict exactly what he'll do.",
+  "description": "Cooper the Corgi makes every decision with IF→THEN rules — the exact way computers choose what to do! Read his rulebook, look at what Cooper sees, and predict his action, remembering that corgis take rules VERY literally. It teaches conditional logic: matching conditions, falling through to an 'otherwise' branch, and combining conditions with AND. Grade bands ramp from two simple rules, to three rules with an otherwise/else, to AND-conditions where order matters. A free online coding and conditional-logic game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 680,
+  "controls": "Mouse / tap the action Cooper's rules say he'll take.",
+  "tags": [
+    "coding",
+    "conditionals",
+    "logic",
+    "if-then",
+    "strand-conditionals",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:conditional-corgis"
+}

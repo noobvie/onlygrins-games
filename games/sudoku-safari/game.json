@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "sudoku-safari",
+  "title": "Sudoku Safari",
+  "category": "logic",
+  "short_description": "Picture sudoku with safari animals — work out which animal belongs in the glowing pen so no row or column repeats. The zebra referee is watching.",
+  "description": "The safari park's animals must line up so no row or column ever has the same animal twice — park rules, don't ask. One pen is empty and glowing: study the rows and columns and work out which animal belongs there, while the unblinking zebra referee watches. It's real sudoku deduction with lions and flamingos instead of numbers. Grade bands ramp from grids full of clues, to sparser grids, to brain-benders where most pens are hidden and only careful row-and-column logic saves you. A free online picture sudoku and logical deduction game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 720,
+  "controls": "Mouse / tap the animal that belongs in the glowing pen.",
+  "tags": [
+    "logic",
+    "sudoku",
+    "puzzles",
+    "deduction",
+    "strand-deduction",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:sudoku-safari"
+}

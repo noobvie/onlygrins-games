@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#13204a"/><stop offset=".5" stop-color="#1a1140"/><stop offset="1" stop-color="#0c2a3a"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd166"/><stop offset=".5" stop-color="#ff8a5c"/><stop offset="1" stop-color="#c77dff"/>
+    </linearGradient>
+    <radialGradient id="coin" cx=".35" cy=".3" r="1">
+      <stop offset="0" stop-color="#ffe9a8"/><stop offset="1" stop-color="#d99a1b"/>
+    </radialGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- goat -->
+  <text x="210" y="300" font-size="180" text-anchor="middle">🐐</text>
+  <text x="330" y="130" font-size="34" font-weight="800" fill="#ff6b81" transform="rotate(-8 330 130)">CHANGE. NOW.</text>
+  <!-- coins -->
+  <g text-anchor="middle" font-weight="800" fill="#4a2f00">
+    <circle cx="560" cy="250" r="62" fill="url(#coin)" stroke="#b8860b" stroke-width="6"/>
+    <text x="560" y="265" font-size="38">ツ5</text>
+    <circle cx="700" cy="320" r="52" fill="url(#coin)" stroke="#b8860b" stroke-width="6"/>
+    <text x="700" y="334" font-size="32">ツ2</text>
+    <circle cx="810" cy="220" r="46" fill="url(#coin)" stroke="#b8860b" stroke-width="6"/>
+    <text x="810" y="234" font-size="28">ツ1</text>
+  </g>
+  <!-- shop items -->
+  <g font-size="46">
+    <text x="560" y="120">🎩</text><text x="650" y="120">🧸</text><text x="740" y="120">🪁</text>
+  </g>
+  <text x="655" y="170" fill="#9fb4e0" font-size="20" font-weight="700" text-anchor="middle">(your lives — the goat WILL eat them)</text>
+  <text x="660" y="430" fill="#bfe6ff" font-size="24" font-weight="600" text-anchor="middle" letter-spacing="3">FEWEST COINS WINS</text>
+  <text x="480" y="505" fill="url(#ttl)" font-size="58" font-weight="800" text-anchor="middle">Grin Change Maker</text>
+</svg>

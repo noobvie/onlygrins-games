@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0c2a2a"/><stop offset=".5" stop-color="#123a3a"/><stop offset="1" stop-color="#082020"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- 3x3 memory grid -->
+  <g>
+    <rect x="300" y="90" width="120" height="120" rx="14" fill="#0a2626" stroke="#2e8a8a" stroke-width="4"/>
+    <rect x="430" y="90" width="120" height="120" rx="14" fill="#0a2626" stroke="#2e8a8a" stroke-width="4"/>
+    <rect x="560" y="90" width="120" height="120" rx="14" fill="#0a2626" stroke="#2e8a8a" stroke-width="4"/>
+    <rect x="300" y="220" width="120" height="120" rx="14" fill="#0a2626" stroke="#2e8a8a" stroke-width="4"/>
+    <rect x="430" y="220" width="120" height="120" rx="14" fill="#2a4a2a" stroke="#ffb84d" stroke-width="5"/>
+    <rect x="560" y="220" width="120" height="120" rx="14" fill="#0a2626" stroke="#2e8a8a" stroke-width="4"/>
+    <rect x="300" y="350" width="120" height="120" rx="14" fill="#0a2626" stroke="#2e8a8a" stroke-width="4"/>
+    <rect x="430" y="350" width="120" height="120" rx="14" fill="#0a2626" stroke="#2e8a8a" stroke-width="4"/>
+    <rect x="560" y="350" width="120" height="120" rx="14" fill="#0a2626" stroke="#2e8a8a" stroke-width="4"/>
+    <text x="360" y="170" font-size="60" text-anchor="middle">🍎</text>
+    <text x="490" y="170" font-size="60" text-anchor="middle">🐱</text>
+    <text x="620" y="170" font-size="60" text-anchor="middle">⚽</text>
+    <text x="360" y="300" font-size="60" text-anchor="middle">🎈</text>
+    <text x="490" y="302" font-size="58" text-anchor="middle">🦄</text>
+    <text x="620" y="300" font-size="60" text-anchor="middle">🚀</text>
+    <text x="360" y="430" font-size="60" text-anchor="middle">🍩</text>
+    <text x="490" y="430" font-size="60" text-anchor="middle">🌈</text>
+    <text x="620" y="430" font-size="60" text-anchor="middle">🐸</text>
+  </g>
+  <!-- magnifier + prof -->
+  <text x="720" y="290" font-size="80">🔍</text>
+  <text x="140" y="270" font-size="96" text-anchor="middle">🎩</text>
+  <text x="480" y="510" fill="url(#ttl)" font-size="56" font-weight="800" text-anchor="middle">Now You See It</text>
+</svg>

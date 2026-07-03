@@ -1,0 +1,30 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "angle-alligator",
+  "title": "Angle Alligator",
+  "category": "math",
+  "short_description": "Read the alligator's jaw angle to feed him flying snacks — get it wrong and his jaw locks open and a dentist bird moves in.",
+  "description": "Snappy the alligator only eats snacks served at EXACTLY the right jaw angle. Look at his open jaw, then name the angle — is it acute, right or obtuse? How many degrees? Get it wrong and his jaw locks open, a dentist bird moves in, and Snappy has to listen to a lecture about flossing. Grade bands ramp from spotting acute, right and obtuse angles, to estimating degrees, to straight angles and sneaky close-together choices under time pressure. A free online angles and geometry game for kids in grades 3–5, with speed and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap the answer that matches the jaw angle, before the timer runs out.",
+  "tags": [
+    "math",
+    "angles",
+    "geometry",
+    "strand-geometry",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:angle-alligator"
+}

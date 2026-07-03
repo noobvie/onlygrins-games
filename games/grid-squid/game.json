@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "grid-squid",
+  "title": "Grid Squid",
+  "category": "math",
+  "short_description": "Gary the squid lost his 8 shoes across a coordinate grid — tap the right spot, or the tentacle slaps a tuna who slaps back.",
+  "description": "Gary the Grid Squid has EIGHT shoes and has lost all of them across the coordinate grid. Read each location and tap the right spot to send a tentacle — miss and it slaps a passing tuna, and the tuna WILL slap back (and possibly press charges). Grade bands ramp from battleship-style grid squares like B3, to first-quadrant coordinate points like (4, 2), to translations (\"move 3 right, then 2 up — where does Gary land?\"). A free online coordinates and grid-reading game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap the grid square or coordinate point named in the task.",
+  "tags": [
+    "math",
+    "coordinates",
+    "grids",
+    "strand-geometry",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:grid-squid"
+}

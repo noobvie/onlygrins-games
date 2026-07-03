@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Percent Parlor — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="percent-parlor"></script>
+
+<style>
+  :root{
+    --bg1:#2e0a2a; --bg2:#40123a; --bg3:#180616;
+    --card:#351030; --line:#8a3a7a; --text:#fff0fa; --muted:#e0a8d4;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --pink:#ff8fc7; --cream:#ffe8b0; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(140deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--pink),var(--cream),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#2a0824;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--pink);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .arena{background:#280a24;border:2px solid var(--line);border-radius:16px;padding:14px;
+    text-align:center;margin-bottom:12px;overflow:hidden;}
+  .task{font-size:clamp(16px,3vw,20px);font-weight:800;color:var(--muted);}
+  .order{font-size:clamp(24px,5vw,38px);font-weight:800;margin:6px 0 10px;}
+  .order .cust{display:inline-block;animation:bob 1.2s infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  .order .pct{color:var(--pink);} .order .of{color:var(--muted);font-size:.7em;}
+  .timerbar{height:10px;border-radius:6px;background:#180616;overflow:hidden;}
+  .timerbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--cream),var(--bad));}
+  .answers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .ans{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:24px;
+    padding:14px 6px;border-radius:14px;color:#2a0824;background:var(--cream);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .ans small{display:block;font-size:13px;font-weight:700;opacity:.7;}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .ans.right{background:var(--green);} .ans.wrong{background:var(--bad);}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#2a0824;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#5a2050;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#a05a90;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🍦 Percent Parlor</h1>
+      <p class="sub">Welcome to the ice-cream parlor where EVERYTHING is on sale! Customers order
+        percentages of scoops, sprinkles and prices. Get the maths wrong and the tiny inspector
+        penguin waddles over and stamps your forehead with <b>AUDITED</b>.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 4<small>50% · 25% · 10%</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 5<small>5% · 20% · 75% too</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 5–6<small>discount prices</small></button>
+      </div>
+      <p class="sub">12 customers · fast serving = bonus points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Customer 1/12</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="arena">
+        <div class="task" id="qtext">A customer waddles up to the counter…</div>
+        <div class="order"><span class="cust" id="custEmoji">🦩</span> <span id="orderTxt"></span></div>
+        <div class="timerbar"><i id="timerFill"></i></div>
+      </div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🍦</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Open shop again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  // denom = smallest base multiple that keeps "pct% of base" a whole number.
+  var PCTS = { 5:20, 10:10, 20:5, 25:4, 50:2, 75:4 };
+  var GRADES = [
+    { id: 4, label: 'Grade 4',   secs: 14, pcts: [50, 25, 10], maxBase: 100, discount: false },
+    { id: 5, label: 'Grade 5',   secs: 12, pcts: [5, 10, 20, 25, 50, 75], maxBase: 200, discount: false },
+    { id: 6, label: 'Grade 5–6', secs: 12, pcts: [5, 10, 20, 25, 50, 75], maxBase: 200, discount: true }
+  ];
+  var ROUNDS = 12;
+  var CUSTOMERS = ['🦩', '🐻', '🐙', '🦒', '🐸', '🦔', '🐼', '🦜'];
+  var ITEMS = ['scoops of grinberry ripple', 'rainbow sprinkles', 'mini marshmallows', 'wafer curls', 'choco pebbles', 'fizzy cherries'];
+
+  var YUM  = ['Perfectly served! The customer does a happy spin! 💫', 'Correct change, correct scoops — five stars! ⭐',
+              'The inspector penguin nods and waddles away. 🐧✅', 'Sundae maths so good the jukebox plays itself. 🎵'];
+  var STAMP = ['STAMP. "AUDITED", right on your forehead. 🐧📋', 'The customer faints into the sprinkle bin. 😵🍬',
+               'The penguin is filling out a VERY long form about you. 🐧✍️', 'Wrong maths — the sundae collapsed in shame. 🍨💥'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var answer = 0, timer = null, tLeft = 0, curTxt = '';
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function ding(){ tone(880,.12,'sine',1760); setTimeout(function(){ tone(1174,.16,'sine'); }, 110); }
+  function thud(){ tone(130,.4,'sawtooth',60); }
+
+  function makeQuestion() {
+    var pct = pick(grade.pcts);
+    var denom = PCTS[pct];
+    var base = denom * rint(Math.max(2, Math.ceil(20 / denom)), Math.floor(grade.maxBase / denom));
+    var part = base * pct / 100;
+    var isDiscount = grade.discount && Math.random() < 0.5;
+    var unit;
+    if (isDiscount) {
+      answer = base - part;
+      unit = 'GP';
+      curTxt = 'A sundae costs ' + base + ' GP — today it\'s ' + pct + '% OFF. What do they pay?';
+      $('qtext').textContent = 'SALE DAY at the parlor!';
+    } else {
+      answer = part;
+      unit = '';
+      var item = pick(ITEMS);
+      curTxt = '“I\'ll have ' + pct + '% of your ' + base + ' ' + item + ', please!”';
+      $('qtext').textContent = 'A customer waddles up to the counter…';
+    }
+    $('custEmoji').textContent = pick(CUSTOMERS);
+    $('orderTxt').innerHTML = curTxt.replace(pct + '%', '<span class="pct">' + pct + '%</span>');
+
+    var opts = [answer];
+    var decoys = isDiscount
+      ? [part, base - part / 2, base - part - denom, answer + denom]     // classic trap: the discount itself
+      : [part * 2, part / 2, base - part, part + denom, part - denom];
+    shuffle(decoys).forEach(function (v) {
+      v = Math.round(v);
+      if (opts.length < 3 && v > 0 && v !== answer && opts.indexOf(v) < 0) opts.push(v);
+    });
+    var box = $('answers');
+    box.innerHTML = '';
+    shuffle(opts).forEach(function (v) {
+      var b = document.createElement('button');
+      b.className = 'ans';
+      b.innerHTML = v + (unit ? ' ' + unit : '') + '<small>' + (isDiscount ? 'they pay 💰' : 'serve this 🍨') + '</small>';
+      b.dataset.v = v;
+      b.addEventListener('click', function(){ choose(b, v); });
+      box.appendChild(b);
+    });
+  }
+
+  function newQuestion() {
+    answered = false;
+    $('roundLbl').textContent = 'Customer ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    makeQuestion();
+    tLeft = grade.secs;
+    clearInterval(timer);
+    timer = setInterval(function () {
+      tLeft -= 0.1;
+      $('timerFill').style.width = Math.max(0, tLeft / grade.secs * 100) + '%';
+      if (tLeft <= 0) timeUp();
+    }, 100);
+    EduSDK.startLesson(q + 1, { question: curTxt });
+  }
+
+  function settle(correct, btn) {
+    clearInterval(timer);
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (Number(b.dataset.v) === answer) b.classList.add('right');
+    });
+    if (correct) {
+      streak++; nCorrect++;
+      var speedBonus = Math.round(tLeft / grade.secs * 40);
+      var pts = 100 + speedBonus + streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      ding();
+      $('toast').textContent = pick(YUM) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      if (btn) btn.classList.add('wrong');
+      thud();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(STAMP) + '  (the answer was ' + answer + ')';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1600);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 1600);
+    } else setTimeout(newQuestion, 1600);
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    settle(v === answer, btn);
+  }
+
+  function timeUp() {
+    if (answered) return;
+    answered = true;
+    settle(false, null);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 10 ? '🍦🏆' : nCorrect >= 6 ? '🍦😋' : '🐧📋';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' orders served right. ' +
+      (nCorrect >= 10 ? 'The parlor earns a fourth Michelin sprinkle!' :
+       nCorrect >= 6 ? 'A tidy day of dessert commerce.' :
+       'The inspector penguin has moved into the walk-in freezer. Rent free.');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'percent-parlor' });
+})();
+</script>
+</body>
+</html>

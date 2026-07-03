@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Punctuation Panic — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="language" data-seed="punctuation-panic"></script>
+
+<style>
+  :root{
+    --bg1:#24240a; --bg2:#333310; --bg3:#121204;
+    --card:#2c2c0e; --line:#8a8a2e; --text:#fffde8; --muted:#d8d49a;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --gold:#ffd166; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(150deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--gold),var(--bad),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#242408;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--gold);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .arena{background:#20200a;border:2px solid var(--line);border-radius:16px;padding:14px;
+    text-align:center;margin-bottom:12px;overflow:hidden;}
+  .task{font-size:clamp(15px,2.8vw,19px);font-weight:800;color:var(--muted);}
+  .bomb{font-size:clamp(19px,3.6vw,28px);font-weight:800;margin:8px 0 10px;line-height:1.5;}
+  .bomb .fuse{display:inline-block;font-size:1.4em;animation:tick .8s infinite;}
+  @keyframes tick{0%,100%{transform:rotate(-6deg) scale(1)}50%{transform:rotate(6deg) scale(1.08)}}
+  .timerbar{height:10px;border-radius:6px;background:#121204;overflow:hidden;}
+  .timerbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--gold),var(--bad));}
+  .answers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .answers.stack{grid-template-columns:1fr;max-width:720px;}
+  .ans{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:26px;
+    padding:14px 10px;border-radius:14px;color:#242408;background:var(--gold);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .answers.stack .ans{font-size:19px;text-align:left;padding:13px 18px;}
+  .ans small{display:block;font-size:13px;font-weight:700;opacity:.7;}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .ans.right{background:var(--green);} .ans.wrong{background:var(--bad);}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#242408;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#50501c;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#98984f;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>💣 Punctuation Panic</h1>
+      <p class="sub">The Punctuation Bomb Squad needs YOU. Sentences are ticking down to zero and
+        only the right punctuation can defuse them — one missed comma turns
+        “Let's eat, Grandma!” into something horrifying. Grandma is NOT amused.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>. or ? or !</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3–4<small>commas &amp; capitals</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 5<small>apostrophe defusal</small></button>
+      </div>
+      <p class="sub">12 ticking sentences · fast defusing = bonus points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Bomb 1/12</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="arena">
+        <div class="task" id="qtext">Defuse it! Which end mark?</div>
+        <div class="bomb"><span class="fuse">💣</span> <span id="sentence"></span></div>
+        <div class="timerbar"><i id="timerFill"></i></div>
+      </div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">💣</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Next mission ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // --- end-mark bombs: [sentence without end mark, correct mark] ---
+  var ENDMARKS = [
+    ['The cat is asleep on the mat', '.'], ['What time is the party', '?'],
+    ['Look out for that banana peel', '!'], ['My brother has a pet snail', '.'],
+    ['Where did the pirate park his ship', '?'], ['The volcano is erupting', '!'],
+    ['I like cheese sandwiches', '.'], ['Can penguins fly', '?'],
+    ['We won the cup', '!'], ['The library opens at nine', '.'],
+    ['Why is the dog wearing sunglasses', '?'], ['Run, the robots are coming', '!']
+  ];
+  var MARKLBL = { '.': 'full stop', '?': 'question mark', '!': 'exclamation mark' };
+
+  // --- pick-the-correct-version bombs: first entry is correct ---
+  var VERSIONS = [
+    ["Let's eat, Grandma!", "Let's eat Grandma!", "Lets eat, Grandma!"],
+    ['I packed apples, socks and a torch.', 'I packed apples socks and a torch.', 'I packed, apples, socks and a torch.'],
+    ['My friend Leo lives in Paris.', 'my friend leo lives in Paris.', 'My friend leo lives in paris.'],
+    ['We visited London on Monday.', 'we visited london on monday.', 'We visited london on Monday.'],
+    ['The dragon likes tea, toast and jam.', 'The dragon likes tea toast, and, jam.', 'The dragon, likes tea, toast and jam.'],
+    ['“Help!” shouted the pirate.', '“Help” shouted! the pirate.', 'Help! “shouted the pirate.”'],
+    ['Is your hamster called Kevin?', 'Is your hamster called Kevin.', 'is your hamster called Kevin?'],
+    ['On Saturday we play football, chess and tag.', 'On saturday we play football chess and tag.', 'On Saturday we play, football chess, and tag.'],
+    ['“Wait for me!” yelled the tortoise.', '“Wait for me yelled” the tortoise!', 'Wait for me! yelled “the tortoise”.'],
+    ['My teacher, Mr Grin, juggles pineapples.', 'My teacher Mr Grin juggles, pineapples.', 'my teacher, mr grin, juggles pineapples.']
+  ];
+
+  // --- apostrophe bombs: first entry is correct ---
+  var APOSTROPHES = [
+    ["It's raining cats and dogs.", 'Its raining cats and dogs.', "Its' raining cats and dogs."],
+    ['The robot lost its batteries.', "The robot lost it's batteries.", "The robot lost its' batteries."],
+    ["The dog's bowl is empty again.", 'The dogs bowl is empty again.', "The dogs' bowl is empty again. (there is ONE dog)"],
+    ["We're late for the rocket launch!", 'Were late for the rocket launch!', "Wer'e late for the rocket launch!"],
+    ["The twins' bunk bed collapsed. (TWO twins)", "The twin's bunk bed collapsed. (TWO twins)", 'The twins bunk bed collapsed. (TWO twins)'],
+    ["Don't feed the seagulls.", 'Dont feed the seagulls.', "Do'nt feed the seagulls."],
+    ["The wizard's hat is full of frogs.", 'The wizards hat is full of frogs. (ONE wizard)', "The wizards' hat is full of frogs. (ONE wizard)"],
+    ["You're standing on my sandwich.", 'Your standing on my sandwich.', "Youre' standing on my sandwich."],
+    ["The children's cloakroom is a swamp now.", "The childrens' cloakroom is a swamp now.", 'The childrens cloakroom is a swamp now.'],
+    ["That is Grandma's secret recipe.", 'That is Grandmas secret recipe.', "That is Grandmas' secret recipe."]
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', secs: 12, mode: 'endmark' },
+    { id: 3, label: 'Grade 3–4', secs: 15, mode: 'version', bank: VERSIONS },
+    { id: 5, label: 'Grade 5',   secs: 15, mode: 'version', bank: APOSTROPHES }
+  ];
+  var ROUNDS = 12;
+
+  var SNIP = ['SNIP. Defused with half a second to spare. 😎', 'The sentence sighs with relief. 😮‍💨',
+              'Grandma nods approvingly and offers biscuits. 👵🍪', 'The bomb squad chief salutes your comma. 🫡'];
+  var BOOM = ['BOOM. Confetti made of tiny commas everywhere. 💥', 'The sentence now means something HORRIFYING. 😱',
+              'Grandma read it. Grandma is NOT amused. 👵💢', 'The full stop rolled under the sofa. Gone forever. ⚫'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var answer = '', timer = null, tLeft = 0, order = [], curSrc = '';
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function snipSfx(){ tone(1046,.1,'sine'); setTimeout(function(){ tone(1568,.18,'sine'); }, 100); }
+  function boomSfx(){ tone(90,.6,'sawtooth',35); }
+
+  function makeQuestion() {
+    var box = $('answers');
+    box.innerHTML = '';
+    if (grade.mode === 'endmark') {
+      var e = order[q % order.length];
+      curSrc = e[0];
+      answer = e[1];
+      $('sentence').textContent = e[0] + ' ⍰';
+      $('qtext').textContent = 'Which END MARK defuses this sentence?';
+      box.className = 'answers';
+      ['.', '?', '!'].forEach(function (m) {
+        var b = document.createElement('button');
+        b.className = 'ans';
+        b.innerHTML = m + '<small>' + MARKLBL[m] + '</small>';
+        b.dataset.v = m;
+        b.addEventListener('click', function(){ choose(b, m); });
+        box.appendChild(b);
+      });
+    } else {
+      var v = order[q % order.length];
+      curSrc = v[0];
+      answer = v[0];
+      $('sentence').textContent = 'Only ONE version is safe to cut…';
+      $('qtext').textContent = 'Tap the CORRECTLY punctuated sentence!';
+      box.className = 'answers stack';
+      shuffle(v).forEach(function (s) {
+        var b = document.createElement('button');
+        b.className = 'ans';
+        b.textContent = '✂️ ' + s;
+        b.dataset.v = s;
+        b.addEventListener('click', function(){ choose(b, s); });
+        box.appendChild(b);
+      });
+    }
+  }
+
+  function newQuestion() {
+    answered = false;
+    $('roundLbl').textContent = 'Bomb ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    makeQuestion();
+    tLeft = grade.secs;
+    clearInterval(timer);
+    timer = setInterval(function () {
+      tLeft -= 0.1;
+      $('timerFill').style.width = Math.max(0, tLeft / grade.secs * 100) + '%';
+      if (tLeft <= 0) timeUp();
+    }, 100);
+    EduSDK.startLesson(q + 1, { sentence: curSrc });
+  }
+
+  function settle(correct, btn) {
+    clearInterval(timer);
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (b.dataset.v === answer) b.classList.add('right');
+    });
+    if (correct) {
+      streak++; nCorrect++;
+      var speedBonus = Math.round(tLeft / grade.secs * 40);
+      var pts = 100 + speedBonus + streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      snipSfx();
+      $('toast').textContent = pick(SNIP) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      if (btn) btn.classList.add('wrong');
+      boomSfx();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(BOOM) + (grade.mode === 'endmark'
+        ? '  (it needed a ' + MARKLBL[answer] + ': “' + curSrc + answer + '”)'
+        : '  (safe version: “' + answer + '”)');
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1900);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 1900);
+    } else setTimeout(newQuestion, 1900);
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    settle(v === answer, btn);
+  }
+
+  function timeUp() {
+    if (answered) return;
+    answered = true;
+    settle(false, null);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 10 ? '💣🏆' : nCorrect >= 6 ? '💣✂️' : '👵💢';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' sentences defused. ' +
+      (nCorrect >= 10 ? 'Chief of the Punctuation Bomb Squad!' :
+       nCorrect >= 6 ? 'The city is mostly safe from bad grammar.' :
+       'Grandma has confiscated the biscuit tin until further notice.');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    order = shuffle(grade.mode === 'endmark' ? ENDMARKS : grade.bank);
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'punctuation-panic' });
+})();
+</script>
+</body>
+</html>

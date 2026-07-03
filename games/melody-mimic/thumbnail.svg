@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a0c33"/><stop offset=".5" stop-color="#2a1247"/><stop offset="1" stop-color="#100820"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- glowing pads -->
+  <g>
+    <rect x="120" y="150" width="150" height="150" rx="20" fill="#ff6b81"/>
+    <rect x="290" y="150" width="150" height="150" rx="20" fill="#ffb84d" filter="brightness(1.4)"/>
+    <rect x="290" y="150" width="150" height="150" rx="20" fill="#fff" opacity=".25"/>
+    <rect x="460" y="150" width="150" height="150" rx="20" fill="#3ee87a"/>
+    <rect x="630" y="150" width="150" height="150" rx="20" fill="#5ad8ff"/>
+    <text x="195" y="248" font-size="54" text-anchor="middle">🎵</text>
+    <text x="365" y="248" font-size="54" text-anchor="middle">🎶</text>
+    <text x="535" y="248" font-size="54" text-anchor="middle">🎵</text>
+    <text x="705" y="248" font-size="54" text-anchor="middle">🎶</text>
+  </g>
+  <!-- macaw + notes -->
+  <text x="840" y="230" font-size="90" text-anchor="middle">🦜</text>
+  <text x="150" y="110" font-size="40">🎶</text>
+  <text x="500" y="100" font-size="44">♪</text>
+  <text x="680" y="120" font-size="40">♫</text>
+  <text x="480" y="420" fill="url(#ttl)" font-size="66" font-weight="800" text-anchor="middle">Melody Mimic</text>
+  <text x="480" y="470" font-size="22" fill="#c9a8e8" text-anchor="middle">Listen · Remember · Play it back</text>
+</svg>

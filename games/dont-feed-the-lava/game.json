@@ -1,0 +1,31 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "dont-feed-the-lava",
+  "title": "Don't Feed the Lava",
+  "category": "science",
+  "short_description": "Feed each sorting monster the right kind of thing — wrong answers make the Lava Monster erupt.",
+  "description": "The sorting monsters are hungry, and each one only eats ONE kind of thing. Sort items into the right monster's mouth: living vs non-living for Grade 1–2, solid/liquid/gas for Grade 3, and mammal/bird/reptile (with sneaky gotchas like whales, bats and penguins) for Grade 4–5. Feed the wrong monster and the extremely dramatic Lava Monster erupts and spits it back over everyone. Teaches scientific classification with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap the monster that eats the shown item.",
+  "tags": [
+    "science",
+    "classification",
+    "strand-classification",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:dont-feed-the-lava"
+}

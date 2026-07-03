@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Times-Table Trampoline — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="times-table-trampoline"></script>
+
+<style>
+  :root{
+    --bg1:#13204a; --bg2:#1a1140; --bg3:#0c2a3a;
+    --card:#141c3f; --line:#2b3a77; --text:#eaf2ff; --muted:#9fb4e0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ff8a5c; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--blue),var(--green),var(--orange));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades,.modes{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn,.modeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#06122a;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active,.modeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small,.modeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+  .modeBtn{background:#22305f;color:var(--text);border:2px solid var(--line);}
+  .modeBtn.sel{background:var(--orange);color:#06122a;border-color:var(--orange);}
+
+  .layout{display:flex;gap:18px;}
+  .sky{width:150px;min-width:120px;height:380px;border-radius:16px;position:relative;overflow:hidden;
+    background:linear-gradient(180deg,#0b1030 0%,#17306b 55%,#2b57a8 100%);border:2px solid var(--line);}
+  .cloud{position:absolute;font-size:22px;opacity:.5;}
+  .jumper{position:absolute;font-size:34px;transition:bottom .5s cubic-bezier(.3,1.6,.5,1);transform:translateX(-50%);}
+  .jumper .tag{display:block;font-size:10px;font-weight:800;text-align:center;color:#fff;
+    background:rgba(0,0,0,.4);border-radius:6px;padding:0 4px;}
+  .tramp{position:absolute;bottom:2px;width:100%;text-align:center;font-size:20px;}
+  .altLbl{position:absolute;top:6px;left:0;right:0;text-align:center;font-size:12px;font-weight:800;color:#bfe6ff;}
+
+  .qarea{flex:1;display:flex;flex-direction:column;}
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .qcard{background:#0d1533;border:2px solid var(--line);border-radius:16px;padding:18px;text-align:center;}
+  .qtext{font-size:clamp(30px,6vw,52px);font-weight:800;margin:4px 0 14px;}
+  .timerbar{height:10px;border-radius:6px;background:#0a1130;overflow:hidden;margin:0 0 16px;}
+  .timerbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--orange),var(--bad));}
+  .answers{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .ans{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:26px;
+    padding:16px;border-radius:14px;color:#06122a;background:var(--blue);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .ans.right{background:var(--green);} .ans.wrong{background:var(--bad);}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#06122a;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#22305f;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#5f74a8;}
+  @media (max-width:640px){ .layout{flex-direction:column;} .sky{width:100%;height:120px;}
+    .jumper{transition:left .5s cubic-bezier(.3,1.6,.5,1);} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🦭 Times-Table Trampoline</h1>
+      <p class="sub">Answer times-table questions to bounce Waldo the Walrus into the sky!
+        Right answers = boing. Wrong answers = a very sad <i>pfffft</i>. In Race mode, a rival
+        walrus named Kevin bounces beside you. Kevin is not as clever as he thinks.</p>
+      <div class="modes">
+        <button class="modeBtn sel" data-mode="solo">🦭 Solo<small>just you &amp; the sky</small></button>
+        <button class="modeBtn" data-mode="race">🦭🆚🦭 Race Kevin<small>beat the bot walrus</small></button>
+      </div>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>×2 ×5 ×10</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>×3 ×4 ×6 + ÷</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>×7 ×8 ×9 ×12, × and ÷</small></button>
+      </div>
+      <p class="sub">12 bounces · fast answers bounce higher</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Bounce 1/12</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="layout">
+        <div class="sky" id="sky">
+          <div class="altLbl" id="altLbl">0 m</div>
+          <span class="cloud" style="top:18%;left:8%">☁️</span>
+          <span class="cloud" style="top:42%;left:60%">☁️</span>
+          <span class="cloud" style="top:66%;left:25%">☁️</span>
+          <div class="jumper" id="you" style="left:35%;bottom:26px;"><span class="tag">YOU</span>🦭</div>
+          <div class="jumper hidden" id="bot" style="left:70%;bottom:26px;"><span class="tag">KEVIN</span>🦭</div>
+          <div class="tramp">🔵➖➖➖🔵</div>
+        </div>
+        <div class="qarea">
+          <div class="qcard">
+            <div class="qtext" id="qtext">7 × 8 = ?</div>
+            <div class="timerbar"><i id="timerFill"></i></div>
+            <div class="answers" id="answers"></div>
+          </div>
+          <div class="toast" id="toast"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🦭</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Bounce again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Grade bands — one game, difficulty chosen inside (PLAN.md §5.1).
+  // `bot` = Kevin's accuracy/speed per grade: beatable but pushy.
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', tables: [2, 5, 10],   div: false, secs: 12, bot: { acc: 0.55 } },
+    { id: 3, label: 'Grade 3',   tables: [3, 4, 6],    div: true,  secs: 10, bot: { acc: 0.65 } },
+    { id: 4, label: 'Grade 4–5', tables: [7, 8, 9, 12],div: true,  secs: 8,  bot: { acc: 0.72 } }
+  ];
+  var QUESTIONS = 12, JUMP = 10, MAXALT = QUESTIONS * JUMP;
+
+  var PFFT = ['Pfffft… the trampoline deflated a little. 😔',
+              'BOING—no wait, that was a flop. 🫠',
+              'Waldo face-planted. Gracefully. 🦭💥',
+              'The seagulls are laughing. Ignore them. 🐦'];
+  var BOING = ['BOING! Waldo soars! 🚀', 'Magnificent blubber physics! ✨',
+               'The clouds wave hello! ☁️👋', 'Kevin is visibly worried. 😰'];
+
+  var grade = GRADES[0], mode = 'solo';
+  var q = 0, score = 0, alt = 0, botAlt = 0, streak = 0;
+  var answer = 0, timer = null, tLeft = 0, answered = false;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function boing(){ tone(220,.25,'sine',660); }
+  function pfft(){ tone(300,.4,'sawtooth',60); }
+
+  function setAlt(el, a) {
+    var pct = Math.min(1, a / MAXALT);
+    el.style.bottom = (26 + pct * 300) + 'px';
+    if (window.matchMedia('(max-width:640px)').matches) {
+      el.style.bottom = '26px';
+      el.style.left = (10 + pct * 75) + '%';
+    }
+  }
+
+  function makeQuestion() {
+    var t = pick(grade.tables), n = rint(2, 12);
+    var isDiv = grade.div && Math.random() < 0.4;
+    if (isDiv) { answer = n; $('qtext').textContent = (t * n) + ' ÷ ' + t + ' = ?'; }
+    else { answer = t * n; $('qtext').textContent = t + ' × ' + n + ' = ?'; }
+
+    var opts = [answer];
+    while (opts.length < 4) {
+      var wrong = answer + pick([-2, -1, 1, 2, t, -t, 10, -10]);
+      if (wrong > 0 && opts.indexOf(wrong) < 0) opts.push(wrong);
+    }
+    opts.sort(function(){ return Math.random() - 0.5; });
+
+    var box = $('answers'); box.innerHTML = '';
+    opts.forEach(function (v) {
+      var b = document.createElement('button');
+      b.className = 'ans'; b.textContent = v;
+      b.addEventListener('click', function(){ choose(b, v); });
+      box.appendChild(b);
+    });
+  }
+
+  function newQuestion() {
+    answered = false;
+    $('roundLbl').textContent = 'Bounce ' + (q + 1) + '/' + QUESTIONS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    makeQuestion();
+    tLeft = grade.secs;
+    clearInterval(timer);
+    timer = setInterval(function () {
+      tLeft -= 0.1;
+      $('timerFill').style.width = Math.max(0, tLeft / grade.secs * 100) + '%';
+      if (tLeft <= 0) timeUp();
+    }, 100);
+    EduSDK.startLesson(q + 1, { question: $('qtext').textContent });
+  }
+
+  function botBounces() {
+    if (mode !== 'race') return;
+    if (Math.random() < grade.bot.acc) {
+      botAlt += JUMP;
+      setAlt($('bot'), botAlt);
+    }
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    clearInterval(timer);
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (Number(b.textContent) === answer) b.classList.add('right');
+    });
+    var correct = v === answer;
+    if (correct) {
+      streak++;
+      var speedBonus = Math.round(tLeft / grade.secs * 40);
+      var pts = 100 + speedBonus + streak * 10;
+      score += pts; alt += JUMP;
+      $('scoreVal').textContent = score;
+      setAlt($('you'), alt);
+      boing();
+      $('toast').textContent = pick(BOING) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      btn.classList.add('wrong');
+      alt = Math.max(0, alt - JUMP / 2);
+      setAlt($('you'), alt);
+      pfft();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(PFFT) + '  (it was ' + answer + ')';
+      $('toast').className = 'toast bad';
+    }
+    botBounces();
+    $('altLbl').textContent = Math.round(alt) + ' m' + (mode === 'race' ? ' · Kevin ' + Math.round(botAlt) + ' m' : '');
+    EduSDK.finishLesson(q + 1, { correct: correct, timeLeft: Math.max(0, Math.round(tLeft)) });
+    next();
+  }
+
+  function timeUp() {
+    if (answered) return;
+    answered = true;
+    clearInterval(timer);
+    streak = 0;
+    $('toast').textContent = '⏰ Too slow! Waldo just… stood there. (it was ' + answer + ')';
+    $('toast').className = 'toast bad';
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (Number(b.textContent) === answer) b.classList.add('right');
+    });
+    botBounces();
+    $('altLbl').textContent = Math.round(alt) + ' m' + (mode === 'race' ? ' · Kevin ' + Math.round(botAlt) + ' m' : '');
+    EduSDK.finishLesson(q + 1, { correct: false, timeout: true });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= QUESTIONS) return setTimeout(finish, 1500);
+    if (q === Math.floor(QUESTIONS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 1500);
+    } else setTimeout(newQuestion, 1500);
+  }
+
+  function finish() {
+    var wonRace = mode === 'race' && alt > botAlt;
+    if (wonRace) score += 300;
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = wonRace ? '🦭🏆' : (mode === 'race' && botAlt >= alt ? '🦭😤' : '🦭🎈');
+    $('finalLine').textContent = grade.label + ' — Waldo reached ' + Math.round(alt) + ' m' +
+      (mode === 'race'
+        ? (wonRace ? ' and beat Kevin (' + Math.round(botAlt) + ' m)! +300 race bonus!'
+                   : '. Kevin got ' + Math.round(botAlt) + ' m and will NOT stop talking about it.')
+        : ' above the trampoline!');
+    EduSDK.submitScore(score, { grade: grade.id, mode: mode, altitude: Math.round(alt) })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; alt = 0; botAlt = 0; streak = 0;
+    $('scoreVal').textContent = '0';
+    $('bot').classList.toggle('hidden', mode !== 'race');
+    setAlt($('you'), 0); setAlt($('bot'), 0);
+    $('altLbl').textContent = '0 m';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.modeBtn'), function (b) {
+    b.addEventListener('click', function () {
+      mode = b.dataset.mode;
+      Array.prototype.forEach.call(document.querySelectorAll('.modeBtn'), function (x) {
+        x.classList.toggle('sel', x === b);
+      });
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'times-table-trampoline' });
+})();
+</script>
+</body>
+</html>

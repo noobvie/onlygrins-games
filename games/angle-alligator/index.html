@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Angle Alligator — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="angle-alligator"></script>
+
+<style>
+  :root{
+    --bg1:#0c2e1a; --bg2:#144024; --bg3:#06180d;
+    --card:#103522; --line:#2e7a4a; --text:#eafff0; --muted:#9ad8ae;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --gold:#ffd166; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(150deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--green),var(--gold),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#062712;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .arena{background:#0a2415;border:2px solid var(--line);border-radius:16px;padding:10px 14px;
+    text-align:center;margin-bottom:12px;overflow:hidden;}
+  .task{font-size:clamp(16px,3vw,21px);font-weight:800;color:var(--muted);}
+  .jawbox{margin:2px auto 8px;}
+  .jawbox svg{max-width:100%;height:auto;display:block;margin:0 auto;}
+  .timerbar{height:10px;border-radius:6px;background:#06180d;overflow:hidden;}
+  .timerbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--gold),var(--bad));}
+  .answers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .ans{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:22px;
+    padding:14px 6px;border-radius:14px;color:#062712;background:var(--gold);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .ans small{display:block;font-size:13px;font-weight:700;opacity:.7;}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .ans.right{background:var(--green);} .ans.wrong{background:var(--bad);}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#062712;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#1c5a34;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#4a9a68;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🐊 Angle Alligator</h1>
+      <p class="sub">Snappy the alligator only eats snacks served at EXACTLY the right jaw angle.
+        Read his open jaw and name the angle. Get it wrong and his jaw locks open, a dentist bird
+        moves in, and Snappy gets a lecture about flossing.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 3<small>acute · right · obtuse</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 4<small>estimate the degrees</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 5<small>straight angles &amp; close calls</small></button>
+      </div>
+      <p class="sub">12 hungry chomps · fast reading = bonus points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Chomp 1/12</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="arena">
+        <div class="task" id="qtext">What kind of angle is Snappy's jaw?</div>
+        <div class="jawbox">
+          <svg id="jaw" width="420" height="190" viewBox="0 0 420 190">
+            <g id="jawG" transform="translate(80,150)">
+              <path id="arc" d="" fill="none" stroke="#ffd166" stroke-width="4"/>
+              <line x1="0" y1="0" x2="290" y2="0" stroke="#3ee87a" stroke-width="12" stroke-linecap="round"/>
+              <line id="upper" x1="0" y1="0" x2="290" y2="0" stroke="#3ee87a" stroke-width="12" stroke-linecap="round"/>
+              <circle cx="0" cy="0" r="12" fill="#ffd166"/>
+              <text id="eye" x="-38" y="-6" font-size="34">🐊</text>
+              <text id="snack" x="150" y="-40" font-size="30">🍩</text>
+            </g>
+          </svg>
+        </div>
+        <div class="timerbar"><i id="timerFill"></i></div>
+      </div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🐊</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Chomp again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 3, label: 'Grade 3', secs: 12, mode: 'classify', straight: false },
+    { id: 4, label: 'Grade 4', secs: 11, mode: 'estimate', gap: 30 },
+    { id: 5, label: 'Grade 5', secs: 9,  mode: 'mixed',    gap: 20, straight: true }
+  ];
+  var ROUNDS = 12;
+  var SNACKS = ['🍩', '🍕', '🍉', '🌮', '🍪', '🐟'];
+
+  var CHOMP = ['CHOMP! Delicious geometry! 🐊✨', 'Perfect angle — Snappy purrs. (Alligators can purr now.) 🐊',
+               'Snack captured! The swamp applauds politely. 👏', 'Protractor-perfect! Snappy sheds a proud tear. 🥲'];
+  var LOCK  = ['CREAK. Jaw locked open. The dentist bird moves in. 🐦', 'Wrong angle! The snack bounced off his nose. 🍩💨',
+               'The dentist bird is flossing him AND judging you. 🐦🦷', 'Snappy sighs through his locked jaw. It whistles. 🎵'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var answer = null, timer = null, tLeft = 0, curDeg = 45;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function chompSfx(){ tone(220,.08,'square'); setTimeout(function(){ tone(660,.15,'sine',1320); }, 90); }
+  function creakSfx(){ tone(120,.5,'sawtooth',70); }
+
+  function drawJaw(deg) {
+    var rad = deg * Math.PI / 180;
+    var len = 290;
+    var x2 = Math.cos(rad) * len, y2 = -Math.sin(rad) * len;
+    var up = $('upper');
+    up.setAttribute('x2', x2.toFixed(1));
+    up.setAttribute('y2', y2.toFixed(1));
+    // angle arc (radius 46, from lower ray up to the upper ray)
+    var r = 46, ax = Math.cos(rad) * r, ay = -Math.sin(rad) * r;
+    $('arc').setAttribute('d', 'M ' + r + ' 0 A ' + r + ' ' + r + ' 0 ' + (deg > 180 ? 1 : 0) + ' 0 ' +
+      ax.toFixed(1) + ' ' + ay.toFixed(1));
+    // snack floats mid-angle
+    var mid = rad / 2, sr = 120;
+    $('snack').setAttribute('x', (Math.cos(mid) * sr - 14).toFixed(0));
+    $('snack').setAttribute('y', (-Math.sin(mid) * sr + 10).toFixed(0));
+    $('snack').textContent = pick(SNACKS);
+  }
+
+  function classOf(deg) {
+    if (deg === 90) return 'right';
+    if (deg === 180) return 'straight';
+    return deg < 90 ? 'acute' : 'obtuse';
+  }
+
+  function makeQuestion() {
+    var mode = grade.mode === 'mixed' ? pick(['classify', 'estimate']) : grade.mode;
+    var opts, labels;
+    if (mode === 'classify') {
+      var pool = grade.straight
+        ? [20, 35, 50, 65, 75, 90, 90, 110, 125, 140, 155, 180]
+        : [20, 30, 45, 60, 75, 90, 90, 105, 120, 135, 150, 160];
+      curDeg = pick(pool);
+      answer = classOf(curDeg);
+      $('qtext').textContent = "What kind of angle is Snappy's jaw?";
+      opts = grade.straight ? ['acute', 'right', 'obtuse', 'straight'] : ['acute', 'right', 'obtuse'];
+      labels = { acute: 'less than 90°', right: 'exactly 90°', obtuse: 'more than 90°', straight: 'exactly 180°' };
+    } else {
+      var gap = grade.gap;
+      curDeg = rint(2, Math.floor(170 / 10)) * 10;   // 20°…170°, multiples of 10
+      answer = curDeg;
+      $('qtext').textContent = 'How many DEGREES is Snappy\'s jaw open?';
+      var d1 = curDeg + gap * (Math.random() < 0.5 ? 1 : -1);
+      if (d1 < 10 || d1 > 175) d1 = curDeg + gap * (d1 < 10 ? 1 : -1) * -1 + 2 * gap * (d1 < 10 ? 1 : 0);
+      if (d1 < 10) d1 = curDeg + gap;
+      if (d1 > 175) d1 = curDeg - gap;
+      var d2 = curDeg + gap * 2 * (curDeg > 95 ? -1 : 1);
+      opts = [curDeg, d1, d2].filter(function (v, i, a) { return a.indexOf(v) === i && v >= 5 && v <= 178; });
+      while (opts.length < 3) opts.push(curDeg + gap * opts.length * (curDeg > 95 ? -1 : 1));
+      labels = null;
+    }
+    drawJaw(curDeg);
+    var box = $('answers');
+    box.innerHTML = '';
+    shuffle(opts).forEach(function (v) {
+      var b = document.createElement('button');
+      b.className = 'ans';
+      b.innerHTML = labels ? (v.toUpperCase() + '<small>' + labels[v] + '</small>')
+                           : (v + '°<small>degrees</small>');
+      b.dataset.v = v;
+      b.addEventListener('click', function(){ choose(b, mode === 'classify' ? v : Number(v)); });
+      box.appendChild(b);
+    });
+  }
+
+  function newQuestion() {
+    answered = false;
+    $('roundLbl').textContent = 'Chomp ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    makeQuestion();
+    tLeft = grade.secs;
+    clearInterval(timer);
+    timer = setInterval(function () {
+      tLeft -= 0.1;
+      $('timerFill').style.width = Math.max(0, tLeft / grade.secs * 100) + '%';
+      if (tLeft <= 0) timeUp();
+    }, 100);
+    EduSDK.startLesson(q + 1, { angle: curDeg });
+  }
+
+  function settle(correct, btn) {
+    clearInterval(timer);
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      var v = isNaN(Number(b.dataset.v)) ? b.dataset.v : Number(b.dataset.v);
+      if (v === answer) b.classList.add('right');
+    });
+    if (correct) {
+      streak++; nCorrect++;
+      var speedBonus = Math.round(tLeft / grade.secs * 40);
+      var pts = 100 + speedBonus + streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      chompSfx();
+      drawJaw(4); // snap shut!
+      $('toast').textContent = pick(CHOMP) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      if (btn) btn.classList.add('wrong');
+      creakSfx();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(LOCK) + '  (it was ' +
+        (typeof answer === 'number' ? answer + '°' : answer.toUpperCase() + ', ' + curDeg + '°') + ')';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1600);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 1600);
+    } else setTimeout(newQuestion, 1600);
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    settle(v === answer, btn);
+  }
+
+  function timeUp() {
+    if (answered) return;
+    answered = true;
+    settle(false, null);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 10 ? '🐊🏆' : nCorrect >= 6 ? '🐊🍩' : '🐊🐦';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' snacks chomped. ' +
+      (nCorrect >= 10 ? 'Snappy names you Royal Protractor of the Swamp!' :
+       nCorrect >= 6 ? 'A well-fed alligator is a happy alligator.' :
+       'The dentist bird has moved in permanently. It brought a tiny chair.');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'angle-alligator' });
+})();
+</script>
+</body>
+</html>

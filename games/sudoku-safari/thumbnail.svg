@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1c2a0c"/><stop offset=".5" stop-color="#2a3a12"/><stop offset="1" stop-color="#141f08"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- 3x3 corner of a sudoku grid -->
+  <g>
+    <rect x="330" y="60" width="100" height="100" rx="16" fill="#31451a" stroke="#52702a" stroke-width="5"/>
+    <rect x="444" y="60" width="100" height="100" rx="16" fill="#31451a" stroke="#52702a" stroke-width="5"/>
+    <rect x="558" y="60" width="100" height="100" rx="16" fill="#31451a" stroke="#52702a" stroke-width="5"/>
+    <rect x="330" y="174" width="100" height="100" rx="16" fill="#31451a" stroke="#52702a" stroke-width="5"/>
+    <rect x="444" y="174" width="100" height="100" rx="16" fill="#3a3110" stroke="#ffb84d" stroke-width="5" stroke-dasharray="14 10"/>
+    <rect x="558" y="174" width="100" height="100" rx="16" fill="#31451a" stroke="#52702a" stroke-width="5"/>
+    <rect x="330" y="288" width="100" height="100" rx="16" fill="#31451a" stroke="#52702a" stroke-width="5"/>
+    <rect x="444" y="288" width="100" height="100" rx="16" fill="#31451a" stroke="#52702a" stroke-width="5"/>
+    <rect x="558" y="288" width="100" height="100" rx="16" fill="#31451a" stroke="#52702a" stroke-width="5"/>
+    <text x="380" y="132" font-size="60" text-anchor="middle">🦁</text>
+    <text x="494" y="132" font-size="60" text-anchor="middle">🦒</text>
+    <text x="608" y="132" font-size="60" text-anchor="middle">🐘</text>
+    <text x="380" y="246" font-size="60" text-anchor="middle">🐘</text>
+    <text x="494" y="252" font-size="62" font-weight="800" fill="#ffb84d" text-anchor="middle">?</text>
+    <text x="608" y="246" font-size="60" text-anchor="middle">🦁</text>
+    <text x="380" y="360" font-size="60" text-anchor="middle">🦒</text>
+    <text x="494" y="360" font-size="60" text-anchor="middle">🦁</text>
+    <text x="608" y="360" font-size="60" text-anchor="middle">🦓</text>
+  </g>
+  <!-- zebra referee + jeep -->
+  <text x="140" y="280" font-size="120" text-anchor="middle">🦓</text>
+  <text x="140" y="360" font-size="40" text-anchor="middle">📋</text>
+  <text x="830" y="280" font-size="90" text-anchor="middle">🦒</text>
+  <text x="840" y="400" font-size="56" text-anchor="middle">🚙</text>
+  <text x="480" y="490" fill="url(#ttl)" font-size="64" font-weight="800" text-anchor="middle">Sudoku Safari</text>
+</svg>

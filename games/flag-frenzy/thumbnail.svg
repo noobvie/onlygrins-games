@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1e3a"/><stop offset=".5" stop-color="#10294f"/><stop offset="1" stop-color="#081326"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5ad8ff"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#ffb84d"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="86" y="150" font-size="70">🌍</text>
+  <!-- three waving flags -->
+  <g stroke="rgba(0,0,0,.3)" stroke-width="2">
+    <g transform="translate(150,190)"><rect width="150" height="100" fill="#0055a4"/><rect x="50" width="50" height="100" fill="#fff"/><rect x="100" width="50" height="100" fill="#ef4135"/></g>
+    <g transform="translate(330,225) rotate(-4)"><rect width="150" height="100" fill="#009246"/><rect x="50" width="50" height="100" fill="#fff"/><rect x="100" width="50" height="100" fill="#ce2b37"/></g>
+    <g transform="translate(520,195) rotate(3)"><rect width="150" height="100" fill="#fff"/><circle cx="75" cy="50" r="30" fill="#d30000"/></g>
+    <g transform="translate(700,230)"><rect width="150" height="100" fill="#000"/><rect y="33" width="150" height="34" fill="#dd0000"/><rect y="66" width="150" height="34" fill="#ffce00"/></g>
+  </g>
+  <text x="790" y="150" font-size="60">🎏</text>
+  <text x="480" y="470" fill="url(#ttl)" font-size="70" font-weight="800" text-anchor="middle">Flag Frenzy</text>
+  <text x="480" y="512" fill="#a9c4e8" font-size="26" font-weight="700" text-anchor="middle">Match every flag to its country!</text>
+</svg>

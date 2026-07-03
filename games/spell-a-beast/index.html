@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Spell-a-Beast — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="language" data-seed="spell-a-beast"></script>
+
+<style>
+  :root{
+    --bg1:#13204a; --bg2:#1a1140; --bg3:#0c2a3a;
+    --card:#141c3f; --line:#2b3a77; --text:#eaf2ff; --muted:#9fb4e0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ff8a5c; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(900px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--purple),var(--blue),var(--green));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:20px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:16px 22px;border-radius:16px;color:#06122a;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:6px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .zoo{display:flex;justify-content:center;gap:8px;font-size:26px;min-height:34px;margin:2px 0 8px;}
+  .zoo span{filter:drop-shadow(0 3px 5px rgba(0,0,0,.4));}
+
+  .stage{display:flex;flex-direction:column;align-items:center;gap:8px;margin:6px 0 10px;}
+  .beast{font-size:clamp(64px,13vw,110px);line-height:1;transition:transform .3s;
+    filter:drop-shadow(0 10px 18px rgba(0,0,0,.5));}
+  .beast.pop{animation:pop .5s ease;}
+  @keyframes pop{0%{transform:scale(.3) rotate(-20deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .beast.wobble{animation:wobble .6s ease;}
+  @keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg) scale(1.1)}60%{transform:rotate(9deg) scale(.95)}}
+  .caption{background:#0d1533;border:2px solid var(--line);border-radius:14px;padding:10px 16px;
+    font-weight:700;text-align:center;max-width:60ch;min-height:44px;font-size:clamp(14px,2.3vw,17px);}
+  .caption b{color:var(--orange);}
+
+  .built{display:flex;justify-content:center;gap:7px;min-height:56px;margin:8px 0;}
+  .slot{width:46px;height:52px;border-radius:10px;border:2px dashed #3a4f9e;background:#0a1130;}
+  .built .tile{border-style:solid;border-color:var(--green);background:#103b29;}
+  .tile{cursor:pointer;border:none;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;
+    width:46px;height:52px;border-radius:10px;font-weight:800;font-size:24px;color:var(--text);
+    background:#22305f;border:2px solid var(--line);box-shadow:0 4px 0 rgba(0,0,0,.35);}
+  .tile:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.35);}
+  .tray{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;min-height:56px;margin:4px 0 10px;}
+
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:12px 26px;border-radius:14px;color:#06122a;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#22305f;color:var(--text);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:10px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .final .zoo{font-size:34px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#5f74a8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🦄 Spell-a-Beast</h1>
+      <p class="sub">Spell the word correctly and a magnificent beast joins your zoo.
+        Spell it wrong and you summon a <b>MUTANT</b> — like a sheep that is mostly legs.
+        The mutants are not dangerous. Just deeply embarrassing.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>3–4 letter beasts</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>5-letter beasts</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>big tricky beasts</small></button>
+      </div>
+      <p class="sub">8 beasts to summon · watch out for decoy letters!</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Beast 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="zoo" id="zoo"></div>
+      <div class="stage">
+        <div class="beast" id="beast">❓</div>
+        <div class="caption" id="caption"></div>
+      </div>
+      <div class="built" id="built"></div>
+      <div class="tray" id="tray"></div>
+      <div class="actions">
+        <button class="btn" id="summonBtn" disabled>SUMMON! ⚡</button>
+        <button class="btn ghost" id="clearBtn">Clear</button>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <p>Your beast zoo:</p>
+      <div class="zoo" id="finalZoo"></div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Summon more ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', decoys: 2, words: [
+      ['cat','🐱'],['dog','🐶'],['pig','🐷'],['owl','🦉'],['bee','🐝'],
+      ['fox','🦊'],['frog','🐸'],['fish','🐟'],['duck','🦆'],['crab','🦀'],['lion','🦁'],['bear','🐻']
+    ]},
+    { id: 3, label: 'Grade 3', decoys: 3, words: [
+      ['sheep','🐑'],['horse','🐴'],['whale','🐳'],['snake','🐍'],['tiger','🐯'],
+      ['mouse','🐭'],['panda','🐼'],['koala','🐨'],['camel','🐫'],['zebra','🦓'],['sloth','🦥'],['shark','🦈']
+    ]},
+    { id: 4, label: 'Grade 4–5', decoys: 4, words: [
+      ['penguin','🐧'],['octopus','🐙'],['dolphin','🐬'],['giraffe','🦒'],['unicorn','🦄'],
+      ['hamster','🐹'],['raccoon','🦝'],['squirrel','🐿️'],['elephant','🐘'],['flamingo','🦩'],['hedgehog','🦔'],['dinosaur','🦕']
+    ]}
+  ];
+  var ROUNDS = 8;
+  var MUTANTS = ['👾','🧟','👹','🫠','🦠','👻','🥴','🧌'];
+  var MUTANT_LINES = [
+    'You summoned <b>the {word}</b>. It is mostly legs.',
+    '<b>The {word}</b> appears! It smells like old cheese and regret.',
+    'Behold… <b>the {word}</b>. It immediately walked into a wall.',
+    '<b>The {word}</b> has arrived. It only eats homework and socks.',
+    'Oh no. <b>The {word}</b>. It is doing a little dance. Nobody asked it to.',
+    '<b>The {word}</b>?! Even the other mutants are confused.'
+  ];
+  var PRAISE = [
+    'Magnificent! It joins your zoo! 🎉',
+    'Perfect spelling — the beast bows to you!',
+    'SUMMONED! Not a single leg out of place!',
+    'Your zoo grows mightier!'
+  ];
+
+  var grade = GRADES[0], round = 0, score = 0, tries = 0, streak = 0;
+  var word = '', emoji = '', zoo = [], deck = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // --- sound effects (Web Audio, no assets) ---
+  var _sAC = window.AudioContext || window.webkitAudioContext, _sac = null;
+  function _sfx(f, d, type, slide, when) { try { _sac = _sac || new _sAC();
+    var t = _sac.currentTime + (when || 0), o = _sac.createOscillator(), g = _sac.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + d);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.14, t + .012);
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(_sac.destination); o.start(t); o.stop(t + d + .03);
+  } catch (e) {} }
+  function sfxGood() { _sfx(523, .13, 'triangle'); _sfx(784, .17, 'triangle', 0, .1); }
+  function sfxBad() { _sfx(196, .3, 'sawtooth', 90); }
+  function sfxWin() { [523, 659, 784, 1047].forEach(function (f, i) { _sfx(f, .2, 'triangle', 0, i * .12); }); }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;} return a; }
+
+  function builtWord() {
+    return Array.prototype.map.call($('built').querySelectorAll('.tile'), function(t){ return t.textContent; }).join('');
+  }
+
+  function refreshSlots() {
+    // pad the built row with empty slots up to word length
+    var built = $('built');
+    Array.prototype.forEach.call(built.querySelectorAll('.slot:not(.tile)'), function(s){ s.remove(); });
+    var need = word.length - built.querySelectorAll('.tile').length;
+    for (var i = 0; i < need; i++) {
+      var s = document.createElement('div'); s.className = 'slot';
+      built.appendChild(s);
+    }
+    $('summonBtn').disabled = builtWord().length !== word.length;
+  }
+
+  function makeTile(ch, inBuilt) {
+    var t = document.createElement('button');
+    t.className = inBuilt ? 'tile slot' : 'tile';
+    t.textContent = ch;
+    t.addEventListener('click', function () {
+      if (t.parentNode === $('tray')) {
+        if (builtWord().length >= word.length) return;
+        var nt = makeTile(ch, true);
+        var firstEmpty = $('built').querySelector('.slot:not(.tile)');
+        $('built').insertBefore(nt, firstEmpty || null);
+        t.remove();
+      } else {
+        $('tray').appendChild(makeTile(ch, false));
+        t.remove();
+      }
+      refreshSlots();
+    });
+    return t;
+  }
+
+  function newRound() {
+    tries = 0;
+    var w = deck[round];
+    word = w[0]; emoji = w[1];
+    $('roundLbl').textContent = 'Beast ' + (round + 1) + '/' + ROUNDS;
+    $('beast').textContent = emoji;
+    $('beast').className = 'beast pop';
+    $('caption').innerHTML = 'A wild <b>' + word.toUpperCase() + '</b>-shape shimmers… spell it to summon it!';
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('built').innerHTML = ''; $('tray').innerHTML = '';
+
+    var letters = word.split('');
+    var alpha = 'abcdefghijklmnopqrstuvwxyz';
+    for (var i = 0; i < grade.decoys; i++) {
+      var d;
+      do { d = alpha[Math.floor(Math.random() * 26)]; } while (word.indexOf(d) >= 0);
+      letters.push(d);
+    }
+    shuffle(letters).forEach(function (ch) { $('tray').appendChild(makeTile(ch, false)); });
+    refreshSlots();
+    EduSDK.startLesson(round + 1, { word: word });
+  }
+
+  function summon() {
+    tries++;
+    var got = builtWord();
+    if (got === word) {
+      var pts = tries === 1 ? 100 : (tries === 2 ? 50 : 25);
+      streak = tries === 1 ? streak + 1 : 0;
+      pts += streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      zoo.push(emoji);
+      sfxGood();
+      renderZoo('zoo');
+      $('beast').textContent = emoji;
+      $('beast').className = 'beast pop';
+      $('caption').innerHTML = '<b>' + word.toUpperCase() + '</b> — ' + pick(PRAISE);
+      $('toast').textContent = '+' + pts;
+      $('toast').className = 'toast good';
+      $('summonBtn').disabled = true;
+      EduSDK.finishLesson(round + 1, { correct: true, tries: tries });
+      setTimeout(nextRound, 1700);
+    } else {
+      streak = 0;
+      $('beast').textContent = pick(MUTANTS);
+      sfxBad();
+      $('beast').className = 'beast wobble';
+      $('caption').innerHTML = pick(MUTANT_LINES).replace('{word}', got.toUpperCase());
+      $('toast').textContent = 'That is NOT a ' + word + '. Send it back and try again!';
+      $('toast').className = 'toast bad';
+      // return all tiles to the tray
+      Array.prototype.forEach.call($('built').querySelectorAll('.tile'), function (t) {
+        $('tray').appendChild(makeTile(t.textContent, false));
+        t.remove();
+      });
+      refreshSlots();
+      EduSDK.retryLesson(round + 1, { attempt: got });
+    }
+  }
+
+  function clearBuilt() {
+    Array.prototype.forEach.call($('built').querySelectorAll('.tile'), function (t) {
+      $('tray').appendChild(makeTile(t.textContent, false));
+      t.remove();
+    });
+    refreshSlots();
+  }
+
+  function renderZoo(id) {
+    var el = $(id); el.innerHTML = '';
+    zoo.forEach(function (e) {
+      var s = document.createElement('span'); s.textContent = e; el.appendChild(s);
+    });
+  }
+
+  function nextRound() {
+    round++;
+    if (round >= ROUNDS) return finish();
+    if (round === Math.floor(ROUNDS / 2)) {
+      EduSDK.adBreak('interlevel').then(newRound);
+    } else newRound();
+  }
+
+  function finish() {
+    sfxWin();
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    renderZoo('finalZoo');
+    $('finalScore').textContent = score;
+    $('finalLine').textContent = grade.label + ' — ' + zoo.length + ' of ' + ROUNDS +
+      ' beasts summoned with zero extra legs. The mutants send their regards.';
+    EduSDK.submitScore(score, { grade: grade.id, beasts: zoo.length })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; round = 0; score = 0; streak = 0; zoo = [];
+    deck = shuffle(grade.words).slice(0, ROUNDS);
+    $('scoreVal').textContent = '0';
+    renderZoo('zoo');
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newRound();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('summonBtn').addEventListener('click', summon);
+  $('clearBtn').addEventListener('click', clearBuilt);
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'spell-a-beast' });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Copy-Cat Parrot — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="memory" data-seed="copy-cat-parrot"></script>
+
+<style>
+  :root{
+    --bg1:#0c3320; --bg2:#12472e; --bg3:#082014;
+    --card:#0e3a24; --line:#2e8a5a; --text:#e6fff0; --muted:#9fe0c0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#0c3320;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .stage{text-align:center;margin:6px 0 8px;}
+  .stage .parrot{font-size:70px;line-height:1;transition:transform .1s;}
+  .stage .parrot.dance{transform:scale(1.25) rotate(-8deg);}
+  .status{text-align:center;font-weight:800;font-size:clamp(15px,3vw,20px);margin:2px 0 12px;min-height:26px;}
+  .status.watch{color:var(--orange);} .status.your{color:var(--green);}
+  .moves{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:560px;margin:0 auto 12px;}
+  .moves.n6{grid-template-columns:repeat(3,1fr);max-width:460px;}
+  .move{cursor:pointer;border:3px solid var(--line);border-radius:18px;aspect-ratio:1;font-size:44px;
+    background:#0a3020;box-shadow:0 6px 0 rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;
+    transition:transform .08s,filter .1s;filter:brightness(.85);}
+  .move:active{transform:translateY(3px);}
+  .move.lit{filter:brightness(1.6) drop-shadow(0 0 8px #fff);transform:scale(1.08);}
+  .bar{text-align:center;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:16px;
+    padding:11px 24px;border-radius:12px;color:#0c3320;background:var(--green);box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#0a3020;color:var(--text);}
+  .btn:disabled{opacity:.4;cursor:default;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:16px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#4fa880;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🦜 Copy-Cat Parrot</h1>
+      <p class="sub">Pablo the Parrot LOVES to show off his dance moves — watch the sequence light up,
+        then copy it back in the exact same order! Each round he adds one more move.
+        A classic memory workout for your working memory.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>4 moves, slow</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>4 moves, quicker</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>6 moves, speedy</small></button>
+      </div>
+      <p class="sub">Copy as long a dance as you can — every move scores!</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Dance length: 1</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="stage"><div class="parrot" id="parrot">🦜</div></div>
+      <div class="status" id="status">Watch Pablo…</div>
+      <div class="moves" id="moves"></div>
+      <div class="bar"><button class="btn ghost" id="replayBtn">🔁 Watch again</button></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🦜</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Dance again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var MOVES = ['💃','🕺','🙌','👏','🦵','🌀']; // dance moves
+  var MOVE_FREQ = [330, 392, 440, 494, 587, 660];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', n: 4, gap: 700, maxLen: 8 },
+    { id: 3, label: 'Grade 3',   n: 4, gap: 480, maxLen: 12 },
+    { id: 4, label: 'Grade 4–5', n: 6, gap: 380, maxLen: 16 }
+  ];
+
+  var CHEER = ['Perfect copy! Pablo squawks "AGAIN!" 🦜🎉', 'Flawless moves! 💃✨', 'You\'ve got the rhythm! 🕺', 'Pablo is SO proud! 🦜'];
+
+  var grade = GRADES[0];
+  var score = 0, seq = [], input = [], accepting = false, nMoves = 4, best = 0;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function ensureCtx(){ if(!actx) actx = new AC(); if(actx.state === 'suspended') actx.resume(); }
+  function beep(i, dur){ try{ ensureCtx(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type='triangle'; o.frequency.value=MOVE_FREQ[i]||440;
+    g.gain.setValueAtTime(.0001,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.22,actx.currentTime+.02);
+    g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+(dur||.3));
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+(dur||.3));}catch(e){} }
+  function buzz(){ try{ ensureCtx(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type='sawtooth'; o.frequency.value=110; g.gain.setValueAtTime(.2,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+.4);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+.4);}catch(e){} }
+
+  function buildMoves() {
+    var m = $('moves'); m.innerHTML = '';
+    m.className = 'moves' + (nMoves === 6 ? ' n6' : '');
+    for (var i = 0; i < nMoves; i++) {
+      var b = document.createElement('button');
+      b.className = 'move'; b.dataset.i = i; b.textContent = MOVES[i];
+      (function (idx, el) { el.addEventListener('click', function(){ tap(idx, el); }); })(i, b);
+      m.appendChild(b);
+    }
+  }
+
+  function litMove(i, dur) {
+    var el = document.querySelector('.move[data-i="' + i + '"]');
+    if (!el) return;
+    el.classList.add('lit');
+    var p = $('parrot'); p.classList.add('dance');
+    setTimeout(function(){ el.classList.remove('lit'); p.classList.remove('dance'); }, dur || 300);
+  }
+
+  function playSequence() {
+    accepting = false;
+    $('status').textContent = '👀 Watch Pablo dance…';
+    $('status').className = 'status watch';
+    $('replayBtn').disabled = true;
+    var i = 0;
+    var t = setInterval(function () {
+      if (i >= seq.length) {
+        clearInterval(t);
+        setTimeout(function () {
+          accepting = true; input = [];
+          $('status').textContent = '🕺 Your turn — copy the dance!';
+          $('status').className = 'status your';
+          $('replayBtn').disabled = false;
+        }, 350);
+        return;
+      }
+      litMove(seq[i], grade.gap * 0.6); beep(seq[i], grade.gap / 1000 * 0.6);
+      i++;
+    }, grade.gap);
+  }
+
+  function tap(i, el) {
+    if (!accepting) return;
+    beep(i, .25); litMove(i, 180);
+    input.push(i);
+    var idx = input.length - 1;
+    if (input[idx] !== seq[idx]) return wrong();
+    if (input.length === seq.length) {
+      accepting = false;
+      score += seq.length * 10;
+      $('scoreVal').textContent = score;
+      best = Math.max(best, seq.length);
+      $('toast').textContent = '💃 +' + (seq.length * 10);
+      $('toast').className = 'toast good';
+      if (seq.length >= grade.maxLen) return setTimeout(function(){ finish(true); }, 700);
+      setTimeout(nextRound, 850);
+    }
+  }
+
+  function nextRound() {
+    seq.push(rint(0, nMoves - 1));
+    $('roundLbl').textContent = 'Dance length: ' + seq.length;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    if (seq.length === 5) EduSDK.adBreak('interlevel').then(playSequence);
+    else playSequence();
+    EduSDK.startLesson(seq.length, { length: seq.length });
+  }
+
+  function wrong() {
+    accepting = false;
+    buzz();
+    $('card').classList.add('shake');
+    setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+    $('status').textContent = '';
+    $('toast').textContent = 'Oops — wrong move! Pablo\'s dance was ' + seq.length + ' moves long.';
+    $('toast').className = 'toast bad';
+    EduSDK.finishLesson(seq.length, { reached: seq.length });
+    setTimeout(function(){ finish(false); }, 1400);
+  }
+
+  function finish(maxed) {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = best >= 8 ? '🦜🏆' : best >= 4 ? '🦜💃' : '🦜🎵';
+    $('finalLine').textContent = grade.label + ' — longest dance copied: ' + best + ' moves. ' +
+      (maxed ? 'You maxed out the dance floor — memory superstar!' :
+       best >= 8 ? 'Incredible working memory! Pablo wants you in his dance crew.' :
+       best >= 4 ? 'Great moves — your memory is getting stronger each round.' :
+       'Every dancer practices. Watch closely and try again!');
+    EduSDK.submitScore(score, { grade: grade.id, best: best })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; nMoves = g.n; score = 0; seq = []; input = []; best = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    buildMoves();
+    ensureCtx();
+    setTimeout(nextRound, 500);
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('replayBtn').addEventListener('click', function () { if (!$('replayBtn').disabled) playSequence(); });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'copy-cat-parrot' });
+})();
+</script>
+</body>
+</html>

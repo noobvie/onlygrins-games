@@ -1,0 +1,30 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "bodmas-bistro",
+  "title": "BODMAS Bistro",
+  "category": "math",
+  "short_description": "Cook Chef Grinjamin's recipe-expressions in the order maths demands — stir the addition in too early and the dish explodes.",
+  "description": "Chef Grinjamin's recipes are maths expressions like 3 + 4 × 2, and maths has RULES about what cooks first: Brackets, then × and ÷, then + and −. Tap the operation that must happen first, step by step, until the dish is done — stir the addition in too early and the dish literally explodes, leaving the chef's hat smoking and soup on the ceiling. Grade 4 covers × and ÷ before + and −; Grade 5 adds brackets to the menu. A free online order-of-operations (BODMAS/PEMDAS) game for kids in grades 4–5, with per-step points, serving bonuses and streaks feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap the operation in the expression that must be calculated first.",
+  "tags": [
+    "math",
+    "order-of-operations",
+    "bodmas",
+    "arithmetic",
+    "strand-arithmetic",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:bodmas-bistro"
+}

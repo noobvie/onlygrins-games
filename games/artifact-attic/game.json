@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "artifact-attic",
+  "title": "Artifact Attic",
+  "category": "history",
+  "short_description": "The museum curator sneezed and lost all the labels — study each treasure and send it back to the right ancient civilization.",
+  "description": "The museum's grumpy curator lost every label in one enormous sneeze, and now the artifacts are hopelessly muddled! Study each treasure — pyramids, the Colosseum, the Terracotta Army, Viking longships — and send it back to the civilization that made it. It teaches world history by connecting famous artifacts to Ancient Egypt, Rome, Greece, China, the Maya, the Inca and more, with a fun fact on every miss. Grade bands ramp from super-famous treasures, to more civilizations, to trickier and less-famous artifacts for grade 5. A free online ancient civilizations and world history game for kids in grades 2–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 660,
+  "controls": "Mouse / tap the civilization that made the displayed artifact.",
+  "tags": [
+    "history",
+    "ancient-civilizations",
+    "artifacts",
+    "world-history",
+    "strand-civilizations",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:artifact-attic"
+}

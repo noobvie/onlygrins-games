@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "melody-mimic",
+  "title": "Melody Mimic",
+  "category": "music",
+  "short_description": "Maestro Macaw plays a tune on the glowing pads — listen, then echo it back. Each round adds a note, training your musical ear and memory.",
+  "description": "Maestro Macaw plays a melody on the glowing musical pads — listen closely, then play it back note for note! Every round the tune grows by one note, so it trains your musical ear, pitch memory and listening skills, Simon-style, using pleasant pentatonic notes that always sound good together. Grade bands ramp from four pads at a gentle pace, to a quicker four-pad tempo, to six speedy pads for grade 4–5. Turn the sound on for the full concert. A free online music, listening and ear-training game for kids in grades 1–5, with every echoed note feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Sound ON. Watch and listen to the pads light up, then tap them back in the same order.",
+  "tags": [
+    "music",
+    "ear-training",
+    "listening",
+    "memory",
+    "strand-listening",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:melody-mimic"
+}

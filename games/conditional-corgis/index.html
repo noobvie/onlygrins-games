@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Conditional Corgis — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="coding" data-seed="conditional-corgis"></script>
+
+<style>
+  :root{
+    --bg1:#33260c; --bg2:#4a3812; --bg3:#241a08;
+    --card:#3d2e10; --line:#a8842e; --text:#fff6df; --muted:#e8d08a;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#33260c;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .paws{display:flex;align-items:center;gap:4px;justify-content:center;font-size:20px;
+    background:#2b2008;border:2px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
+  .paws .step{opacity:.4;} .paws .step.done{opacity:1;}
+  .rules{background:#2b2008;border:2px dashed var(--orange);border-radius:16px;padding:12px 18px;
+    max-width:560px;margin:0 auto 12px;}
+  .rules .t{color:var(--orange);font-weight:800;font-size:14px;letter-spacing:.5px;text-align:center;margin-bottom:4px;}
+  .rules .rule{font-weight:800;font-size:clamp(14px,2.7vw,18px);margin:6px 0;}
+  .rules .rule .if{color:var(--blue);} .rules .rule .then{color:var(--green);}
+  .see{display:flex;align-items:center;gap:12px;justify-content:center;margin:8px 0 12px;
+    font-size:clamp(16px,3.2vw,22px);font-weight:800;}
+  .see .tile{font-size:56px;background:#54420f;border-radius:14px;padding:6px 14px;border:2px solid var(--line);}
+  .q{font-size:clamp(15px,2.8vw,19px);font-weight:800;text-align:center;margin:0 0 10px;color:var(--muted);}
+  .answers{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:600px;margin:0 auto;}
+  .ans{cursor:pointer;border:3px solid #a8842e;font-family:inherit;font-weight:800;
+    padding:14px 6px;border-radius:16px;color:var(--text);background:#54420f;
+    box-shadow:0 5px 0 rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .ans .ic{font-size:40px;line-height:1;}
+  .ans .lb{font-size:13px;}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.4);}
+  .ans.right{background:var(--green);border-color:var(--green);color:#33260c;}
+  .ans.wrong{background:var(--bad);border-color:var(--bad);color:#33260c;}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:17px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#33260c;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#54420f;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#c09a4a;}
+  @media (max-width:520px){ .answers{grid-template-columns:repeat(2,1fr);} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🐕 Conditional Corgis</h1>
+      <p class="sub">Cooper the Corgi follows <b>IF → THEN</b> rules — that's how computers make decisions!
+        Read his rulebook, look at what Cooper sees, and predict exactly what he'll do.
+        Warning: corgis take rules VERY literally.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>2 simple rules</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>3 rules + "otherwise"</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>AND / order-matters</small></button>
+      </div>
+      <p class="sub">10 decisions · streaks earn bonus treats</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Rule 1/10</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="paws" id="paws"></div>
+      <div class="rules">
+        <div class="t">📖 COOPER'S RULEBOOK</div>
+        <div id="ruleList"></div>
+      </div>
+      <div class="see">Cooper sees: <span class="tile" id="tile">🦴</span></div>
+      <div class="q">What will Cooper do?</div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🐕</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // things Cooper can SEE (conditions) and DO (actions)
+  var THINGS = [
+    { see:'🦴', name:'a bone' }, { see:'🎾', name:'a ball' }, { see:'🐈', name:'a cat' },
+    { see:'💧', name:'a puddle' }, { see:'📮', name:'the mailman' }, { see:'🍖', name:'a steak' },
+    { see:'🦆', name:'a duck' }, { see:'🧦', name:'a sock' }
+  ];
+  var ACTIONS = [
+    { ic:'🍽️', lb:'Eat it' }, { ic:'🏃', lb:'Chase it' }, { ic:'💤', lb:'Nap' },
+    { ic:'🗣️', lb:'Bark' }, { ic:'🦮', lb:'Fetch it' }, { ic:'🙈', lb:'Hide' },
+    { ic:'🤗', lb:'Cuddle it' }, { ic:'🌀', lb:'Spin' }
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', nRules: 2, otherwise: false, andRule: false },
+    { id: 3, label: 'Grade 3',   nRules: 3, otherwise: true,  andRule: false },
+    { id: 4, label: 'Grade 4–5', nRules: 3, otherwise: true,  andRule: true }
+  ];
+  var ROUNDS = 10;
+
+  var CHEER = ['Woof! You think just like Cooper. 🐕💭', 'Rule followed perfectly! 💻✅',
+               'Good human! Have a treat. 🦴', 'You read the code like a pro! 📖'];
+  var OOPS  = ['Cooper did something else — reread the rules! 🐕❓', 'Nope! Corgis are VERY literal. 📏',
+               'That rule didn\'t match. Debug it! 🐛', 'Cooper tilts his head at your guess. 🐶'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var current = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function woof(){ tone(500,.12,'sine',760); }
+  function grr(){ tone(180,.3,'sawtooth',90); }
+
+  function makeQuestion() {
+    var things = shuffle(THINGS).slice(0, grade.nRules + 1);
+    var actions = shuffle(ACTIONS).slice(0, grade.nRules + 1);
+    var rules = [];
+    for (var i = 0; i < grade.nRules; i++) {
+      rules.push({ cond: things[i], act: actions[i], and: null });
+    }
+    // optionally one AND rule (needs two conditions true — we present the tile as satisfying the first)
+    var useAnd = grade.andRule && Math.random() < 0.5;
+    var otherwiseAct = actions[grade.nRules];
+
+    // choose what Cooper sees & compute correct action
+    var seeMatched = Math.random() < (grade.otherwise ? 0.7 : 1); // sometimes falls to otherwise
+    var seen, answer;
+    if (useAnd) {
+      // Rewrite rule 0 to require AND that is NOT satisfied → falls through
+      rules[0].and = things[grade.nRules]; // second required condition (a thing NOT shown)
+    }
+    if (seeMatched) {
+      var ri = Math.floor(Math.random() * grade.nRules);
+      // if that rule is an AND rule, its extra condition won't be met, so it fails → pick a non-AND rule
+      if (rules[ri].and) ri = (ri + 1) % grade.nRules;
+      seen = rules[ri].cond;
+      answer = rules[ri].act;
+    } else {
+      seen = things[grade.nRules]; // matches no simple rule
+      answer = otherwiseAct;
+    }
+
+    return { rules: rules, otherwise: grade.otherwise ? otherwiseAct : null,
+      seen: seen, answer: answer, options: shuffle(actions.slice()) };
+  }
+
+  function ruleText(r) {
+    var cond = 'IF Cooper sees <span class="if">' + r.cond.see + ' ' + r.cond.name + '</span>';
+    if (r.and) cond += ' <b>AND</b> <span class="if">' + r.and.see + ' ' + r.and.name + '</span>';
+    return cond + ' → <span class="then">' + r.act.ic + ' ' + r.act.lb + '</span>';
+  }
+
+  function drawPaws() {
+    var el = $('paws'), html = '';
+    for (var i = 0; i < ROUNDS; i++) {
+      if (i === q) html += '<span class="step done">🐕</span>';
+      else if (i < q) html += '<span class="step done">🐾</span>';
+      else html += '<span class="step">·</span>';
+    }
+    el.innerHTML = html;
+  }
+
+  function newQuestion() {
+    answered = false;
+    current = makeQuestion();
+    $('roundLbl').textContent = 'Rule ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    drawPaws();
+    var html = current.rules.map(function (r) { return '<div class="rule">' + ruleText(r) + '</div>'; }).join('');
+    if (current.otherwise) html += '<div class="rule"><span class="if">OTHERWISE</span> → <span class="then">' +
+      current.otherwise.ic + ' ' + current.otherwise.lb + '</span></div>';
+    $('ruleList').innerHTML = html;
+    $('tile').textContent = current.seen.see;
+    var box = $('answers'); box.innerHTML = '';
+    current.options.forEach(function (a) {
+      var b = document.createElement('button');
+      b.className = 'ans'; b.dataset.lb = a.lb;
+      b.innerHTML = '<span class="ic">' + a.ic + '</span><span class="lb">' + a.lb + '</span>';
+      b.addEventListener('click', function(){ choose(b, a); });
+      box.appendChild(b);
+    });
+    EduSDK.startLesson(q + 1, { rules: current.rules.length });
+  }
+
+  function choose(btn, a) {
+    if (answered) return;
+    answered = true;
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (b.dataset.lb === current.answer.lb) b.classList.add('right');
+    });
+    var correct = a.lb === current.answer.lb;
+    if (correct) {
+      streak++; nCorrect++;
+      var pts = 100 + streak * 15;
+      score += pts;
+      $('scoreVal').textContent = score;
+      woof();
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      btn.classList.add('wrong');
+      grr();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' Cooper would ' + current.answer.lb.toLowerCase() + '.';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 2000);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 2000);
+    } else setTimeout(newQuestion, 2000);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 8 ? '🐕🏆' : nCorrect >= 5 ? '🐕🦴' : '🐕❓';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' decisions right. ' +
+      (nCorrect >= 8 ? 'You think in perfect IF-THEN logic! Cooper wants to hire you.' :
+       nCorrect >= 5 ? 'Solid logic — a few tricky rules slipped past you.' :
+       'Conditionals are sneaky. Reread carefully and try again — Cooper waits patiently.');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'conditional-corgis' });
+})();
+</script>
+</body>
+</html>

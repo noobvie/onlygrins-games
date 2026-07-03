@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "spell-a-beast",
+  "title": "Spell-a-Beast",
+  "category": "language",
+  "short_description": "Spell the word to summon a beast — misspell it and you get an embarrassing mutant.",
+  "description": "Spell each animal's name from a tray of letter tiles (with sneaky decoys) to summon it into your beast zoo. Misspell it and you summon a MUTANT instead — like a sheep that is mostly legs, or a creature that only eats homework and socks. Grade bands ramp from 3-letter beasts to big tricky ones like 'squirrel'. Teaches spelling and phonics with first-try and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap. Tap letter tiles to build the word, tap a placed tile to send it back, then press SUMMON.",
+  "tags": [
+    "language",
+    "spelling",
+    "phonics",
+    "strand-spelling",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:spell-a-beast"
+}

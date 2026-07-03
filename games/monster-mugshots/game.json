@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "monster-mugshots",
+  "title": "Monster Mugshots",
+  "category": "memory",
+  "short_description": "Study the monster police lineup, then answer from memory — who wore the top hat? Who held the umbrella? Train your memory like a detective.",
+  "description": "Welcome to the Monster Police! A lineup of silly suspects appears, each with its own accessories — top hats, sunglasses, umbrellas, crowns. Study them carefully, because they'll hide, and then you must answer from memory: which monster was wearing the hat? Who was holding the balloon? It's a detective-themed workout for memory and attention to detail. Grade bands ramp from three monsters with a long look, to four monsters, to five monsters and more accessories with only a quick peek. A free online memory and observation game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 660,
+  "controls": "Study the lineup, then tap the monster that matches the question from memory.",
+  "tags": [
+    "memory",
+    "attention",
+    "observation",
+    "recall",
+    "strand-detail-memory",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:monster-mugshots"
+}

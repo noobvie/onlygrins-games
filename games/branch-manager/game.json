@@ -1,0 +1,31 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "branch-manager",
+  "title": "Branch Manager",
+  "category": "civics",
+  "short_description": "A government has three branches — one makes the laws, one carries them out, one decides what's fair. Sort each job into the right branch.",
+  "description": "A government has three teams called branches, and each has a different job: one MAKES the laws, one CARRIES THEM OUT, and one DECIDES what's fair. Read each job and sort it into the right branch — Lawmakers (legislative), Leaders (executive), or Judges (judicial). It teaches the non-partisan idea of separated powers and why it keeps government balanced. Grade bands ramp from the big idea in kid-friendly words, to trickier jobs, to real government terms like Congress, Supreme Court and signing a bill into law. A free online civics and government game for kids in grades 2–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 660,
+  "controls": "Mouse / tap the branch of government each job belongs to.",
+  "tags": [
+    "civics",
+    "government",
+    "branches-of-government",
+    "citizenship",
+    "strand-government",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:branch-manager"
+}

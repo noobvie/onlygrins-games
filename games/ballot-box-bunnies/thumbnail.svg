@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0c1e33"/><stop offset=".5" stop-color="#123047"/><stop offset="1" stop-color="#081420"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- bunting -->
+  <path d="M 40 70 Q 480 140 920 70" stroke="#3a6a9a" stroke-width="4" fill="none"/>
+  <text x="150" y="110" font-size="30">🎉</text><text x="470" y="128" font-size="30">🎊</text><text x="790" y="110" font-size="30">🎉</text>
+  <!-- ballot box -->
+  <g>
+    <rect x="380" y="200" width="200" height="170" rx="16" fill="#153658" stroke="#ffd54a" stroke-width="6"/>
+    <rect x="440" y="185" width="80" height="30" rx="6" fill="#0a1e30" stroke="#ffd54a" stroke-width="4"/>
+    <text x="480" y="310" font-size="70" text-anchor="middle">🗳️</text>
+    <rect x="455" y="150" width="50" height="60" rx="4" fill="#fff" transform="rotate(-12 480 180)"/>
+    <text x="480" y="188" font-size="30" text-anchor="middle" transform="rotate(-12 480 180)">✅</text>
+  </g>
+  <!-- voting bunnies -->
+  <text x="150" y="330" font-size="90" text-anchor="middle">🐰</text>
+  <text x="150" y="400" font-size="40" text-anchor="middle">🥕</text>
+  <text x="810" y="330" font-size="90" text-anchor="middle">🐇</text>
+  <text x="810" y="400" font-size="40" text-anchor="middle">🥕</text>
+  <text x="480" y="470" fill="url(#ttl)" font-size="58" font-weight="800" text-anchor="middle">Ballot Box Bunnies</text>
+  <text x="480" y="508" font-size="22" fill="#9fc0e8" text-anchor="middle">Every vote counts!</text>
+</svg>

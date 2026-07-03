@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "weigh-a-whale",
+  "title": "Weigh-a-Whale",
+  "category": "math",
+  "short_description": "Measure the patients at a chaotic vet clinic — suggest weighing the whale in grams and she leaves a one-star review.",
+  "description": "Welcome to Dr. Blubber's Very Chaotic Vet Clinic, where every patient needs measuring. Pick the sensible unit (grams for a hamster, NOT for a whale), read rulers and dial scales, and convert units — get it wrong and the offended patient leaves a devastating one-star review. Grade bands ramp from heavier/longer comparisons and g vs kg, to choosing cm/m/km and reading rulers, to unit conversions and reading scales between the tick marks. A free online measurement and units game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap the correct unit or measurement reading.",
+  "tags": [
+    "math",
+    "measurement",
+    "units",
+    "strand-measurement",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:weigh-a-whale"
+}

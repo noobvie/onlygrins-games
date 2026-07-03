@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2e0a2a"/><stop offset=".5" stop-color="#40123a"/><stop offset="1" stop-color="#180616"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff8fc7"/><stop offset=".5" stop-color="#ffe8b0"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- bunting -->
+  <path d="M0 40 L120 90 240 40 360 90 480 40 600 90 720 40 840 90 960 40" stroke="#ff8fc7" stroke-width="6" fill="none" opacity=".6"/>
+  <!-- sale sign -->
+  <rect x="80" y="120" width="270" height="130" rx="18" fill="#280a24" stroke="#ffe8b0" stroke-width="6"/>
+  <text x="215" y="180" font-size="52" font-weight="800" fill="#ff8fc7" text-anchor="middle">25% OFF</text>
+  <text x="215" y="226" font-size="30" font-weight="800" fill="#ffe8b0" text-anchor="middle">of 80 = ?</text>
+  <!-- giant sundae -->
+  <text x="520" y="300" font-size="150" text-anchor="middle">🍦</text>
+  <text x="640" y="220" font-size="70" text-anchor="middle">🍨</text>
+  <!-- inspector penguin with stamp -->
+  <text x="810" y="320" font-size="100" text-anchor="middle">🐧</text>
+  <rect x="740" y="340" width="150" height="44" rx="10" fill="#ff6b81" transform="rotate(-8 815 362)"/>
+  <text x="815" y="371" font-size="26" font-weight="800" fill="#2a0824" text-anchor="middle" transform="rotate(-8 815 362)">AUDITED</text>
+  <text x="480" y="490" fill="url(#ttl)" font-size="64" font-weight="800" text-anchor="middle">Percent Parlor</text>
+</svg>

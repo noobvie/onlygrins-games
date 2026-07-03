@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0c2a1a"/><stop offset=".5" stop-color="#123a20"/><stop offset="1" stop-color="#08201c"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- swamp water -->
+  <ellipse cx="480" cy="400" rx="430" ry="90" fill="#0a3a2e" opacity=".8"/>
+  <!-- stepping stones with numbers -->
+  <g font-weight="800" font-size="42" fill="#04220f" text-anchor="middle">
+    <ellipse cx="160" cy="360" rx="66" ry="40" fill="#8fd9a8" stroke="#5aa877" stroke-width="6"/><text x="160" y="375">2</text>
+    <ellipse cx="330" cy="330" rx="66" ry="40" fill="#8fd9a8" stroke="#5aa877" stroke-width="6"/><text x="330" y="345">4</text>
+    <ellipse cx="500" cy="360" rx="66" ry="40" fill="#8fd9a8" stroke="#5aa877" stroke-width="6"/><text x="500" y="375">6</text>
+    <ellipse cx="670" cy="330" rx="66" ry="40" fill="#1a4a30" stroke="#ffb84d" stroke-width="6" stroke-dasharray="14 10"/>
+    <text x="670" y="345" fill="#ffb84d">?</text>
+  </g>
+  <!-- pirate -->
+  <text x="330" y="290" font-size="100" text-anchor="middle">🏴‍☠️</text>
+  <!-- croc + complaint -->
+  <text x="840" y="400" font-size="76" text-anchor="middle">🐊</text>
+  <text x="845" y="300" font-size="44" text-anchor="middle">📋</text>
+  <!-- treasure -->
+  <text x="880" y="180" font-size="70" text-anchor="middle">💰</text>
+  <text x="110" y="150" font-size="56">🦜</text>
+  <text x="480" y="490" fill="url(#ttl)" font-size="64" font-weight="800" text-anchor="middle">Pattern Pirates</text>
+</svg>

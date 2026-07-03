@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "froggy-french",
+  "title": "Froggy French Phrases",
+  "category": "language",
+  "short_description": "Help Gaston the frog cross the pond by picking the right French — wrong picks mean SPLOOSH.",
+  "description": "Gaston the frog wants to cross the pond, but the lily pads only hold him if he says the right French. Pick the correct French translation of each English word or phrase to hop forward — pick wrong and Gaston belly-flops into the water while the fish applaud. Correct answers are spoken aloud in French. Levels ramp from greetings, colours and numbers to whole everyday phrases. Teaches French vocabulary and phrases with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap the lily pad with the correct French translation.",
+  "tags": [
+    "language",
+    "french",
+    "vocabulary",
+    "phrases",
+    "strand-vocabulary",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:froggy-french"
+}

@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Ocean Commotion — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="geography" data-seed="ocean-commotion"></script>
+
+<style>
+  :root{
+    --bg1:#03253a; --bg2:#053a58; --bg3:#021826;
+    --card:#06304a; --line:#1e6d9c; --text:#e6f7ff; --muted:#93cfe8;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(180deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#032438;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .depth{display:flex;align-items:center;gap:4px;justify-content:center;font-size:20px;
+    background:#032438;border:2px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
+  .depth .step{opacity:.4;} .depth .step.done{opacity:1;}
+  .porthole{display:flex;flex-direction:column;align-items:center;gap:6px;margin:8px auto 14px;
+    background:radial-gradient(circle at 35% 30%,#0a5c8a,#04314e 70%);border:8px solid #b8894a;border-radius:50%;
+    width:min(220px,50vw);height:min(220px,50vw);justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,.5);}
+  .porthole .pic{font-size:72px;line-height:1;}
+  .q{font-size:clamp(16px,3vw,21px);font-weight:800;text-align:center;margin:6px 0 12px;}
+  .answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .ans{cursor:pointer;border:3px solid #1e6d9c;font-family:inherit;font-weight:800;font-size:19px;
+    padding:15px 10px;border-radius:16px;color:var(--text);background:#0a4266;
+    box-shadow:0 5px 0 rgba(0,0,0,.45);}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.45);}
+  .ans.right{background:var(--green);border-color:var(--green);color:#032438;}
+  .ans.wrong{background:var(--bad);border-color:var(--bad);color:#032438;}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:17px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#032438;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#0a4266;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#3f88b0;}
+  @media (max-width:520px){ .answers{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🌊 Ocean Commotion</h1>
+      <p class="sub">Captain Grin's submarine is touring the planet's wettest, tallest and driest places —
+        oceans, rivers, mountains and deserts. Answer the crew's questions or the octopus navigator
+        takes the wheel (he has opinions, and eight of them are wrong).</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 2–3<small>oceans &amp; biggest things</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 4<small>rivers, deserts, mountains</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 5<small>record-breakers &amp; tricksters</small></button>
+      </div>
+      <p class="sub">10 dives per voyage · streaks earn bonus bubbles</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Dive 1/10</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="depth" id="depth"></div>
+      <div class="porthole"><div class="pic" id="pic">🌊</div></div>
+      <div class="q" id="qtext"></div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🤿</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Dive again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── CONTENT — physical-geography question bank (band: 0 easy, 1 medium, 2 hard) ──
+  var QUESTIONS = [
+    { q:'Which is the BIGGEST ocean on Earth?', a:'Pacific Ocean', w:['Atlantic Ocean','Indian Ocean','Arctic Ocean'], e:'🌊', band:0, fact:'The Pacific covers more area than ALL the land on Earth combined.' },
+    { q:'Which ocean is the SMALLEST and coldest?', a:'Arctic Ocean', w:['Pacific Ocean','Atlantic Ocean','Indian Ocean'], e:'🧊', band:0, fact:'Much of the Arctic Ocean is covered in sea ice.' },
+    { q:'How many oceans does Earth have?', a:'5', w:['3','7','12'], e:'🖐️', band:0, fact:'Pacific, Atlantic, Indian, Southern and Arctic.' },
+    { q:'What is the LONGEST river in the world (by most maps)?', a:'The Nile', w:['The Amazon','The Mississippi','The Thames'], e:'🐊', band:0, fact:'The Nile flows about 6,650 km through Africa.' },
+    { q:'What is the TALLEST mountain above sea level?', a:'Mount Everest', w:['Mount Fuji','Kilimanjaro','Ben Nevis'], e:'🏔️', band:0, fact:'Everest is 8,849 m — and still growing a tiny bit each year!' },
+    { q:'Which of these is a DESERT?', a:'The Sahara', w:['The Amazon','The Alps','The Pacific'], e:'🏜️', band:0, fact:'The Sahara is almost as big as the whole USA.' },
+    { q:'Which ocean is between Europe and North America?', a:'Atlantic Ocean', w:['Pacific Ocean','Indian Ocean','Southern Ocean'], e:'🚢', band:1, fact:'The Atlantic gets about 4 cm wider every year.' },
+    { q:'Which river carries the MOST water in the world?', a:'The Amazon', w:['The Nile','The Danube','The Yangtze'], e:'🐬', band:1, fact:'The Amazon pours a fifth of all river water into the sea — and has pink dolphins.' },
+    { q:'Which mountain range separates Europe from Asia?', a:'The Urals', w:['The Andes','The Rockies','The Alps'], e:'⛰️', band:1, fact:'The Ural Mountains are one of the oldest ranges on Earth.' },
+    { q:'The Great Barrier Reef is off the coast of which country?', a:'Australia', w:['Brazil','Egypt','Japan'], e:'🐠', band:1, fact:'It is the largest living structure on Earth — visible from space!' },
+    { q:'Which is the LONGEST mountain range on land?', a:'The Andes', w:['The Himalayas','The Alps','The Rockies'], e:'🦙', band:1, fact:'The Andes stretch about 7,000 km down South America.' },
+    { q:'What is the largest lake in the world by area?', a:'The Caspian Sea', w:['Lake Victoria','Loch Ness','Lake Superior'], e:'🛶', band:1, fact:'Despite its name, the Caspian Sea counts as a giant lake.' },
+    { q:'Which desert is the LARGEST hot desert?', a:'The Sahara', w:['The Gobi','The Mojave','The Kalahari'], e:'🐪', band:1, fact:'Antarctica is technically the biggest desert of all — a COLD one.' },
+    { q:'What is the DEEPEST place in the ocean?', a:'The Mariana Trench', w:['The Nile Delta','The Bermuda Triangle','The Suez Canal'], e:'🐙', band:2, fact:'It plunges ~11 km down — Everest would sink without a trace.' },
+    { q:'Which is the world’s largest ISLAND (not counting Australia)?', a:'Greenland', w:['Madagascar','Iceland','Great Britain'], e:'🧊', band:2, fact:'Greenland is mostly white ice; Iceland is mostly green. Vikings were confusing.' },
+    { q:'The Southern Ocean surrounds which continent?', a:'Antarctica', w:['Africa','Oceania','South America'], e:'🐧', band:2, fact:'It was only officially recognised as its own ocean in 2000.' },
+    { q:'Which waterfall is the TALLEST in the world?', a:'Angel Falls', w:['Niagara Falls','Victoria Falls','Rhine Falls'], e:'💦', band:2, fact:'Angel Falls in Venezuela drops 979 m — water turns to mist before landing!' },
+    { q:'Which country has the MOST volcanoes?', a:'Indonesia', w:['Switzerland','Ireland','Denmark'], e:'🌋', band:2, fact:'Indonesia has about 130 active volcanoes.' },
+    { q:'Which two continents does the Panama Canal connect by sea?', a:'North & South America', w:['Europe & Africa','Asia & Oceania','Africa & Asia'], e:'🚢', band:2, fact:'Ships take about 8–10 hours to cross it.' },
+    { q:'The Dead Sea is famous because…', a:'You float without trying', w:['It is full of sharks','It is frozen all year','It glows at night'], e:'🏖️', band:2, fact:'It is so salty almost nothing can live in it — hence the name.' }
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 2, label: 'Grade 2–3', bands: [0]    },
+    { id: 4, label: 'Grade 4',   bands: [0, 1] },
+    { id: 5, label: 'Grade 5',   bands: [1, 2] }
+  ];
+  var ROUNDS = 10;
+
+  var CHEER = ['The octopus applauds with all eight arms! 🐙👏', 'Sonar says: PING of approval. 📡',
+               'The crew does a tiny submarine dance. 💃', 'Whale of an answer! 🐋'];
+  var OOPS  = ['The octopus grabs the wheel! Everyone panic politely. 🐙🎡', 'GLUB. The porthole fogs up in embarrassment. 😶‍🌫️',
+               'A passing crab facepalms with a claw. 🦀', 'The map is now upside down. It didn’t help. 🗺️'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var current = null, deck = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function ping(){ tone(1200,.25,'sine',600); }
+  function glub(){ tone(220,.4,'sine',80); }
+
+  function buildDeck() {
+    var pool = QUESTIONS.filter(function (x) { return grade.bands.indexOf(x.band) >= 0; });
+    deck = shuffle(pool).slice(0, ROUNDS);
+    while (deck.length < ROUNDS) deck.push(pick(pool));
+  }
+
+  function drawDepth() {
+    var d = $('depth'), html = '';
+    for (var i = 0; i < ROUNDS; i++) {
+      if (i === q) html += '<span class="step done">🟡</span>';
+      else if (i < q) html += '<span class="step done">🫧</span>';
+      else html += '<span class="step">·</span>';
+    }
+    html += '<span class="step">🏴‍☠️</span>';
+    d.innerHTML = html;
+  }
+
+  function newQuestion() {
+    answered = false;
+    var item = deck[q];
+    current = { item: item, answer: item.a, options: shuffle([item.a].concat(item.w)) };
+    $('roundLbl').textContent = 'Dive ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    drawDepth();
+    $('pic').textContent = item.e;
+    $('qtext').textContent = item.q;
+    var box = $('answers'); box.innerHTML = '';
+    current.options.forEach(function (v) {
+      var b = document.createElement('button');
+      b.className = 'ans'; b.textContent = v;
+      b.addEventListener('click', function(){ choose(b, v); });
+      box.appendChild(b);
+    });
+    EduSDK.startLesson(q + 1, { question: item.q });
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (b.textContent === current.answer) b.classList.add('right');
+    });
+    var correct = v === current.answer;
+    if (correct) {
+      streak++; nCorrect++;
+      var pts = 100 + streak * 15;
+      score += pts;
+      $('scoreVal').textContent = score;
+      ping();
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      btn.classList.add('wrong');
+      glub();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' Answer: ' + current.answer + '. ' + current.item.fact;
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 2100);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 2100);
+    } else setTimeout(newQuestion, 2100);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 8 ? '🤿🏆' : nCorrect >= 5 ? '🤿🐠' : '🐙🎡';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' dives completed. ' +
+      (nCorrect >= 8 ? 'Captain Grin promotes you to Chief Navigator!' :
+       nCorrect >= 5 ? 'A fine voyage — only slightly lost near Greenland.' :
+       'The octopus drove you into a kelp forest. He is NOT sorry. Dive again!');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    buildDeck();
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'ocean-commotion' });
+})();
+</script>
+</body>
+</html>

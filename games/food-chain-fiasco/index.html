@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Food Chain Fiasco — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="science" data-seed="food-chain-fiasco"></script>
+
+<style>
+  :root{
+    --bg1:#13204a; --bg2:#1a1140; --bg3:#0c2a3a;
+    --card:#141c3f; --line:#2b3a77; --text:#eaf2ff; --muted:#9fb4e0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ff8a5c; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(920px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--green),var(--orange),var(--bad));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:20px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:16px 22px;border-radius:16px;color:#06122a;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .prompt{text-align:center;color:var(--muted);font-weight:700;margin:4px 0 10px;}
+  .prompt b{color:var(--green);}
+
+  .chainRow{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;
+    background:#0a1130;border:2px dashed #3a4f9e;border-radius:16px;min-height:86px;padding:10px;margin:6px 0 12px;}
+  .chainRow .stage{display:flex;align-items:center;gap:6px;}
+  .chainRow .org{font-size:44px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4));}
+  .chainRow .arrow{font-size:24px;color:var(--green);font-weight:800;}
+  .chainRow .slotHint{color:#3a4f9e;font-size:34px;}
+
+  .poolRow{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:6px 0 12px;}
+  .orgBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;
+    background:#0d1533;border:3px solid var(--line);border-radius:18px;padding:10px 16px;
+    color:var(--text);box-shadow:0 5px 0 rgba(0,0,0,.35);transition:.12s;}
+  .orgBtn:hover{border-color:var(--blue);transform:translateY(-2px);}
+  .orgBtn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .orgBtn .em{font-size:42px;display:block;}
+  .orgBtn .nm{font-size:13px;color:var(--muted);}
+  .orgBtn.used{opacity:.25;pointer-events:none;}
+
+  .fiasco{min-height:56px;text-align:center;}
+  .fiascoScene{font-size:38px;letter-spacing:4px;}
+  .fiascoLine{font-weight:800;color:var(--bad);min-height:24px;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:18px;}
+  .toast.good{color:var(--green);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+  .runaway{display:inline-block;animation:run 1.1s ease;}
+  @keyframes run{0%{transform:translateX(0)}100%{transform:translateX(46px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#06122a;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#22305f;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#5f74a8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🦁 Food Chain Fiasco</h1>
+      <p class="sub">Build each food chain in the right order — <b>who gets eaten first?</b>
+        Get it wrong and the ecosystem acts out your mistake: yes, that means the grass
+        chases the lion. Nature finds it very confusing.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>3-link chains</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>4-link chains</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>5-link chains</small></button>
+      </div>
+      <p class="sub">6 ecosystems · start from the plant (the producer)!</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Ecosystem 1/6</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <p class="prompt">Tap the organisms in order — <b>producer first</b>, top predator last:</p>
+      <div class="chainRow" id="chainRow"></div>
+      <div class="poolRow" id="poolRow"></div>
+      <div class="fiasco">
+        <div class="fiascoScene" id="fiascoScene"></div>
+        <div class="fiascoLine" id="fiascoLine"></div>
+        <div class="toast" id="toast"></div>
+      </div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px">🌿🦁🎉</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Play again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Chains ordered producer → apex. [emoji, name]
+  var CHAINS = {
+    3: [
+      [['🌾','grass'],['🐰','rabbit'],['🦊','fox']],
+      [['🌽','corn'],['🐭','mouse'],['🦉','owl']],
+      [['🌾','grass'],['🦓','zebra'],['🦁','lion']],
+      [['🌿','seaweed'],['🐠','fish'],['🦈','shark']],
+      [['🍃','leaves'],['🐛','caterpillar'],['🐦','bird']],
+      [['🌸','flowers'],['🐝','bee'],['🐸','frog']],
+      [['🥬','lettuce'],['🐌','snail'],['🦔','hedgehog']]
+    ],
+    4: [
+      [['🌾','grass'],['🦗','grasshopper'],['🐸','frog'],['🐍','snake']],
+      [['🍃','leaves'],['🐛','caterpillar'],['🐦','bird'],['🦅','hawk']],
+      [['🌿','algae'],['🦐','shrimp'],['🐟','fish'],['🦭','seal']],
+      [['🌽','corn'],['🐭','mouse'],['🐍','snake'],['🦉','owl']],
+      [['🌸','flowers'],['🦋','butterfly'],['🐸','frog'],['🦩','heron']],
+      [['🥕','carrots'],['🐰','rabbit'],['🦊','fox'],['🐻','bear']]
+    ],
+    5: [
+      [['🌾','grass'],['🦗','grasshopper'],['🐸','frog'],['🐍','snake'],['🦅','hawk']],
+      [['🌿','algae'],['🦐','shrimp'],['🐟','small fish'],['🐠','big fish'],['🦈','shark']],
+      [['🍃','leaves'],['🐛','caterpillar'],['🐦','songbird'],['🐍','snake'],['🦅','eagle']],
+      [['🌱','plants'],['🐌','snail'],['🐸','frog'],['🦩','heron'],['🐊','crocodile']],
+      [['🌽','corn'],['🐭','mouse'],['🦔','hedgehog'],['🦊','fox'],['🐺','wolf']]
+    ]
+  };
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', len: 3 },
+    { id: 3, label: 'Grade 3',   len: 4 },
+    { id: 4, label: 'Grade 4–5', len: 5 }
+  ];
+  var ROUNDS = 6;
+
+  var FIASCO_LINES = [
+    'FIASCO! The {prey} is chasing the {pred}! Nature is SO confused!',
+    'Uh oh — now the {prey} thinks it eats {pred}s. It is telling all its friends.',
+    'The {pred} just got chased up a tree by a {prey}. It will never live this down.',
+    'BREAKING NEWS: local {prey} declares itself king of the {pred}s.'
+  ];
+  var PRAISE = [
+    'Ecosystem restored! Everyone is eating the correct neighbours. 🎉',
+    'Perfect chain! The apex predator nods approvingly.',
+    'Nature is balanced. The grass is safe. Well… safe-ish.',
+    'Chain complete! Energy flows, science cheers!'
+  ];
+
+  var grade = GRADES[0], round = 0, score = 0, tries = 0, streak = 0;
+  var chain = [], pos = 0, deck = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // --- sound effects (Web Audio, no assets) ---
+  var _sAC = window.AudioContext || window.webkitAudioContext, _sac = null;
+  function _sfx(f, d, type, slide, when) { try { _sac = _sac || new _sAC();
+    var t = _sac.currentTime + (when || 0), o = _sac.createOscillator(), g = _sac.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + d);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.14, t + .012);
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(_sac.destination); o.start(t); o.stop(t + d + .03);
+  } catch (e) {} }
+  function sfxGood() { _sfx(523, .13, 'triangle'); _sfx(784, .17, 'triangle', 0, .1); }
+  function sfxBad() { _sfx(196, .3, 'sawtooth', 90); }
+  function sfxWin() { [523, 659, 784, 1047].forEach(function (f, i) { _sfx(f, .2, 'triangle', 0, i * .12); }); }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;} return a; }
+
+  function renderChain() {
+    var row = $('chainRow'); row.innerHTML = '';
+    for (var i = 0; i < chain.length; i++) {
+      var st = document.createElement('span'); st.className = 'stage';
+      if (i < pos) {
+        st.innerHTML = '<span class="org">' + chain[i][0] + '</span>';
+      } else {
+        st.innerHTML = '<span class="slotHint">❔</span>';
+      }
+      row.appendChild(st);
+      if (i < chain.length - 1) {
+        var ar = document.createElement('span'); ar.className = 'arrow'; ar.textContent = '➜';
+        row.appendChild(ar);
+      }
+    }
+  }
+
+  function renderPool() {
+    var row = $('poolRow'); row.innerHTML = '';
+    shuffle(chain).forEach(function (org) {
+      var b = document.createElement('button');
+      b.className = 'orgBtn';
+      b.innerHTML = '<span class="em">' + org[0] + '</span><span class="nm">' + org[1] + '</span>';
+      b.dataset.name = org[1];
+      b.addEventListener('click', function () { chooseOrg(org, b); });
+      row.appendChild(b);
+    });
+  }
+
+  function syncPoolUsed() {
+    var placed = chain.slice(0, pos).map(function (o) { return o[1]; });
+    Array.prototype.forEach.call($('poolRow').querySelectorAll('.orgBtn'), function (b) {
+      b.classList.toggle('used', placed.indexOf(b.dataset.name) >= 0);
+    });
+  }
+
+  function newRound() {
+    tries = 0; pos = 0;
+    chain = deck[round];
+    $('roundLbl').textContent = 'Ecosystem ' + (round + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('fiascoScene').textContent = ''; $('fiascoLine').textContent = '';
+    renderChain(); renderPool();
+    EduSDK.startLesson(round + 1, { links: chain.length });
+  }
+
+  function chooseOrg(org, btn) {
+    if (org[1] === chain[pos][1]) {
+      pos++;
+      renderChain(); syncPoolUsed();
+      $('fiascoScene').textContent = ''; $('fiascoLine').textContent = '';
+      if (pos === chain.length) {
+        tries++;
+        var pts = tries === 1 ? 150 : (tries === 2 ? 75 : 40);
+        streak = tries === 1 ? streak + 1 : 0;
+        pts += streak * 15;
+        score += pts;
+        $('scoreVal').textContent = score;
+        $('toast').textContent = pick(PRAISE) + '  +' + pts;
+        $('toast').className = 'toast good';
+        sfxGood();
+        EduSDK.finishLesson(round + 1, { correct: true, tries: tries });
+        setTimeout(nextRound, 1800);
+      }
+    } else {
+      tries++;
+      streak = 0;
+      // act out the mistake: the wrongly-placed prey "chases" a predator
+      var wrongIdx = chain.map(function(o){return o[1];}).indexOf(org[1]);
+      var predator = chain[Math.min(chain.length - 1, Math.max(pos, wrongIdx + 1))];
+      if (predator[1] === org[1]) predator = chain[chain.length - 1];
+      $('fiascoScene').innerHTML =
+        '<span class="runaway">' + predator[0] + '💨</span> <span class="runaway">' + org[0] + '</span>';
+      $('fiascoLine').textContent = pick(FIASCO_LINES)
+        .replace('{prey}', org[1]).replace('{pred}', predator[1]);
+      $('card').classList.add('shake');
+      sfxBad();
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      // chain resets — energy must flow from the start
+      pos = 0;
+      renderChain(); syncPoolUsed();
+      EduSDK.retryLesson(round + 1, { picked: org[1] });
+    }
+  }
+
+  function nextRound() {
+    round++;
+    if (round >= ROUNDS) return finish();
+    if (round === Math.floor(ROUNDS / 2)) {
+      EduSDK.adBreak('interlevel').then(newRound);
+    } else newRound();
+  }
+
+  function finish() {
+    sfxWin();
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalLine').textContent = grade.label + ' — ' + ROUNDS +
+      ' ecosystems balanced. The grass has stopped chasing anyone. Probably.';
+    EduSDK.submitScore(score, { grade: grade.id, rounds: ROUNDS })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; round = 0; score = 0; streak = 0;
+    deck = shuffle(CHAINS[grade.len]).slice(0, ROUNDS);
+    while (deck.length < ROUNDS) deck = deck.concat(shuffle(CHAINS[grade.len]).slice(0, ROUNDS - deck.length));
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newRound();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'food-chain-fiasco' });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "symmetry-salon",
+  "title": "Symmetry Salon",
+  "category": "math",
+  "short_description": "Style monster clients with perfect mirror lines — asymmetric haircuts make them sob into the salon mirror until it cracks.",
+  "description": "Welcome to the Symmetry Salon, where fussy monster clients demand PERFECTLY balanced looks. Study each shape, letter and design: does it have a mirror line? How many lines of symmetry? Answer wrong and the client sobs dramatically into the salon mirror until it cracks — and no, they will not be paying. Grade bands ramp from spotting whether a mirror line exists, to counting lines of symmetry on friendly shapes, to sneaky cases like the parallelogram (zero — it fools everyone). A free online symmetry and geometry game for kids in grades 2–5, with speed and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap the number of mirror lines before the client loses patience.",
+  "tags": [
+    "math",
+    "symmetry",
+    "geometry",
+    "shapes",
+    "strand-geometry",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:symmetry-salon"
+}

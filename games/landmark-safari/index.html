@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Landmark Safari — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="geography" data-seed="landmark-safari"></script>
+
+<style>
+  :root{
+    --bg1:#2a1d0c; --bg2:#3a2a12; --bg3:#201608;
+    --card:#2f2310; --line:#8a6a2e; --text:#fff6e4; --muted:#e0c48c;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#2a1d0c;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .film{display:flex;align-items:center;gap:4px;justify-content:center;font-size:20px;
+    background:#241a0a;border:2px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
+  .film .step{opacity:.4;} .film .step.done{opacity:1;}
+  .photo{display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0 14px;
+    background:#fff;border-radius:12px;padding:16px 26px 10px;max-width:340px;margin-left:auto;margin-right:auto;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);transform:rotate(-1.5deg);}
+  .photo .pic{font-size:64px;line-height:1.1;}
+  .photo .cap{color:#453317;font-weight:800;font-size:clamp(15px,3vw,20px);text-align:center;}
+  .q{font-size:clamp(15px,2.8vw,19px);font-weight:800;text-align:center;margin:6px 0 10px;color:var(--muted);}
+  .answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .ans{cursor:pointer;border:3px solid #8a6a2e;font-family:inherit;font-weight:800;font-size:19px;
+    padding:15px 10px;border-radius:16px;color:var(--text);background:#443311;
+    box-shadow:0 5px 0 rgba(0,0,0,.45);}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.45);}
+  .ans.right{background:var(--green);border-color:var(--green);color:#2a1d0c;}
+  .ans.wrong{background:var(--bad);border-color:var(--bad);color:#2a1d0c;}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:17px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#2a1d0c;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#443311;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#a8873f;}
+  @media (max-width:520px){ .answers{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>📸 Landmark Safari</h1>
+      <p class="sub">You're a wildlife photographer whose GPS broke — the camera roll is full of the world's
+        most famous landmarks, but WHERE were they taken?! Label 10 photos before the safari jeep
+        runs out of snacks.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 2–3<small>super-famous sights</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 4<small>more of the world</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 5<small>continents &amp; deep cuts</small></button>
+      </div>
+      <p class="sub">10 photos per safari · streaks earn bonus film</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Photo 1/10</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="film" id="film"></div>
+      <div class="photo">
+        <div class="pic" id="pic">🗼</div>
+        <div class="cap" id="caption">The Eiffel Tower</div>
+      </div>
+      <div class="q" id="qtext">Which country was this photo taken in?</div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">📸</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">New safari ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── CONTENT (band: 0 super-famous, 1 medium, 2 hard). fact = shown on wrong answers. ──
+  var LANDMARKS = [
+    { n:'The Eiffel Tower',        e:'🗼', country:'France',        continent:'Europe',        band:0, fact:'It grows ~15 cm taller in summer heat!' },
+    { n:'The Statue of Liberty',   e:'🗽', country:'United States', continent:'North America', band:0, fact:'She was a gift from France in 1886.' },
+    { n:'The Great Pyramid',       e:'🔺', country:'Egypt',         continent:'Africa',        band:0, fact:'It was the tallest building on Earth for 3,800 years.' },
+    { n:'The Great Wall',          e:'🧱', country:'China',         continent:'Asia',          band:0, fact:'It is over 21,000 km long — a real walk!' },
+    { n:'Big Ben',                 e:'🕰️', country:'England (UK)',  continent:'Europe',        band:0, fact:'Big Ben is actually the BELL, not the tower.' },
+    { n:'The Colosseum',           e:'🏟️', country:'Italy',         continent:'Europe',        band:0, fact:'It could seat about 50,000 ancient Romans.' },
+    { n:'The Sydney Opera House',  e:'🎭', country:'Australia',     continent:'Oceania',       band:0, fact:'Its roof has over 1 million tiles.' },
+    { n:'Mount Fuji',              e:'🗻', country:'Japan',         continent:'Asia',          band:0, fact:'It is Japan’s tallest mountain — and a volcano!' },
+    { n:'The Leaning Tower of Pisa', e:'🏛️', country:'Italy',       continent:'Europe',        band:1, fact:'It started leaning before it was even finished.' },
+    { n:'Christ the Redeemer',     e:'⛰️', country:'Brazil',        continent:'South America', band:1, fact:'The statue is 30 m tall and gets hit by lightning!' },
+    { n:'The Taj Mahal',           e:'🕌', country:'India',         continent:'Asia',          band:1, fact:'It took about 20,000 workers to build.' },
+    { n:'The Kremlin',             e:'🏰', country:'Russia',        continent:'Europe',        band:1, fact:'Its name just means “fortress” in Russian.' },
+    { n:'Machu Picchu',            e:'🦙', country:'Peru',          continent:'South America', band:1, fact:'This Inca city hides 2,430 m up in the Andes.' },
+    { n:'The Acropolis',           e:'🏛️', country:'Greece',        continent:'Europe',        band:1, fact:'Acropolis means “high city” in Greek.' },
+    { n:'Niagara Falls',           e:'🌊', country:'Canada',        continent:'North America', band:1, fact:'Enough water for a million bathtubs falls every second-ish.' },
+    { n:'The Sphinx',              e:'🦁', country:'Egypt',         continent:'Africa',        band:1, fact:'It has the body of a lion and a pharaoh’s head.' },
+    { n:'Table Mountain',          e:'⛰️', country:'South Africa',  continent:'Africa',        band:2, fact:'Its flat top is often covered by a “tablecloth” of cloud.' },
+    { n:'Petra',                   e:'🏜️', country:'Jordan',        continent:'Asia',          band:2, fact:'A whole city carved into rose-red rock.' },
+    { n:'Angkor Wat',              e:'🛕', country:'Cambodia',      continent:'Asia',          band:2, fact:'The largest religious monument in the world.' },
+    { n:'Chichén Itzá',            e:'🐍', country:'Mexico',        continent:'North America', band:2, fact:'On equinox days a snake of shadow slithers down its steps.' },
+    { n:'Stonehenge',              e:'🪨', country:'England (UK)',  continent:'Europe',        band:2, fact:'Some stones came from 240 km away — with no trucks.' },
+    { n:'The Blue Mosque',         e:'🕌', country:'Turkey',        continent:'Europe',        band:2, fact:'It has six minarets and 20,000 blue tiles.' },
+    { n:'Uluru',                   e:'🟥', country:'Australia',     continent:'Oceania',       band:2, fact:'This giant red rock is taller than the Eiffel Tower.' },
+    { n:'Mount Kilimanjaro',       e:'🏔️', country:'Tanzania',      continent:'Africa',        band:2, fact:'Africa’s tallest peak — with snow near the equator!' }
+  ];
+  var COUNTRIES = ['France','United States','Egypt','China','England (UK)','Italy','Australia','Japan',
+    'Brazil','India','Russia','Peru','Greece','Canada','South Africa','Jordan','Cambodia','Mexico',
+    'Turkey','Tanzania','Spain','Germany','Kenya','Argentina'];
+  var CONTINENTS = ['Europe','Asia','Africa','North America','South America','Oceania'];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 2, label: 'Grade 2–3', bands: [0],     continentQ: 0    },
+    { id: 4, label: 'Grade 4',   bands: [0, 1],  continentQ: 0.25 },
+    { id: 5, label: 'Grade 5',   bands: [1, 2],  continentQ: 0.4  }
+  ];
+  var ROUNDS = 10;
+
+  var CHEER = ['Perfect label! National Geographic is calling. 📞', 'The jeep honks in celebration! 🚙',
+               'Snap-tastic! ✨', 'Even the llama nodded approvingly. 🦙'];
+  var OOPS  = ['The GPS giggles at you. 🛰️', 'A pigeon photobombed AND you got the place wrong. 🐦',
+               'That label fell off immediately. 🏷️', 'Your camera bag sighs deeply. 🎒'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var current = null, deck = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function snap(){ tone(880,.08,'square'); setTimeout(function(){ tone(1320,.15,'sine'); },90); }
+  function womp(){ tone(280,.4,'sawtooth',90); }
+
+  function buildDeck() {
+    var pool = LANDMARKS.filter(function (l) { return grade.bands.indexOf(l.band) >= 0; });
+    deck = shuffle(pool).slice(0, ROUNDS);
+    while (deck.length < ROUNDS) deck.push(pick(pool));
+  }
+
+  function makeQuestion() {
+    var l = deck[q];
+    var askContinent = Math.random() < grade.continentQ;
+    var answer, opts;
+    if (askContinent) {
+      answer = l.continent;
+      opts = shuffle([answer].concat(shuffle(CONTINENTS.filter(function (c) { return c !== answer; })).slice(0, 3)));
+    } else {
+      answer = l.country;
+      opts = shuffle([answer].concat(shuffle(COUNTRIES.filter(function (c) { return c !== answer; })).slice(0, 3)));
+    }
+    return { l: l, askContinent: askContinent, answer: answer, options: opts };
+  }
+
+  function drawFilm() {
+    var f = $('film'), html = '';
+    for (var i = 0; i < ROUNDS; i++) {
+      if (i === q) html += '<span class="step done">📸</span>';
+      else if (i < q) html += '<span class="step done">🖼️</span>';
+      else html += '<span class="step">🎞️</span>';
+    }
+    f.innerHTML = html;
+  }
+
+  function newQuestion() {
+    answered = false;
+    current = makeQuestion();
+    $('roundLbl').textContent = 'Photo ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    drawFilm();
+    $('pic').textContent = current.l.e;
+    $('caption').textContent = current.l.n;
+    $('qtext').textContent = current.askContinent
+      ? 'Which CONTINENT was this photo taken on?'
+      : 'Which country was this photo taken in?';
+    var box = $('answers'); box.innerHTML = '';
+    current.options.forEach(function (v) {
+      var b = document.createElement('button');
+      b.className = 'ans'; b.textContent = v;
+      b.addEventListener('click', function(){ choose(b, v); });
+      box.appendChild(b);
+    });
+    EduSDK.startLesson(q + 1, { landmark: current.l.n, continentQ: current.askContinent });
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (b.textContent === current.answer) b.classList.add('right');
+    });
+    var correct = v === current.answer;
+    if (correct) {
+      streak++; nCorrect++;
+      var pts = 100 + streak * 15;
+      score += pts;
+      $('scoreVal').textContent = score;
+      snap();
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      btn.classList.add('wrong');
+      womp();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' It’s in ' + current.answer + '. ' + current.l.fact;
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 2100);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 2100);
+    } else setTimeout(newQuestion, 2100);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 8 ? '📸🏆' : nCorrect >= 5 ? '📸🌍' : '📸🐦';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' photos labelled. ' +
+      (nCorrect >= 8 ? 'Your safari album belongs in a museum!' :
+       nCorrect >= 5 ? 'A fine album — with a few photos on holiday in the wrong country.' :
+       'The GPS has offered to drive next time. Take another safari!');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    buildDeck();
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'landmark-safari' });
+})();
+</script>
+</body>
+</html>

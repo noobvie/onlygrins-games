@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "rounding-rodeo",
+  "title": "Rounding Rodeo",
+  "category": "math",
+  "short_description": "Herd stampeding numbers into the right corral by rounding fast — herd wrong and the number kicks the fence down and dances.",
+  "description": "Numbers are stampeding across the ranch! Herd each one into the right corral by rounding it — to the nearest ten, hundred, thousand or whole number — before it gets away. Herd it wrong and the number kicks the fence down and does a smug little victory dance. Grade bands ramp from rounding 2-digit numbers to the nearest ten, to nearest ten and hundred with decoy corrals, to decimals and the nearest thousand under real time pressure. A free online rounding game for kids in grades 1–5, with speed and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap the corral the number rounds to, before the timer runs out.",
+  "tags": [
+    "math",
+    "rounding",
+    "place-value",
+    "strand-number",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:rounding-rodeo"
+}

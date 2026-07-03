@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a1633"/><stop offset=".5" stop-color="#241f47"/><stop offset="1" stop-color="#100d20"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- ordered step chips with arrows -->
+  <g font-weight="800">
+    <rect x="90" y="150" width="150" height="90" rx="14" fill="#2a2450" stroke="#5a4a9a" stroke-width="3"/>
+    <text x="165" y="200" font-size="40" text-anchor="middle">💡</text>
+    <text x="165" y="230" font-size="15" fill="#b8aae0" text-anchor="middle">Idea</text>
+    <text x="262" y="205" font-size="34" fill="#ffb84d" text-anchor="middle">→</text>
+    <rect x="290" y="150" width="150" height="90" rx="14" fill="#2a2450" stroke="#5a4a9a" stroke-width="3"/>
+    <text x="365" y="200" font-size="40" text-anchor="middle">📝</text>
+    <text x="365" y="230" font-size="15" fill="#b8aae0" text-anchor="middle">Write bill</text>
+    <text x="462" y="205" font-size="34" fill="#ffb84d" text-anchor="middle">→</text>
+    <rect x="490" y="150" width="150" height="90" rx="14" fill="#2a2450" stroke="#5a4a9a" stroke-width="3"/>
+    <text x="565" y="200" font-size="40" text-anchor="middle">🗳️</text>
+    <text x="565" y="230" font-size="15" fill="#b8aae0" text-anchor="middle">Vote</text>
+    <text x="662" y="205" font-size="34" fill="#ffb84d" text-anchor="middle">→</text>
+    <rect x="690" y="150" width="150" height="90" rx="14" fill="#124430" stroke="#3ee87a" stroke-width="3"/>
+    <text x="765" y="200" font-size="40" text-anchor="middle">📜</text>
+    <text x="765" y="230" font-size="15" fill="#3ee87a" text-anchor="middle">Law!</text>
+  </g>
+  <!-- capitol + gavel -->
+  <text x="200" y="380" font-size="90" text-anchor="middle">🏛️</text>
+  <text x="760" y="390" font-size="80" text-anchor="middle">🔨</text>
+  <text x="480" y="450" fill="url(#ttl)" font-size="64" font-weight="800" text-anchor="middle">Bill to Law</text>
+  <text x="480" y="495" font-size="22" fill="#b8aae0" text-anchor="middle">Put the steps in order!</text>
+</svg>

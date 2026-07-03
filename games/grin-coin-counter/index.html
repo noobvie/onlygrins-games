@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
 <title>Grin Coin Counter</title>
 
 <!-- Platform SDK: absolute path the OnlyGrins arcade serves. When absent
@@ -12,6 +13,7 @@
 <!-- Our helper, bundled WITH the game (relative) so it works everywhere:
      file:// double-click, the dev host, and the real platform. -->
 <script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="grin-coin-counter"></script>
 
 <style>
   :root { --bg:#0c1a14; --panel:#11271d; --panel2:#0e2017; --line:#1f4634; --grin:#5ee0a0;
@@ -153,6 +155,20 @@
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
 
+  // --- sound effects (Web Audio, no assets) ---
+  var _sAC = window.AudioContext || window.webkitAudioContext, _sac = null;
+  function _sfx(f, d, type, slide, when) { try { _sac = _sac || new _sAC();
+    var t = _sac.currentTime + (when || 0), o = _sac.createOscillator(), g = _sac.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + d);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.14, t + .012);
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(_sac.destination); o.start(t); o.stop(t + d + .03);
+  } catch (e) {} }
+  function sfxGood() { _sfx(523, .13, 'triangle'); _sfx(784, .17, 'triangle', 0, .1); }
+  function sfxBad() { _sfx(196, .3, 'sawtooth', 90); }
+  function sfxWin() { [523, 659, 784, 1047].forEach(function (f, i) { _sfx(f, .2, 'triangle', 0, i * .12); }); }
+
   // Work in integer MILLIGRIN (1 grin = 1000) to avoid decimal rounding bugs.
   var MILLI = 1000, ROUNDS = 8;
 
@@ -257,14 +273,17 @@
       $('score').textContent = state.score;
       var bonus = (firstTry ? ' first try!' : '') + (fewCoins ? ' fewest coins!' : '');
       setMsg('good', '✓ Correct! +' + pts + bonus);
+      sfxGood();
       EduSDK.finishLesson(state.round + 1, { correct: true, attempts: state.attempts }); // SDK: level end
       state.round++;
       setTimeout(function () { state.round >= ROUNDS ? endGame() : newRound(); }, 1100);
     } else if (t > state.target) {
       setMsg('bad', 'Too much by ' + fmt(t - state.target, dec) + ' ツ — basket cleared, try again.');
+      sfxBad();
       state.basket = []; renderBasket();
     } else {
       setMsg('bad', 'Not enough — add ' + fmt(state.target - t, dec) + ' ツ more.');
+      sfxBad();
     }
   }
 
@@ -284,6 +303,7 @@
   }
 
   function endGame() {
+    sfxWin();
     $('finalScore').textContent = state.score;
     $('solved').textContent = state.solved;
     $('perfect').textContent = state.perfect;

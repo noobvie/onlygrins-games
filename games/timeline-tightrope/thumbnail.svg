@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a1a0c"/><stop offset=".5" stop-color="#3d2712"/><stop offset="1" stop-color="#1c1108"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- tightrope -->
+  <line x1="40" y1="250" x2="920" y2="250" stroke="#9a6e2e" stroke-width="6"/>
+  <!-- event cards hanging on the rope -->
+  <g>
+    <rect x="120" y="120" width="140" height="120" rx="14" fill="#4a340f" stroke="#9a6e2e" stroke-width="4"/>
+    <text x="190" y="185" font-size="52" text-anchor="middle">🔺</text>
+    <text x="190" y="222" font-size="18" font-weight="800" fill="#ffb84d" text-anchor="middle">2600 BCE</text>
+    <rect x="410" y="120" width="140" height="120" rx="14" fill="#4a340f" stroke="#9a6e2e" stroke-width="4"/>
+    <text x="480" y="185" font-size="52" text-anchor="middle">🏰</text>
+    <text x="480" y="222" font-size="18" font-weight="800" fill="#ffb84d" text-anchor="middle">1100 CE</text>
+    <rect x="700" y="120" width="140" height="120" rx="14" fill="#4a340f" stroke="#9a6e2e" stroke-width="4"/>
+    <text x="770" y="185" font-size="52" text-anchor="middle">🌕</text>
+    <text x="770" y="222" font-size="18" font-weight="800" fill="#ffb84d" text-anchor="middle">1969 CE</text>
+  </g>
+  <!-- balancing time cat -->
+  <text x="480" y="320" font-size="96" text-anchor="middle">🐱</text>
+  <text x="360" y="300" font-size="40">⏳</text>
+  <text x="600" y="300" font-size="40">⌛</text>
+  <text x="480" y="470" fill="url(#ttl)" font-size="60" font-weight="800" text-anchor="middle">Timeline Tightrope</text>
+</svg>

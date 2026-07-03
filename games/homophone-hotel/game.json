@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "homophone-hotel",
+  "title": "Homophone Hotel",
+  "category": "language",
+  "short_description": "Check chaotic guests into the room with the right word — put the bear in the BARE room and, well, that's a lawsuit.",
+  "description": "Welcome to the Homophone Hotel, where every guest's booking hangs on ONE little word. Read the sentence on their luggage and check them into the right room: their or there? to, too or two? bear or bare? Get it wrong and chaos erupts — put the bear in the BARE room and, well, that's a lawsuit. Grade bands ramp from friendly pairs like sea/see and blew/blue, to the classic their/there/they're and your/you're, to grown-up mix-ups like whose/who's and allowed/aloud. A free online homophones and spelling game for kids in grades 2–5, with speed and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap the room with the right word before the front-desk bell rings.",
+  "tags": [
+    "language",
+    "homophones",
+    "spelling",
+    "grammar",
+    "strand-vocabulary",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:homophone-hotel"
+}

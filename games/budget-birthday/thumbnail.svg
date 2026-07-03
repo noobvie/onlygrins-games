@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a0c2a"/><stop offset=".5" stop-color="#3d123d"/><stop offset="1" stop-color="#1c0820"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- bunting -->
+  <path d="M 40 60 Q 480 130 920 60" stroke="#94469a" stroke-width="4" fill="none"/>
+  <g font-size="34">
+    <text x="140" y="95">🎈</text><text x="320" y="118">🎈</text><text x="620" y="118">🎈</text><text x="800" y="95">🎈</text>
+  </g>
+  <!-- budget tag -->
+  <rect x="330" y="150" width="300" height="120" rx="18" fill="#1c0820" stroke="#ffd54a" stroke-width="6"/>
+  <text x="480" y="200" font-size="24" font-weight="800" fill="#e8a8e0" text-anchor="middle">BUDGET</text>
+  <text x="480" y="250" font-size="52" font-weight="800" fill="#ffd54a" text-anchor="middle">$20.00</text>
+  <!-- shop items -->
+  <g text-anchor="middle">
+    <text x="170" y="360" font-size="76">🎂</text>
+    <text x="360" y="380" font-size="70">🍕</text>
+    <text x="600" y="380" font-size="70">🎁</text>
+    <text x="790" y="360" font-size="76">🍬</text>
+  </g>
+  <!-- piggy + coins -->
+  <text x="150" y="470" font-size="56" text-anchor="middle">🐷</text>
+  <text x="820" y="470" font-size="52" text-anchor="middle">🪙</text>
+  <text x="480" y="500" fill="url(#ttl)" font-size="62" font-weight="800" text-anchor="middle">Budget Birthday</text>
+</svg>

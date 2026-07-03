@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "rule-or-law",
+  "title": "Rule or Law?",
+  "category": "civics",
+  "short_description": "A rule is made by people around you; a law is made by government for everyone — read each statement and sort it into the right box.",
+  "description": "What's the difference between a rule and a law? A rule is made by the people around you — family, class, a game — to keep things fair, while a law is made by the government for the whole community and everyone must follow it. Read each statement and sort it into the right box. It's a core early-civics idea about how we live together, and grade 4–5 adds a second round on the difference between your rights and your responsibilities. Grade bands ramp from clear rule-or-law examples, to trickier ones, to a mix that includes rights and responsibilities. A free online civics, rules-and-laws and citizenship game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 660,
+  "controls": "Mouse / tap the box (Rule or Law, Right or Responsibility) each statement belongs in.",
+  "tags": [
+    "civics",
+    "rules-and-laws",
+    "rights-and-responsibilities",
+    "citizenship",
+    "strand-citizenship",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:rule-or-law"
+}

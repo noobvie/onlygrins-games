@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#13204a"/><stop offset=".5" stop-color="#1a1140"/><stop offset="1" stop-color="#0c2a3a"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c77dff"/><stop offset=".5" stop-color="#5ad8ff"/><stop offset="1" stop-color="#3ee87a"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- sparkles -->
+  <g font-size="30" opacity=".8">
+    <text x="330" y="120">✨</text><text x="600" y="100">✨</text><text x="470" y="70">⚡</text>
+  </g>
+  <!-- correct beast vs mutant -->
+  <text x="280" y="280" font-size="150" text-anchor="middle">🦄</text>
+  <text x="280" y="350" font-size="30" font-weight="800" fill="#3ee87a" text-anchor="middle">UNICORN ✓</text>
+  <text x="480" y="250" font-size="50" text-anchor="middle" fill="#9fb4e0">vs</text>
+  <text x="680" y="280" font-size="150" text-anchor="middle">🧟</text>
+  <text x="680" y="350" font-size="30" font-weight="800" fill="#ff6b81" text-anchor="middle">"UNCORIN"…?</text>
+  <!-- letter tiles -->
+  <g font-size="34" font-weight="800" text-anchor="middle">
+    <rect x="300" y="380" width="56" height="62" rx="10" fill="#22305f" stroke="#2b3a77" stroke-width="3"/>
+    <text x="328" y="424" fill="#eaf2ff">U</text>
+    <rect x="366" y="380" width="56" height="62" rx="10" fill="#22305f" stroke="#2b3a77" stroke-width="3"/>
+    <text x="394" y="424" fill="#eaf2ff">N</text>
+    <rect x="432" y="380" width="56" height="62" rx="10" fill="#103b29" stroke="#3ee87a" stroke-width="3"/>
+    <text x="460" y="424" fill="#3ee87a">I</text>
+    <rect x="498" y="380" width="56" height="62" rx="10" fill="#22305f" stroke="#2b3a77" stroke-width="3"/>
+    <text x="526" y="424" fill="#eaf2ff">C</text>
+    <rect x="564" y="380" width="56" height="62" rx="10" fill="#22305f" stroke="#2b3a77" stroke-width="3"/>
+    <text x="592" y="424" fill="#eaf2ff">?</text>
+  </g>
+  <text x="480" y="505" fill="url(#ttl)" font-size="58" font-weight="800" text-anchor="middle">Spell-a-Beast</text>
+</svg>

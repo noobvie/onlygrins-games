@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#33240c"/><stop offset=".5" stop-color="#472f12"/><stop offset="1" stop-color="#241808"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- town hall -->
+  <path d="M 380 120 L 480 70 L 580 120 Z" fill="#a8802e"/>
+  <rect x="400" y="120" width="160" height="24" fill="#a8802e"/>
+  <text x="480" y="110" font-size="30" text-anchor="middle">🏛️</text>
+  <!-- helper badges -->
+  <g>
+    <circle cx="180" cy="250" r="66" fill="#54400f" stroke="#a8802e" stroke-width="5"/>
+    <text x="180" y="272" font-size="60" text-anchor="middle">🧑‍🚒</text>
+    <circle cx="370" cy="300" r="66" fill="#54400f" stroke="#a8802e" stroke-width="5"/>
+    <text x="370" y="322" font-size="60" text-anchor="middle">🧑‍⚕️</text>
+    <circle cx="590" cy="300" r="66" fill="#54400f" stroke="#a8802e" stroke-width="5"/>
+    <text x="590" y="322" font-size="60" text-anchor="middle">⚖️</text>
+    <circle cx="780" cy="250" r="66" fill="#54400f" stroke="#a8802e" stroke-width="5"/>
+    <text x="780" y="272" font-size="60" text-anchor="middle">🎩</text>
+  </g>
+  <text x="480" y="455" fill="url(#ttl)" font-size="58" font-weight="800" text-anchor="middle">Town Hall Helpers</text>
+  <text x="480" y="498" font-size="22" fill="#e8cc8a" text-anchor="middle">Who does what in our town?</text>
+</svg>

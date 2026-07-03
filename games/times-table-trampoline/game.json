@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "times-table-trampoline",
+  "title": "Times-Table Trampoline",
+  "category": "math",
+  "short_description": "Bounce Waldo the Walrus sky-high by nailing times tables — or race Kevin the bot walrus.",
+  "description": "Answer multiplication and division facts under gentle time pressure to bounce Waldo the Walrus higher and higher. Right answers go BOING, wrong answers go pfffft. Race mode adds Kevin, a rival bot walrus who is beatable but pushy — beat his altitude for a big bonus. Grade bands ramp from the 2/5/10 tables to 7/8/9/12 with division mixed in. Speed and streak bonuses feed your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap to pick an answer before the timer runs out.",
+  "tags": [
+    "math",
+    "multiplication",
+    "division",
+    "strand-arithmetic",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny",
+    "race"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:times-table-trampoline"
+}

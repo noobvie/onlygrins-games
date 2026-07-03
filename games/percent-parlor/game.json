@@ -1,0 +1,30 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "percent-parlor",
+  "title": "Percent Parlor",
+  "category": "math",
+  "short_description": "Run an ice-cream parlor where everything is X% off — miscalculate and a tiny inspector penguin stamps your forehead with AUDITED.",
+  "description": "Welcome to the Percent Parlor, the ice-cream shop where EVERYTHING is on sale! Customers order percentages of scoops, sprinkles and sundae prices — work out 50%, 25%, 10% and trickier cuts fast, or the tiny inspector penguin waddles over and stamps your forehead with AUDITED. Grade bands ramp from easy halves and quarters, to 10% and 20% of bigger numbers, to full discount prices under real time pressure. A free online percentages game for kids in grades 4–6, with speed and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap the correct amount before the inspector penguin's timer runs out.",
+  "tags": [
+    "math",
+    "percentages",
+    "fractions",
+    "strand-number",
+    "grade-4",
+    "grade-5",
+    "grade-6",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:percent-parlor"
+}

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0e2410"/><stop offset=".5" stop-color="#143318"/><stop offset="1" stop-color="#081a0e"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b8e84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- bar chart -->
+  <g>
+    <rect x="360" y="70" width="420" height="330" rx="16" fill="#0a1f0e" stroke="#2e6e38" stroke-width="4"/>
+    <text x="570" y="110" font-size="24" font-weight="800" fill="#b8e84d" text-anchor="middle">🧦 stolen socks this week 🧦</text>
+    <rect x="400" y="240" width="56" height="130" rx="8" fill="#3ee87a"/>
+    <rect x="480" y="180" width="56" height="190" rx="8" fill="#5ad8ff"/>
+    <rect x="560" y="280" width="56" height="90" rx="8" fill="#c77dff"/>
+    <rect x="640" y="140" width="56" height="230" rx="8" fill="#ffb84d"/>
+    <g fill="#eaffe9" font-size="18" font-weight="800" text-anchor="middle">
+      <text x="428" y="392">Mon</text><text x="508" y="392">Tue</text><text x="588" y="392">Wed</text><text x="668" y="392">Thu</text>
+    </g>
+  </g>
+  <!-- goblin -->
+  <text x="180" y="330" font-size="160" text-anchor="middle">👺</text>
+  <!-- bell of shame -->
+  <text x="290" y="170" font-size="64">🔔</text>
+  <text x="185" y="110" font-size="34" font-weight="800" fill="#ff6b81" transform="rotate(-6 185 110)">ding.</text>
+  <!-- hoard -->
+  <g font-size="40">
+    <text x="80" y="440">🥄</text><text x="150" y="460">🧦</text><text x="230" y="445">🚪</text>
+  </g>
+  <text x="480" y="495" fill="url(#ttl)" font-size="64" font-weight="800" text-anchor="middle">Graph Goblin</text>
+</svg>

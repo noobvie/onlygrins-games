@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a1a3a"/><stop offset=".5" stop-color="#12245a"/><stop offset="1" stop-color="#060f24"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7dd8ff"/><stop offset=".5" stop-color="#ffd166"/><stop offset="1" stop-color="#ff6b81"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- aurora + stars -->
+  <path d="M0 90 Q240 20 480 80 T960 60" stroke="#3ee87a" stroke-width="18" fill="none" opacity=".25"/>
+  <path d="M0 130 Q240 60 480 120 T960 100" stroke="#c77dff" stroke-width="14" fill="none" opacity=".22"/>
+  <circle cx="120" cy="60" r="3" fill="#eaf4ff"/><circle cx="300" cy="40" r="2.5" fill="#eaf4ff"/>
+  <circle cx="700" cy="50" r="3" fill="#eaf4ff"/><circle cx="880" cy="120" r="2.5" fill="#eaf4ff"/>
+  <!-- the division problem -->
+  <text x="480" y="235" font-size="86" font-weight="800" fill="#eaf4ff" text-anchor="middle">17 ÷ 4 = 4 <tspan fill="#ffd166">r 1</tspan></text>
+  <!-- reindeer team -->
+  <text x="180" y="360" font-size="80" text-anchor="middle">🦌🦌🦌🦌</text>
+  <!-- Kevin, smug, with the leftover crate -->
+  <text x="760" y="370" font-size="110" text-anchor="middle">🦌</text>
+  <text x="845" y="360" font-size="60" text-anchor="middle">📦</text>
+  <text x="760" y="420" font-size="26" font-weight="800" fill="#ffd166" text-anchor="middle">KEVIN 😏</text>
+  <!-- sled -->
+  <text x="480" y="380" font-size="70" text-anchor="middle">🛷</text>
+  <text x="480" y="500" fill="url(#ttl)" font-size="64" font-weight="800" text-anchor="middle">Remainder Reindeer</text>
+</svg>

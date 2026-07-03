@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Grid Squid — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="grid-squid"></script>
+
+<style>
+  :root{
+    --bg1:#071b33; --bg2:#0a2547; --bg3:#041226;
+    --card:#0a1f3d; --line:#1d4a7a; --text:#e7f2ff; --muted:#9cbcdd;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--purple),var(--blue),var(--green));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#04122a;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .task{background:#061630;border:2px solid var(--line);border-radius:16px;padding:12px 16px;
+    text-align:center;font-size:clamp(17px,3.2vw,24px);font-weight:800;margin-bottom:12px;}
+  .gridwrap{text-align:center;}
+  .gridwrap svg{max-width:420px;width:100%;height:auto;background:#061630;border-radius:16px;
+    border:2px solid var(--line);}
+  .cell{fill:#0b2a52;stroke:#1d4a7a;stroke-width:1.5;cursor:pointer;}
+  .cell:hover{fill:#12406e;}
+  .pt{fill:#5ad8ff;opacity:.35;cursor:pointer;}
+  .pt:hover{opacity:1;fill:#ffb84d;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#04122a;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#123258;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#4f7ba8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🦑 Grid Squid</h1>
+      <p class="sub">Gary the Grid Squid has EIGHT shoes and he has lost ALL of them across the
+        coordinate grid. Tap the right spot to send a tentacle — miss, and the tentacle slaps a
+        passing tuna, and the tuna WILL slap back.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>squares like B3</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>points like (4, 2)</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>moves: 3 right, 2 up</small></button>
+      </div>
+      <p class="sub">10 lost shoes · streaks earn bonus points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Shoe 1/10</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="task" id="qtext"></div>
+      <div class="gridwrap"><svg id="grid" viewBox="0 0 400 400"></svg></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🦑</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">More shoes ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', mode: 'cells' },
+    { id: 3, label: 'Grade 3',   mode: 'points' },
+    { id: 4, label: 'Grade 4–5', mode: 'moves' }
+  ];
+  var ROUNDS = 10, N = 6; // 6x6 cells / 0..6 points
+  var M = 46, CS = (400 - M - 16) / N; // svg margin + cell size
+  var LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
+  var SHOES = ['👟', '🥾', '👠', '🩴', '👢', '🥿'];
+
+  var GOT = ['SHOE GET! Gary wiggles with joy. 🦑✨', 'Tentacle precision: 100%. 👟',
+             'Four down, four to... wait, how many shoes? 🤔', 'The tuna nods respectfully. 🐟'];
+  var SLAP = ['SLAP! That was a tuna. The tuna slapped back. 🐟💥',
+              'Missed! The tentacle grabbed a very confused crab. 🦀',
+              'Wrong spot — Gary is now wearing seaweed. 🌿',
+              'The tuna has pressed charges. 🐟⚖️'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var target = null, start = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function blub(){ tone(440,.2,'sine',880); }
+  function slap(){ tone(320,.4,'sawtooth',90); }
+
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, text) {
+    var e = document.createElementNS(SVGNS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text) e.textContent = text;
+    return e;
+  }
+  function cellXY(cx, cy) { return { x: M + cx * CS, y: M + (N - 1 - cy) * CS }; }
+  function ptXY(px, py) { return { x: M + px * CS, y: M + (N - py) * CS }; }
+
+  function drawGrid() {
+    var svg = $('grid');
+    svg.innerHTML = '';
+    var i, j, p;
+    if (grade.mode === 'cells') {
+      for (i = 0; i < N; i++) for (j = 0; j < N; j++) {
+        p = cellXY(i, j);
+        var r = el('rect', { x: p.x, y: p.y, width: CS, height: CS, 'class': 'cell', rx: 6,
+                             'data-x': i, 'data-y': j });
+        r.addEventListener('click', onTap);
+        svg.appendChild(r);
+      }
+      for (i = 0; i < N; i++) {
+        p = cellXY(i, 0);
+        svg.appendChild(el('text', { x: p.x + CS / 2, y: 392, fill: '#9cbcdd', 'font-size': 18,
+          'font-weight': 800, 'text-anchor': 'middle' }, LETTERS[i]));
+        p = cellXY(0, i);
+        svg.appendChild(el('text', { x: M - 18, y: p.y + CS / 2 + 6, fill: '#9cbcdd', 'font-size': 18,
+          'font-weight': 800, 'text-anchor': 'middle' }, String(i + 1)));
+      }
+    } else {
+      for (i = 0; i <= N; i++) {
+        var a = ptXY(i, 0), b = ptXY(i, N);
+        svg.appendChild(el('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: '#1d4a7a', 'stroke-width': i === 0 ? 3 : 1.5 }));
+        a = ptXY(0, i); b = ptXY(N, i);
+        svg.appendChild(el('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: '#1d4a7a', 'stroke-width': i === 0 ? 3 : 1.5 }));
+        p = ptXY(i, 0);
+        svg.appendChild(el('text', { x: p.x, y: 392, fill: '#9cbcdd', 'font-size': 17, 'font-weight': 800, 'text-anchor': 'middle' }, String(i)));
+        p = ptXY(0, i);
+        svg.appendChild(el('text', { x: M - 20, y: p.y + 6, fill: '#9cbcdd', 'font-size': 17, 'font-weight': 800, 'text-anchor': 'middle' }, String(i)));
+      }
+      for (i = 0; i <= N; i++) for (j = 0; j <= N; j++) {
+        p = ptXY(i, j);
+        var c = el('circle', { cx: p.x, cy: p.y, r: 11, 'class': 'pt', 'data-x': i, 'data-y': j });
+        c.addEventListener('click', onTap);
+        svg.appendChild(c);
+      }
+      if (grade.mode === 'moves' && start) {
+        p = ptXY(start.x, start.y);
+        svg.appendChild(el('text', { x: p.x, y: p.y + 9, 'font-size': 26, 'text-anchor': 'middle',
+          'pointer-events': 'none' }, '🦑'));
+      }
+    }
+  }
+
+  function markAt(pos, emoji) {
+    var p = grade.mode === 'cells' ? cellXY(pos.x, pos.y) : ptXY(pos.x, pos.y);
+    var x = grade.mode === 'cells' ? p.x + CS / 2 : p.x;
+    var y = grade.mode === 'cells' ? p.y + CS / 2 + 9 : p.y + 9;
+    $('grid').appendChild(el('text', { x: x, y: y, 'font-size': 28, 'text-anchor': 'middle',
+      'pointer-events': 'none' }, emoji));
+  }
+
+  function newQuestion() {
+    answered = false;
+    $('roundLbl').textContent = 'Shoe ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    var shoe = pick(SHOES);
+    if (grade.mode === 'cells') {
+      target = { x: rint(0, N - 1), y: rint(0, N - 1), shoe: shoe };
+      $('qtext').textContent = 'Gary’s ' + shoe + ' is in square ' + LETTERS[target.x] + (target.y + 1) + ' — tap it!';
+      start = null;
+    } else if (grade.mode === 'points') {
+      target = { x: rint(0, N), y: rint(0, N), shoe: shoe };
+      $('qtext').textContent = 'Send a tentacle to (' + target.x + ', ' + target.y + ') for the ' + shoe + '!';
+      start = null;
+    } else {
+      start = { x: rint(0, N), y: rint(0, N) };
+      var dx = rint(-3, 3), dy = rint(-3, 3);
+      while (dx === 0 && dy === 0 ||
+             start.x + dx < 0 || start.x + dx > N || start.y + dy < 0 || start.y + dy > N) {
+        dx = rint(-3, 3); dy = rint(-3, 3);
+      }
+      target = { x: start.x + dx, y: start.y + dy, shoe: shoe };
+      var parts = [];
+      if (dx) parts.push(Math.abs(dx) + ' ' + (dx > 0 ? 'RIGHT' : 'LEFT'));
+      if (dy) parts.push(Math.abs(dy) + ' ' + (dy > 0 ? 'UP' : 'DOWN'));
+      $('qtext').textContent = 'Gary is at (' + start.x + ', ' + start.y + '). Move ' + parts.join(', then ') + ' — tap where he lands!';
+    }
+    drawGrid();
+    EduSDK.startLesson(q + 1, { question: $('qtext').textContent });
+  }
+
+  function onTap(ev) {
+    if (answered) return;
+    answered = true;
+    var x = Number(ev.target.getAttribute('data-x'));
+    var y = Number(ev.target.getAttribute('data-y'));
+    var correct = x === target.x && y === target.y;
+    markAt(target, target.shoe);
+    if (correct) {
+      streak++; nCorrect++;
+      var pts = 100 + streak * 15;
+      score += pts;
+      $('scoreVal').textContent = score;
+      blub();
+      $('toast').textContent = pick(GOT) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      markAt({ x: x, y: y }, '🐟');
+      slap();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      var where = grade.mode === 'cells' ? LETTERS[target.x] + (target.y + 1) : '(' + target.x + ', ' + target.y + ')';
+      $('toast').textContent = pick(SLAP) + '  (the shoe was at ' + where + ')';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1800);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 1800);
+    } else setTimeout(newQuestion, 1800);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 8 ? '🦑👟🏆' : nCorrect >= 5 ? '🦑👟' : '🐟💥';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' shoes found! ' +
+      (nCorrect >= 8 ? 'Gary is fully shod and STRUTTING.' :
+       nCorrect >= 5 ? 'Gary can hop stylishly on most tentacles.' :
+       'The tuna is demanding an apology in writing.');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el2 = $('saveMsg');
+        if (res && res.success) {
+          el2.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el2.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el2.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'grid-squid' });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Melt or Freeze? — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="science" data-seed="melt-or-freeze"></script>
+
+<style>
+  :root{
+    --bg1:#0a2030; --bg2:#123040; --bg3:#051018;
+    --card:#0e2a3a; --line:#2e6a8e; --text:#eefaff; --muted:#9cc8e0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(150deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--blue),var(--purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#06202e;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--orange);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .arena{background:#092230;border:2px solid var(--line);border-radius:16px;padding:14px;
+    text-align:center;margin-bottom:12px;overflow:hidden;}
+  .task{font-size:clamp(15px,2.9vw,20px);font-weight:800;color:var(--muted);}
+  .exhibit{font-size:clamp(22px,4.5vw,34px);font-weight:800;margin:8px 0 10px;}
+  .exhibit .item{display:inline-block;font-size:1.6em;animation:wobble 1.5s infinite;}
+  @keyframes wobble{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+  .timerbar{height:10px;border-radius:6px;background:#051018;overflow:hidden;}
+  .timerbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--blue),var(--orange),var(--bad));}
+  .answers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .answers.four{grid-template-columns:repeat(4,1fr);}
+  .ans{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:14px 8px;border-radius:14px;color:#06202e;background:var(--blue);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .ans small{display:block;font-size:20px;font-weight:700;}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .ans.right{background:var(--green);} .ans.wrong{background:var(--bad);}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#06202e;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#1a4a66;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#4a8ab0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🧪 Melt or Freeze?</h1>
+      <p class="sub">Professor Wobble's lab needs YOU on the states-of-matter station. Sort solids,
+        liquids and gases, and predict what the heat lamp and the freezer will do — get it wrong
+        and the lab yeti's smoothie turns to steam in his face. He never forgives. Ever.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 2<small>solid · liquid · gas</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3–4<small>what happens next?</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 5<small>name the change</small></button>
+      </div>
+      <p class="sub">12 lab jobs · fast science = bonus points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Job 1/12</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="arena">
+        <div class="exhibit"><span class="item" id="itemEmoji">🧊</span> <span id="itemTxt"></span></div>
+        <div class="task" id="qtext">Solid, liquid or gas?</div>
+        <div class="timerbar" style="margin-top:10px"><i id="timerFill"></i></div>
+      </div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🧪</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Next experiment ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // --- curated science bank ---
+  var STATES = [
+    ['an ice cube', '🧊', 'solid'], ['a rock from the yard', '🪨', 'solid'],
+    ['a wooden spoon', '🥄', 'solid'], ['a chocolate bar (unmelted!)', '🍫', 'solid'],
+    ['a glass of juice', '🧃', 'liquid'], ['runny honey', '🍯', 'liquid'],
+    ['milk in a jug', '🥛', 'liquid'], ['rainwater in a puddle', '💧', 'liquid'],
+    ['steam over a kettle', '♨️', 'gas'], ['the air inside a balloon', '🎈', 'gas'],
+    ['bubbles rising in lemonade', '🫧', 'gas'], ['the smell of dinner drifting by', '🍜', 'gas']
+  ];
+  var CHANGES = [
+    ['an ice lolly left in the sun', '🍦', 'it melts', 'solid → liquid in the heat'],
+    ['chocolate in a warm pocket', '🍫', 'it melts', 'solid → liquid in the heat'],
+    ['a snowman on a sunny day', '⛄', 'it melts', 'solid → liquid in the heat'],
+    ['butter dropped in a hot pan', '🧈', 'it melts', 'solid → liquid in the heat'],
+    ['a cup of water in the freezer', '🥶', 'it freezes', 'liquid → solid in the cold'],
+    ['juice poured into an ice-pop mould overnight', '🧃', 'it freezes', 'liquid → solid in the cold'],
+    ['a puddle on a very hot day', '💧', 'it evaporates', 'liquid → gas, up into the air'],
+    ['wet washing on a warm windy line', '👕', 'it evaporates', 'liquid → gas, up into the air'],
+    ['a shallow dish of water by a sunny window', '🥣', 'it evaporates', 'liquid → gas, up into the air']
+  ];
+  var NAMES = [
+    ['ice turning to water', '🧊➜💧', 'melting'],
+    ['water turning to ice', '💧➜🧊', 'freezing'],
+    ['a puddle becoming water vapour', '💧➜☁️', 'evaporation'],
+    ['steam turning to drops on a cold mirror', '☁️➜💧', 'condensation'],
+    ['chocolate going runny in the sun', '🍫➜🫠', 'melting'],
+    ['a lake icing over in winter', '🌊➜🧊', 'freezing'],
+    ['wet pavements drying after rain', '💧➜☁️', 'evaporation'],
+    ['a cold drink can getting wet on the OUTSIDE', '🥤💦', 'condensation']
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 2, label: 'Grade 2',   secs: 13, mode: 'state' },
+    { id: 3, label: 'Grade 3–4', secs: 12, mode: 'change' },
+    { id: 5, label: 'Grade 5',   secs: 12, mode: 'name' }
+  ];
+  var ROUNDS = 12;
+
+  var EUREKA = ['EUREKA! Professor Wobble does a spin! 🧑‍🔬💫', 'Textbook science! The beakers bubble with approval! 🫧',
+                'The lab yeti sips his smoothie safely. All is well. 🦣🥤', 'You may now wear the FANCY goggles. 🥽✨'];
+  var STEAM  = ['FSSSSSH. The yeti\'s smoothie is now steam. In his face. 🦣♨️', 'The experiment did a thing it should NOT have done. 💥',
+                'Professor Wobble is hiding under the desk again. 🧑‍🔬', 'The lab safety poster just sighed audibly. 📋'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var answer = '', timer = null, tLeft = 0, why = '', lastItem = '';
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function bubble(){ tone(660,.1,'sine',990); setTimeout(function(){ tone(880,.16,'sine',1760); }, 100); }
+  function hiss(){ tone(500,.5,'sawtooth',90); }
+
+  function setAnswers(opts, correct, labels, cls) {
+    answer = correct;
+    var box = $('answers');
+    box.className = 'answers' + (cls ? ' ' + cls : '');
+    box.innerHTML = '';
+    opts.forEach(function (v) {
+      var b = document.createElement('button');
+      b.className = 'ans';
+      b.innerHTML = v.toUpperCase() + (labels && labels[v] ? '<small>' + labels[v] + '</small>' : '');
+      b.dataset.v = v;
+      b.addEventListener('click', function(){ choose(b, v); });
+      box.appendChild(b);
+    });
+  }
+
+  function takeItem(bank) {
+    var it;
+    do { it = pick(bank); } while (it[0] === lastItem);
+    lastItem = it[0];
+    return it;
+  }
+
+  function makeQuestion() {
+    if (grade.mode === 'state') {
+      var s = takeItem(STATES);
+      $('itemEmoji').textContent = s[1];
+      $('itemTxt').textContent = s[0];
+      $('qtext').textContent = 'Sort it! Is this a SOLID, a LIQUID or a GAS?';
+      why = s[0] + ' is a ' + s[2];
+      setAnswers(['solid', 'liquid', 'gas'], s[2], { solid: '🧱', liquid: '💧', gas: '☁️' });
+    } else if (grade.mode === 'change') {
+      var c = takeItem(CHANGES);
+      $('itemEmoji').textContent = c[1];
+      $('itemTxt').textContent = c[0];
+      $('qtext').textContent = 'What happens to ' + c[0] + '?';
+      why = c[3];
+      setAnswers(shuffle(['it melts', 'it freezes', 'it evaporates']), c[2],
+        { 'it melts': '🫠', 'it freezes': '🧊', 'it evaporates': '☁️' });
+    } else {
+      var n = takeItem(NAMES);
+      $('itemEmoji').textContent = '🔬';
+      $('itemTxt').textContent = n[0] + '  ' + n[1];
+      $('qtext').textContent = 'What does a scientist CALL this change?';
+      why = n[0] + ' = ' + n[2];
+      setAnswers(shuffle(['melting', 'freezing', 'evaporation', 'condensation']), n[2], null, 'four');
+    }
+  }
+
+  function newQuestion() {
+    answered = false;
+    $('roundLbl').textContent = 'Job ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    makeQuestion();
+    tLeft = grade.secs;
+    clearInterval(timer);
+    timer = setInterval(function () {
+      tLeft -= 0.1;
+      $('timerFill').style.width = Math.max(0, tLeft / grade.secs * 100) + '%';
+      if (tLeft <= 0) timeUp();
+    }, 100);
+    EduSDK.startLesson(q + 1, { item: lastItem });
+  }
+
+  function settle(correct, btn) {
+    clearInterval(timer);
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (b.dataset.v === answer) b.classList.add('right');
+    });
+    if (correct) {
+      streak++; nCorrect++;
+      var speedBonus = Math.round(tLeft / grade.secs * 40);
+      var pts = 100 + speedBonus + streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      bubble();
+      $('toast').textContent = pick(EUREKA) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      if (btn) btn.classList.add('wrong');
+      hiss();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(STEAM) + '  (' + why + ')';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1700);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 1700);
+    } else setTimeout(newQuestion, 1700);
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    settle(v === answer, btn);
+  }
+
+  function timeUp() {
+    if (answered) return;
+    answered = true;
+    settle(false, null);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 10 ? '🧪🏆' : nCorrect >= 6 ? '🧪🥽' : '🦣♨️';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' lab jobs done right. ' +
+      (nCorrect >= 10 ? 'Professor Wobble names a beaker after you!' :
+       nCorrect >= 6 ? 'Solid lab work. Also liquid and gas lab work.' :
+       'The yeti has started labelling his smoothies "NOT FOR SCIENCE".');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0; lastItem = '';
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'melt-or-freeze' });
+})();
+</script>
+</body>
+</html>

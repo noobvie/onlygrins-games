@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "food-chain-fiasco",
+  "title": "Food Chain Fiasco",
+  "category": "science",
+  "short_description": "Build food chains in the right order — mess up and the grass starts chasing the lion.",
+  "description": "Put each ecosystem's food chain in the right order, producer first and top predator last. Get it wrong and the ecosystem hilariously acts out your mistake — the grass chases the lion, the mouse declares itself king of the owls. Grade bands ramp from 3-link to 5-link chains across meadows, oceans and forests. Teaches food chains, producers/consumers and energy flow, with first-try and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap the organisms in order, starting with the plant.",
+  "tags": [
+    "science",
+    "ecosystems",
+    "food-chains",
+    "strand-ecosystems",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:food-chain-fiasco"
+}

@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Remainder Reindeer — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="remainder-reindeer"></script>
+
+<style>
+  :root{
+    --bg1:#0a1a3a; --bg2:#12245a; --bg3:#060f24;
+    --card:#101f44; --line:#3a5a9e; --text:#eaf4ff; --muted:#9db8e0;
+    --green:#3ee87a; --blue:#7dd8ff; --purple:#c77dff; --gold:#ffd166; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(160deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--blue),var(--gold),var(--bad));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#0a1830;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .kevin{color:var(--gold);font-size:14px;}
+  .top .score{color:var(--green);font-size:20px;}
+  .arena{background:#0a1633;border:2px solid var(--line);border-radius:16px;padding:14px;
+    text-align:center;margin-bottom:12px;overflow:hidden;}
+  .task{font-size:clamp(16px,3vw,21px);font-weight:800;color:var(--muted);}
+  .cargo{font-size:clamp(28px,6vw,44px);font-weight:800;margin:4px 0 2px;white-space:nowrap;}
+  .cargo .deer{display:inline-block;animation:trot 1s infinite;}
+  @keyframes trot{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  .ask{font-size:clamp(18px,3.5vw,26px);font-weight:800;color:var(--gold);margin:2px 0 10px;}
+  .timerbar{height:10px;border-radius:6px;background:#060f24;overflow:hidden;}
+  .timerbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--gold),var(--bad));}
+  .answers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .ans{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:24px;
+    padding:14px 6px;border-radius:14px;color:#0a1830;background:var(--blue);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .ans small{display:block;font-size:14px;font-weight:700;opacity:.7;}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .ans.right{background:var(--green);} .ans.wrong{background:var(--bad);}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#0a1830;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#25396b;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#5a7ab0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🦌 Remainder Reindeer</h1>
+      <p class="sub">The sled won't fly unless the cargo is shared FAIRLY. Divide the snack crates
+        among the reindeer team — and whatever is left over goes to Kevin, the greediest reindeer
+        in the Arctic. Divide wrong and the sled tips over mid-takeoff.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 2–3<small>sharing, no leftovers</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3–4<small>remainders for Kevin</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>big cargo, sneaky divisors</small></button>
+      </div>
+      <p class="sub">12 sled launches · fast sharing = bonus points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Launch 1/12</span>
+        <span class="spacer"></span>
+        <span class="kevin" id="kevinLbl">Kevin's pile: 0 🍪</span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="arena">
+        <div class="task" id="qtext">Share the crates!</div>
+        <div class="cargo"><span id="crates">📦 24</span> ÷ <span class="deer" id="team">🦌×4</span></div>
+        <div class="ask" id="ask">How many crates EACH?</div>
+        <div class="timerbar"><i id="timerFill"></i></div>
+      </div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🦌</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Launch again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 2, label: 'Grade 2–3', secs: 14, divisors: [2, 5, 10], maxQ: 10, rem: false },
+    { id: 3, label: 'Grade 3–4', secs: 12, divisors: [2, 3, 4, 5], maxQ: 10, rem: true },
+    { id: 4, label: 'Grade 4–5', secs: 10, divisors: [3, 4, 6, 7, 8, 9], maxQ: 12, rem: true }
+  ];
+  var ROUNDS = 12;
+
+  var CHEER = ['WHOOSH! The sled takes off perfectly! 🛷✨', 'Fair shares all round — the team high-fives hooves! 🦌',
+               'Perfect split! Even Kevin nods respectfully. 🦌👑', 'The cargo balances! Northern lights applaud! 🌌'];
+  var TIP   = ['CRUNCH. The sled tipped over mid-takeoff. 🛷💥', 'Unfair shares! A reindeer union meeting is called. 📋',
+               'Kevin grabbed the WHOLE pile. He looks so smug. 🦌😏', 'The crates rolled down the hill. Penguins are looting them. 🐧'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var answer = 0, timer = null, tLeft = 0, kevinPile = 0;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function jingle(){ tone(523,.12,'sine',1046); setTimeout(function(){ tone(659,.18,'sine',1318); }, 110); }
+  function crash(){ tone(140,.4,'sawtooth',55); }
+
+  function makeQuestion() {
+    var k = pick(grade.divisors);                     // reindeer on the team
+    var quo = rint(2, grade.maxQ);                    // crates each
+    var r = grade.rem ? rint(0, k - 1) : 0;           // Kevin's leftovers
+    var n = k * quo + r;
+    var askRem = grade.rem && Math.random() < 0.5;
+    answer = askRem ? r : quo;
+
+    $('qtext').textContent = n + ' snack crates arrive for a team of ' + k + ' reindeer…';
+    $('crates').textContent = '📦 ' + n;
+    $('team').textContent = '🦌×' + k;
+    $('ask').textContent = askRem ? 'How many crates LEFT OVER for Kevin?' : 'How many crates does EACH reindeer get?';
+
+    var opts = [answer];
+    if (askRem) {
+      // decoys stay in the plausible remainder range, plus the quotient trap
+      var cand = shuffle([ (r + 1) % k, (r + k - 1) % k, quo ]);
+      cand.forEach(function (v) { if (opts.length < 3 && opts.indexOf(v) < 0) opts.push(v); });
+    } else {
+      [quo + 1, quo - 1, quo + 2, r].forEach(function (v) {
+        if (opts.length < 3 && v >= 0 && opts.indexOf(v) < 0) opts.push(v);
+      });
+    }
+    var box = $('answers');
+    box.innerHTML = '';
+    shuffle(opts).forEach(function (v) {
+      var b = document.createElement('button');
+      b.className = 'ans';
+      b.innerHTML = v + '<small>' + (askRem ? 'for Kevin 🍪' : 'crates each 📦') + '</small>';
+      b.dataset.v = v;
+      b.addEventListener('click', function(){ choose(b, v); });
+      box.appendChild(b);
+    });
+    return { n: n, k: k, askRem: askRem, r: r, quo: quo };
+  }
+
+  var cur = null;
+  function newQuestion() {
+    answered = false;
+    $('roundLbl').textContent = 'Launch ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    cur = makeQuestion();
+    tLeft = grade.secs;
+    clearInterval(timer);
+    timer = setInterval(function () {
+      tLeft -= 0.1;
+      $('timerFill').style.width = Math.max(0, tLeft / grade.secs * 100) + '%';
+      if (tLeft <= 0) timeUp();
+    }, 100);
+    EduSDK.startLesson(q + 1, { question: cur.n + ' / ' + cur.k + (cur.askRem ? ' remainder' : ' quotient') });
+  }
+
+  function settle(correct, btn) {
+    clearInterval(timer);
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (Number(b.dataset.v) === answer) b.classList.add('right');
+    });
+    if (correct) {
+      streak++; nCorrect++;
+      kevinPile += cur.r;
+      $('kevinLbl').textContent = "Kevin's pile: " + kevinPile + ' 🍪';
+      var speedBonus = Math.round(tLeft / grade.secs * 40);
+      var pts = 100 + speedBonus + streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      jingle();
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      if (btn) btn.classList.add('wrong');
+      crash();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(TIP) + '  (' + cur.n + ' ÷ ' + cur.k + ' = ' + cur.quo +
+        (grade.rem ? ' r ' + cur.r : '') + ')';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1600);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 1600);
+    } else setTimeout(newQuestion, 1600);
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    settle(v === answer, btn);
+  }
+
+  function timeUp() {
+    if (answered) return;
+    answered = true;
+    settle(false, null);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 10 ? '🦌🏆' : nCorrect >= 6 ? '🦌🛷' : '🦌😏';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' launches shared fairly. ' +
+      (nCorrect >= 10 ? 'Chief Cargo Officer of the whole Arctic!' :
+       nCorrect >= 6 ? 'A solid day of sled logistics.' :
+       'Kevin now owns most of the Arctic. He is unbearable.');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0; kevinPile = 0;
+    $('scoreVal').textContent = '0';
+    $('kevinLbl').textContent = "Kevin's pile: 0 🍪";
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'remainder-reindeer' });
+})();
+</script>
+</body>
+</html>

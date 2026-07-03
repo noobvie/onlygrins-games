@@ -1,0 +1,31 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "fraction-factory",
+  "title": "Burp-o-Matic Fraction Factory",
+  "category": "math",
+  "short_description": "Feed a burping robot exact fractions of fizzy grin-soda.",
+  "description": "The Burp-o-Matic 3000 only drinks EXACT fractions of fizzy grin-soda — pour too much or too little and it burps the whole thing back in your face. Tap bottle segments to serve the fraction it asks for. Three grade bands ramp from halves and quarters up to equivalent fractions on tricky bottles. Eight rounds, first-try bonuses, and streaks feed your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 600,
+  "controls": "Mouse / tap. Tap bottle segments to fill them, then press Feed the machine.",
+  "tags": [
+    "math",
+    "fractions",
+    "strand-fractions",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:fraction-factory"
+}

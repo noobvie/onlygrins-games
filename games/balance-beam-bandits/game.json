@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "balance-beam-bandits",
+  "title": "Balance Beam Bandits",
+  "category": "logic",
+  "short_description": "Raccoon bandits weighed the market's fruit on secret scales — use their balance clues to reason out which fruit is heavier and win back the loot.",
+  "description": "The raccoon bandits weighed the whole market's fruit on their secret balance scales, and YOU found their notes! Use the balance clues to reason out each answer and win back the loot — raccoon math is sneaky, but yours is sneakier. It's pre-algebra deduction disguised as a fruit heist: work out which fruit is heavier, how many small ones balance a big one, and chain two scales together. Grade bands ramp from simple heavier-or-lighter comparisons, to counting how many balance the pan, to two-scale substitution brain-benders. A free online logical reasoning and balance-scale game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 700,
+  "controls": "Mouse / tap the answer the balance clues point to.",
+  "tags": [
+    "logic",
+    "deduction",
+    "reasoning",
+    "pre-algebra",
+    "strand-reasoning",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:balance-beam-bandits"
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "grin-change-maker",
+  "title": "Grin Change Maker",
+  "category": "math",
+  "short_description": "Give a VERY impatient goat correct change in the fewest coins — before it eats your shop.",
+  "description": "You run the Grin General Store and your only customer is a goat with zero patience. Work out the change (payment minus price) and hand it over in the fewest grin coins — wrong change or slow service and the goat starts eating your inventory. Grade bands ramp from whole grin to full decimals. Teaches subtraction, money and optimization with fewest-coin and speed bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap. Tap coins to give them, tap a given coin to take it back, then press Hand it over.",
+  "tags": [
+    "math",
+    "money",
+    "subtraction",
+    "strand-arithmetic",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:grin-change-maker"
+}

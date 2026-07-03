@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Place Value Volcano — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="place-value-volcano"></script>
+
+<style>
+  :root{
+    --bg1:#2a0e12; --bg2:#3d1408; --bg3:#1c0808;
+    --card:#301010; --line:#6e2b1d; --text:#ffe9dd; --muted:#dda28f;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ff8a5c; --bad:#ff6b81; --lava:#ff5c33;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--bad),var(--purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#2a0c04;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .volcano{text-align:center;font-size:56px;min-height:70px;transition:transform .2s;}
+  .numbox{background:#200a0a;border:2px solid var(--line);border-radius:16px;padding:12px 16px;
+    text-align:center;margin-bottom:6px;}
+  .bignum{font-size:clamp(34px,7vw,56px);font-weight:800;letter-spacing:4px;}
+  .bignum .hot{color:var(--lava);text-decoration:underline;}
+  .q{font-size:clamp(17px,3.2vw,23px);font-weight:800;text-align:center;margin:10px 0 14px;}
+  .answers{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:600px;margin:0 auto;}
+  .ans{cursor:pointer;border:3px solid #7a4a2e;font-family:inherit;font-weight:800;font-size:26px;
+    padding:16px 6px;border-radius:50% 46% 52% 48%;color:#ffe9dd;
+    background:radial-gradient(circle at 35% 30%,#8a5a3a,#4a2a18);
+    box-shadow:0 5px 0 rgba(0,0,0,.45);}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.45);}
+  .ans.right{border-color:var(--green);color:var(--green);}
+  .ans.wrong{border-color:var(--bad);color:var(--bad);}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#2a0c04;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#4a1f16;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#a06a52;}
+  @media (max-width:520px){ .answers{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🌋 Place Value Volcano</h1>
+      <p class="sub">Mount Grinatoa is VERY fussy about its digit boulders. Each vent only accepts
+        the digit from the right place — ones, tens, hundreds, thousands… Feed it wrong and it
+        sneezes the boulder back covered in ash. The tenths vent is small and extremely fussy.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>tens &amp; ones</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>hundreds &amp; thousands</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>decimals &amp; digit values</small></button>
+      </div>
+      <p class="sub">10 boulders · streaks earn bonus points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Boulder 1/10</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="volcano" id="volcano">🌋</div>
+      <div class="numbox"><div class="bignum" id="bignum">3,472</div></div>
+      <div class="q" id="qtext"></div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🌋</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">More boulders ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', digits: 2, decimals: 0, valueQ: false },
+    { id: 3, label: 'Grade 3',   digits: 4, decimals: 0, valueQ: true },
+    { id: 4, label: 'Grade 4–5', digits: 3, decimals: 2, valueQ: true }
+  ];
+  var ROUNDS = 10;
+
+  var PLACE_NAMES = { '3': 'THOUSANDS', '2': 'HUNDREDS', '1': 'TENS', '0': 'ONES', '-1': 'TENTHS', '-2': 'HUNDREDTHS' };
+
+  var YUM = ['GLOMP. The volcano purrs happily. 🌋💚', 'A perfect boulder! It did a tiny smoke ring. 💨',
+             'The vent accepts your offering. Majestic. ✨', 'Mount Grinatoa is pleased. For now. 🪨'];
+  var ACHOO = ['AAA-CHOOO! Boulder rejected, everyone is covered in ash. 🌋🤧',
+               'ERUPTION! That was NOT the right vent. 🔥',
+               'The volcano spat it back and glared at you. 😡',
+               'Wrong vent — the lava is doing an angry little bubble. 🫧'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var current = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function glomp(){ tone(180,.25,'sine',420); }
+  function achoo(){ tone(500,.5,'sawtooth',80); }
+
+  // Build a number as arrays of [placeExponent, digit]; returns display string too.
+  function makeNumber() {
+    var places = [], i;
+    for (i = grade.digits - 1; i >= 0; i--) places.push(i);
+    for (i = 1; i <= grade.decimals; i++) places.push(-i);
+    var digits = {};
+    places.forEach(function (p, idx) {
+      digits[p] = idx === 0 ? rint(1, 9) : rint(0, 9);
+    });
+    var intPart = '', decPart = '';
+    places.forEach(function (p) {
+      if (p >= 0) intPart += digits[p]; else decPart += digits[p];
+    });
+    var display = Number(intPart).toLocaleString('en-US');
+    if (intPart.length <= 4 && grade.digits <= 4) display = intPart.length === 4 ? intPart[0] + ',' + intPart.slice(1) : intPart;
+    if (decPart) display += '.' + decPart;
+    return { digits: digits, places: places, display: display };
+  }
+
+  function makeQuestion() {
+    var n = makeNumber();
+    var place = pick(n.places);
+    var placeName = PLACE_NAMES[String(place)];
+    var isValueQ = grade.valueQ && Math.random() < 0.4 && place >= 0;
+    var prompt, correctText, opts;
+    if (isValueQ) {
+      var d = n.digits[place];
+      while (d === 0) { place = pick(n.places.filter(function (p) { return p >= 0; })); d = n.digits[place]; }
+      prompt = 'What is the VALUE of the digit ' + d + '?';
+      var val = d * Math.pow(10, place);
+      correctText = String(val);
+      var wrongVals = [d, d * Math.pow(10, place + 1), d * Math.pow(10, Math.max(0, place - 1)), d * 100];
+      opts = [correctText];
+      wrongVals.forEach(function (w) {
+        var s = String(w);
+        if (opts.length < 4 && opts.indexOf(s) < 0) opts.push(s);
+      });
+      var f = 1;
+      while (opts.length < 4) { var s2 = String(val + f * 10); if (opts.indexOf(s2) < 0) opts.push(s2); f++; }
+      opts = shuffle(opts);
+    } else {
+      prompt = 'Which digit boulder goes in the ' + placeName + ' vent?';
+      correctText = String(n.digits[place]);
+      opts = [correctText];
+      var others = shuffle(n.places.filter(function (p) { return p !== place; }));
+      others.forEach(function (p) {
+        var s = String(n.digits[p]);
+        if (opts.length < 4 && opts.indexOf(s) < 0) opts.push(s);
+      });
+      while (opts.length < 4) { var r = String(rint(0, 9)); if (opts.indexOf(r) < 0) opts.push(r); }
+      opts = shuffle(opts);
+    }
+    return { prompt: prompt, correct: correctText, options: opts, display: n.display,
+             hotDigit: isValueQ ? String(n.digits[place]) : null, place: place };
+  }
+
+  function renderNumber(cur) {
+    if (!cur.hotDigit) { $('bignum').textContent = cur.display; return; }
+    // highlight the asked digit at its place: find its position from the right of the raw digits
+    var html = '', marked = false;
+    var chars = cur.display.split('');
+    // walk from the left, mark the digit at the queried place
+    var placesLeft = [];
+    chars.forEach(function (ch) { if (/[0-9]/.test(ch)) placesLeft.push(ch); });
+    // compute index of queried place among digit chars
+    var intLen = cur.display.split('.')[0].replace(/[^0-9]/g, '').length;
+    var idx = cur.place >= 0 ? intLen - 1 - cur.place : intLen - cur.place - 1;
+    var di = 0;
+    chars.forEach(function (ch) {
+      if (/[0-9]/.test(ch)) {
+        html += (di === idx) ? '<span class="hot">' + ch + '</span>' : ch;
+        di++;
+      } else html += ch;
+    });
+    $('bignum').innerHTML = html;
+  }
+
+  function newQuestion() {
+    answered = false;
+    current = makeQuestion();
+    $('roundLbl').textContent = 'Boulder ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('volcano').textContent = '🌋';
+    renderNumber(current);
+    $('qtext').textContent = current.prompt;
+    var box = $('answers'); box.innerHTML = '';
+    current.options.forEach(function (v) {
+      var b = document.createElement('button');
+      b.className = 'ans'; b.textContent = v;
+      b.addEventListener('click', function(){ choose(b, v); });
+      box.appendChild(b);
+    });
+    EduSDK.startLesson(q + 1, { question: current.prompt, number: current.display });
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (b.textContent === current.correct) b.classList.add('right');
+    });
+    var correct = v === current.correct;
+    if (correct) {
+      streak++; nCorrect++;
+      var pts = 100 + streak * 15;
+      score += pts;
+      $('scoreVal').textContent = score;
+      $('volcano').textContent = '🌋💚';
+      glomp();
+      $('toast').textContent = pick(YUM) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      btn.classList.add('wrong');
+      $('volcano').textContent = '🌋🔥🤧';
+      achoo();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(ACHOO) + '  (answer: ' + current.correct + ')';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1700);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 1700);
+    } else setTimeout(newQuestion, 1700);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 8 ? '🌋🏆' : nCorrect >= 5 ? '🌋💚' : '🌋🤧';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' boulders placed. ' +
+      (nCorrect >= 8 ? 'The volcano is purring like a giant warm kitten!' :
+       nCorrect >= 5 ? 'Only light ash. Could be worse.' :
+       'The village is sweeping ash out of their soup. Again.');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'place-value-volcano' });
+})();
+</script>
+</body>
+</html>

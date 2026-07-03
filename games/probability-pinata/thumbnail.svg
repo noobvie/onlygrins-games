@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a2a2e"/><stop offset=".5" stop-color="#0f3a40"/><stop offset="1" stop-color="#051618"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff8fc7"/><stop offset=".5" stop-color="#ffd166"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- papel picado bunting -->
+  <path d="M0 30 L960 30" stroke="#2e7a80" stroke-width="3"/>
+  <g font-size="34">
+    <text x="60" y="70">🟥</text><text x="180" y="70">🟨</text><text x="300" y="70">🟦</text>
+    <text x="420" y="70">🟩</text><text x="540" y="70">🟪</text><text x="660" y="70">🟥</text>
+    <text x="780" y="70">🟨</text><text x="880" y="70">🟦</text>
+  </g>
+  <!-- piñata A: mostly sweets -->
+  <text x="230" y="260" font-size="130" text-anchor="middle">🪅</text>
+  <text x="230" y="330" font-size="40" text-anchor="middle">🍬🍬🍬🍬 🐝</text>
+  <text x="230" y="385" font-size="30" font-weight="800" fill="#3ee87a" text-anchor="middle">Piñata A</text>
+  <!-- vs -->
+  <text x="480" y="270" font-size="52" font-weight="800" fill="#ffd166" text-anchor="middle">VS</text>
+  <!-- piñata B: mostly bees -->
+  <text x="720" y="260" font-size="130" text-anchor="middle">🪅</text>
+  <text x="720" y="330" font-size="40" text-anchor="middle">🍬 🐝🐝🐝🐝</text>
+  <text x="720" y="385" font-size="30" font-weight="800" fill="#ff6b81" text-anchor="middle">Piñata B</text>
+  <!-- one bee escaped, in a party hat -->
+  <text x="880" y="160" font-size="46">🐝</text>
+  <text x="905" y="125" font-size="30">🎩</text>
+  <text x="480" y="490" fill="url(#ttl)" font-size="62" font-weight="800" text-anchor="middle">Probability Piñata</text>
+</svg>

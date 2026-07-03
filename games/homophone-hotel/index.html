@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Homophone Hotel — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="language" data-seed="homophone-hotel"></script>
+
+<style>
+  :root{
+    --bg1:#2e1206; --bg2:#40200a; --bg3:#180a02;
+    --card:#361a0a; --line:#8a5a2e; --text:#fff6ea; --muted:#dcc09a;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --gold:#ffd166; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(145deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--gold),var(--bad),var(--purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#2a1204;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--gold);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .arena{background:#281204;border:2px solid var(--line);border-radius:16px;padding:14px;
+    text-align:center;margin-bottom:12px;overflow:hidden;}
+  .task{font-size:clamp(15px,2.8vw,19px);font-weight:800;color:var(--muted);}
+  .luggage{font-size:clamp(19px,3.6vw,28px);font-weight:800;margin:8px 0 10px;line-height:1.5;}
+  .luggage .guest{display:inline-block;font-size:1.5em;animation:wheel 1.4s infinite;}
+  @keyframes wheel{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-5px) rotate(3deg)}}
+  .luggage .blank{color:var(--gold);border-bottom:4px dotted var(--gold);padding:0 12px;}
+  .timerbar{height:10px;border-radius:6px;background:#180a02;overflow:hidden;}
+  .timerbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--gold),var(--bad));}
+  .answers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .answers.two{grid-template-columns:1fr 1fr;max-width:460px;}
+  .ans{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:22px;
+    padding:14px 6px;border-radius:14px;color:#2a1204;background:var(--gold);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .ans small{display:block;font-size:13px;font-weight:700;opacity:.7;}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .ans.right{background:var(--green);} .ans.wrong{background:var(--bad);}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#2a1204;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#5a3a18;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#a8824f;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🏨 Homophone Hotel</h1>
+      <p class="sub">Every guest's booking hangs on ONE little word. Read the sentence on their
+        luggage and check them into the right room — <i>their</i> or <i>there</i>? <i>bear</i> or
+        <i>bare</i>? Put the bear in the BARE room and, well, that's a lawsuit.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 2<small>sea/see · blew/blue…</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3–4<small>their/there/they're…</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 5<small>whose/who's · aloud…</small></button>
+      </div>
+      <p class="sub">12 chaotic guests · fast check-ins = bonus points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Guest 1/12</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="arena">
+        <div class="task">A guest arrives! Their luggage tag reads…</div>
+        <div class="luggage"><span class="guest" id="guest">🧳</span> <span id="sentence"></span></div>
+        <div class="timerbar"><i id="timerFill"></i></div>
+      </div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🏨</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Next shift ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Sentence banks: [sentence with ___, correct word, decoy words...]
+  var BANK_EASY = [
+    ['We swam all day in the deep blue ___.', 'sea', 'see'],
+    ['Can you ___ the tiny ship from here?', 'see', 'sea'],
+    ['The ___ was shining all afternoon.', 'sun', 'son'],
+    ['The king smiled at his youngest ___.', 'son', 'sun'],
+    ['A busy ___ buzzed past the flowers.', 'bee', 'be'],
+    ['When I grow up I want to ___ a pilot.', 'be', 'bee'],
+    ['We ___ pancakes for breakfast.', 'ate', 'eight'],
+    ['An octopus has ___ wiggly arms.', 'eight', 'ate'],
+    ['The wind ___ my hat into the pond.', 'blew', 'blue'],
+    ['My favourite colour is ___.', 'blue', 'blew'],
+    ['We need ___ to bake the cake.', 'flour', 'flower'],
+    ['A red ___ grew by the gate.', 'flower', 'flour']
+  ];
+  var BANK_MID = [
+    ['The twins left ___ boots by the door.', 'their', 'there', "they're"],
+    ['Put the suitcase over ___, please.', 'there', 'their', "they're"],
+    ['___ going to love the pancake buffet.', "They're", 'Their', 'There'],
+    ['We are going ___ the rooftop pool.', 'to', 'too', 'two'],
+    ['Can my pet dragon come ___?', 'too', 'to', 'two'],
+    ['The wizard ordered ___ hot chocolates.', 'two', 'to', 'too'],
+    ['Is this ___ scarf on the floor?', 'your', "you're"],
+    ["___ the best juggler in this hotel!", "You're", 'Your'],
+    ['Did you ___ that spooky noise in the hall?', 'hear', 'here'],
+    ['The elevator stops right ___.', 'here', 'hear'],
+    ['Please ___ your name in the guest book.', 'write', 'right'],
+    ['Turn ___ at the fountain for the spa.', 'right', 'write'],
+    ['I ___ the answer to the riddle!', 'know', 'no'],
+    ['There are ___ dragons allowed in the pool.', 'no', 'know']
+  ];
+  var BANK_HARD = [
+    ['The robot butler polished ___ shiny buttons.', 'its', "it's"],
+    ['___ raining soup in the lobby again.', "It's", 'Its'],
+    ['___ umbrella is blocking the revolving door?', 'Whose', "Who's"],
+    ['___ knocking at the door at midnight?', "Who's", 'Whose'],
+    ['The pirate parade marched ___ the hotel.', 'past', 'passed'],
+    ['She ___ the salt without being asked. Suspicious.', 'passed', 'past'],
+    ['The ___ forecast says: cloudy with meatballs.', 'weather', 'whether'],
+    ["I can't decide ___ to laugh or cry.", 'whether', 'weather'],
+    ['A grumpy ___ checked into room 12.', 'bear', 'bare'],
+    ['The room was completely ___ except for one sock.', 'bare', 'bear'],
+    ['Dragons are not ___ in the spa.', 'allowed', 'aloud'],
+    ["Please don't read my diary ___.", 'aloud', 'allowed']
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 2, label: 'Grade 2',   secs: 14, bank: BANK_EASY },
+    { id: 3, label: 'Grade 3–4', secs: 12, bank: BANK_MID },
+    { id: 5, label: 'Grade 5',   secs: 12, bank: BANK_HARD }
+  ];
+  var ROUNDS = 12;
+  var GUESTS = ['🐻', '🦩', '🐙', '🧛', '👵', '🤠', '🐸', '👽', '🦖', '🧜'];
+
+  var DINGDING = ['Checked in! The guest tips you a chocolate coin. 🍫', 'Perfect word! The bellhop salutes! 🛎️',
+                  'Five-star vocabulary! The chandelier twinkles. ✨', 'The guest is delighted and slightly confused. Perfect. 😊'];
+  var LAWSUIT  = ['WRONG ROOM. Distant crashing sounds. 🍽️💥', 'The bear is in the bare room. Lawyers have been called. 🐻⚖️',
+                  'The guest read the tag, gasped, and fainted onto a luggage cart. 😱', 'The manager is doing the slow disappointed head-shake. 🙍'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var answer = '', timer = null, tLeft = 0, order = [], cur = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function bell(){ tone(1318,.15,'sine'); setTimeout(function(){ tone(1760,.2,'sine'); }, 120); }
+  function crashSfx(){ tone(150,.45,'sawtooth',60); }
+
+  function makeQuestion() {
+    cur = order[q % order.length];
+    answer = cur[1];
+    $('guest').textContent = pick(GUESTS) + '🧳';
+    $('sentence').innerHTML = cur[0].replace('___', '<span class="blank">&nbsp;?&nbsp;</span>');
+    var opts = shuffle(cur.slice(1));
+    var box = $('answers');
+    box.className = 'answers' + (opts.length === 2 ? ' two' : '');
+    box.innerHTML = '';
+    opts.forEach(function (w) {
+      var b = document.createElement('button');
+      b.className = 'ans';
+      b.innerHTML = w + '<small>🚪 room ' + (100 + Math.floor(Math.random() * 12)) + '</small>';
+      b.dataset.v = w;
+      b.addEventListener('click', function(){ choose(b, w); });
+      box.appendChild(b);
+    });
+  }
+
+  function newQuestion() {
+    answered = false;
+    $('roundLbl').textContent = 'Guest ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    makeQuestion();
+    tLeft = grade.secs;
+    clearInterval(timer);
+    timer = setInterval(function () {
+      tLeft -= 0.1;
+      $('timerFill').style.width = Math.max(0, tLeft / grade.secs * 100) + '%';
+      if (tLeft <= 0) timeUp();
+    }, 100);
+    EduSDK.startLesson(q + 1, { sentence: cur[0] });
+  }
+
+  function settle(correct, btn) {
+    clearInterval(timer);
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (b.dataset.v === answer) b.classList.add('right');
+    });
+    if (correct) {
+      streak++; nCorrect++;
+      var speedBonus = Math.round(tLeft / grade.secs * 40);
+      var pts = 100 + speedBonus + streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      bell();
+      $('toast').textContent = pick(DINGDING) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      if (btn) btn.classList.add('wrong');
+      crashSfx();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(LAWSUIT) + '  (it\'s “' + answer + '”: ' + cur[0].replace('___', answer) + ')';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1900);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 1900);
+    } else setTimeout(newQuestion, 1900);
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    settle(v === answer, btn);
+  }
+
+  function timeUp() {
+    if (answered) return;
+    answered = true;
+    settle(false, null);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 10 ? '🏨🏆' : nCorrect >= 6 ? '🏨🛎️' : '🐻⚖️';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' guests in the right rooms. ' +
+      (nCorrect >= 10 ? 'The hotel earns its sixth star. That\'s not even a thing!' :
+       nCorrect >= 6 ? 'A mostly peaceful shift at the front desk.' :
+       'The bear\'s lawyer left a business card. It\'s just a paw print.');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    order = shuffle(grade.bank);
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'homophone-hotel' });
+})();
+</script>
+</body>
+</html>

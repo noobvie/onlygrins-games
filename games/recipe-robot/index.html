@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Recipe Robot — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="coding" data-seed="recipe-robot"></script>
+
+<style>
+  :root{
+    --bg1:#0c2333; --bg2:#123347; --bg3:#081a24;
+    --card:#0e2a3d; --line:#2e7a9a; --text:#e6f6ff; --muted:#9fcfe8;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#0c2333;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .plates{display:flex;align-items:center;gap:4px;justify-content:center;font-size:20px;
+    background:#081f2e;border:2px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
+  .plates .step{opacity:.4;} .plates .step.done{opacity:1;}
+  .goal{text-align:center;font-weight:800;font-size:clamp(16px,3.2vw,22px);margin-bottom:10px;}
+  .goal .dish{font-size:44px;}
+  .cols{display:flex;gap:16px;flex-wrap:wrap;}
+  .col{flex:1;min-width:240px;}
+  .col h3{margin:0 0 8px;text-align:center;font-size:14px;letter-spacing:.5px;}
+  .col.prog h3{color:var(--green);} .col.bank h3{color:var(--orange);}
+  .list{min-height:60px;background:#081f2e;border:2px dashed var(--line);border-radius:14px;padding:8px;
+    display:flex;flex-direction:column;gap:8px;}
+  .col.prog .list{border-color:var(--green);border-style:solid;}
+  .item{cursor:pointer;border:2px solid #2e7a9a;font-family:inherit;font-weight:800;font-size:15px;
+    padding:10px 12px;border-radius:12px;color:var(--text);background:#134458;box-shadow:0 3px 0 rgba(0,0,0,.35);
+    display:flex;align-items:center;gap:8px;}
+  .item .ic{font-size:24px;}
+  .item:active{transform:translateY(2px);}
+  .item .num{color:var(--muted);font-size:13px;min-width:18px;}
+  .list.empty-hint::after{content:'Tap steps below in order →';color:var(--muted);font-weight:700;font-size:13px;text-align:center;padding:8px;}
+  .runbar{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:16px;
+    padding:11px 24px;border-radius:12px;color:#0c2333;background:var(--green);box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#134458;color:var(--text);}
+  .btn:disabled{opacity:.4;cursor:default;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:16px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .item.okstep{background:var(--green);border-color:var(--green);color:#0c2333;}
+  .item.badstep{background:var(--bad);border-color:var(--bad);color:#0c2333;}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#4f9ac0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🤖 Recipe Robot</h1>
+      <p class="sub">Chef Bolt the robot only cooks if the steps are in the RIGHT order — computers do
+        exactly what you tell them, in order! Tap the scrambled steps to drop them into the program,
+        then hit COOK. Put the plate before the food and… well, you'll see.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>3 steps</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>4–5 steps</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>6 steps, sneaky order</small></button>
+      </div>
+      <p class="sub">8 recipes · tap ⌫ to fix a mistake · streaks earn bonus tips</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Recipe 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="plates" id="plates"></div>
+      <div class="goal">Make: <span class="dish" id="dishIc">🥪</span> <span id="dishNm">a sandwich</span></div>
+      <div class="cols">
+        <div class="col prog">
+          <h3>▶ YOUR PROGRAM</h3>
+          <div class="list" id="progList"></div>
+        </div>
+        <div class="col bank">
+          <h3>🧩 STEPS (scrambled)</h3>
+          <div class="list" id="bankList"></div>
+        </div>
+      </div>
+      <div class="runbar">
+        <button class="btn" id="cookBtn">🍳 Cook it</button>
+        <button class="btn ghost" id="undoBtn">⌫ Undo</button>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🤖</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">New recipes ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Each recipe = ordered steps (index order IS the correct order).
+  var RECIPES = [
+    { dish:'a sandwich', ic:'🥪', steps:[
+      {ic:'🍞',t:'Get two slices of bread'},{ic:'🧈',t:'Spread the butter'},
+      {ic:'🧀',t:'Add the cheese'},{ic:'🤝',t:'Press the slices together'},
+      {ic:'🔪',t:'Cut it in half'},{ic:'🍽️',t:'Serve it up'} ] },
+    { dish:'a cup of tea', ic:'🍵', steps:[
+      {ic:'🫖',t:'Boil the water'},{ic:'☕',t:'Put the teabag in the cup'},
+      {ic:'💧',t:'Pour in the hot water'},{ic:'⏳',t:'Wait for it to brew'},
+      {ic:'🥄',t:'Stir in the sugar'},{ic:'🍵',t:'Sip and enjoy'} ] },
+    { dish:'a snowman', ic:'⛄', steps:[
+      {ic:'❄️',t:'Roll a big snowball for the body'},{ic:'⚪',t:'Roll a smaller one for the head'},
+      {ic:'🔺',t:'Add a carrot nose'},{ic:'👀',t:'Put on coal eyes'},
+      {ic:'🧣',t:'Wrap a warm scarf'},{ic:'🎩',t:'Top it with a hat'} ] },
+    { dish:'a plant', ic:'🌱', steps:[
+      {ic:'🪴',t:'Fill the pot with soil'},{ic:'🌰',t:'Plant the seed'},
+      {ic:'💧',t:'Water it'},{ic:'☀️',t:'Put it in the sunlight'},
+      {ic:'⏳',t:'Wait for it to grow'},{ic:'🌸',t:'Enjoy the flower'} ] },
+    { dish:'a painting', ic:'🖼️', steps:[
+      {ic:'🎨',t:'Get paper and paint'},{ic:'✏️',t:'Sketch the outline'},
+      {ic:'🖌️',t:'Paint the picture'},{ic:'⏳',t:'Let it dry'},
+      {ic:'🖼️',t:'Put it in a frame'},{ic:'🧱',t:'Hang it on the wall'} ] },
+    { dish:'a robot friend', ic:'🤖', steps:[
+      {ic:'📦',t:'Gather the parts'},{ic:'🔩',t:'Bolt the body together'},
+      {ic:'🔋',t:'Put in the battery'},{ic:'💾',t:'Load the software'},
+      {ic:'🔛',t:'Switch it on'},{ic:'👋',t:'Say hello'} ] },
+    { dish:'a birthday cake', ic:'🎂', steps:[
+      {ic:'🥣',t:'Mix the batter'},{ic:'🍥',t:'Pour it in the tin'},
+      {ic:'🔥',t:'Bake it in the oven'},{ic:'🧊',t:'Let it cool'},
+      {ic:'🧁',t:'Add the icing'},{ic:'🕯️',t:'Put candles on top'} ] },
+    { dish:'clean teeth', ic:'🦷', steps:[
+      {ic:'🪥',t:'Pick up the toothbrush'},{ic:'🧴',t:'Squeeze on toothpaste'},
+      {ic:'💧',t:'Wet the brush'},{ic:'🦷',t:'Brush all your teeth'},
+      {ic:'🚰',t:'Rinse with water'},{ic:'😁',t:'Show your shiny smile'} ] }
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', nSteps: 3 },
+    { id: 3, label: 'Grade 3',   nSteps: 5 },
+    { id: 4, label: 'Grade 4–5', nSteps: 6 }
+  ];
+  var ROUNDS = 8;
+
+  var CHEER = ['Beep boop — PERFECT recipe! 🤖✨', 'Chef Bolt is delighted! 👨‍🍳🤖',
+               'Steps in perfect order! Delicious code. 🍽️', 'Flawless algorithm! *robot happy dance* 🕺'];
+  var OOPS  = ['Chef Bolt made a mess — wrong order! 💥', 'Beep! You buttered the plate. Reorder the steps. 🤖',
+               'That algorithm has a bug. Fix the order! 🐛', 'Kitchen chaos! The steps were out of order. 🍳'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nSolved = 0, answered = false;
+  var recipe = null, steps = [], bank = [], program = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function blip(){ tone(700,.05,'square'); }
+  function ding(){ tone(523,.12,'sine'); setTimeout(function(){ tone(880,.2,'sine',1200); },110); }
+  function crash(){ tone(160,.4,'sawtooth',70); }
+
+  var usedRecipes = [];
+  function makeRound() {
+    var choices = RECIPES.filter(function (r) { return usedRecipes.indexOf(r.dish) < 0; });
+    if (!choices.length) { usedRecipes = []; choices = RECIPES; }
+    recipe = pick(choices); usedRecipes.push(recipe.dish);
+    // take the first nSteps as the correct ordered subset
+    steps = recipe.steps.slice(0, grade.nSteps).map(function (s, i) {
+      return { ic: s.ic, t: s.t, order: i };
+    });
+    bank = shuffle(steps.slice());
+    // avoid an accidentally-already-sorted bank
+    if (bank.every(function (s, i) { return s.order === i; })) bank = shuffle(bank);
+    program = [];
+  }
+
+  function drawPlates() {
+    var el = $('plates'), html = '';
+    for (var i = 0; i < ROUNDS; i++) {
+      if (i === q) html += '<span class="step done">🍳</span>';
+      else if (i < q) html += '<span class="step done">🍽️</span>';
+      else html += '<span class="step">·</span>';
+    }
+    el.innerHTML = html;
+  }
+
+  function render() {
+    var p = $('progList'); p.innerHTML = ''; p.className = 'list' + (program.length ? '' : ' empty-hint');
+    program.forEach(function (s, i) {
+      var d = document.createElement('div');
+      d.className = 'item'; d.innerHTML = '<span class="num">' + (i + 1) + '.</span><span class="ic">' +
+        s.ic + '</span><span>' + s.t + '</span>';
+      p.appendChild(d);
+    });
+    var b = $('bankList'); b.innerHTML = '';
+    bank.forEach(function (s, i) {
+      var d = document.createElement('button');
+      d.className = 'item'; d.dataset.i = i;
+      d.innerHTML = '<span class="ic">' + s.ic + '</span><span>' + s.t + '</span>';
+      d.addEventListener('click', function(){ addStep(i); });
+      b.appendChild(d);
+    });
+    $('cookBtn').disabled = bank.length > 0 || answered;
+  }
+
+  function addStep(i) {
+    if (answered) return;
+    program.push(bank[i]); bank.splice(i, 1); blip(); render();
+  }
+  function undo() {
+    if (answered || !program.length) return;
+    bank.push(program.pop()); render();
+  }
+
+  function newRound() {
+    answered = false;
+    makeRound();
+    $('roundLbl').textContent = 'Recipe ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('dishIc').textContent = recipe.ic; $('dishNm').textContent = recipe.dish;
+    drawPlates();
+    render();
+    EduSDK.startLesson(q + 1, { dish: recipe.dish, steps: steps.length });
+  }
+
+  function cook() {
+    if (answered || bank.length) return;
+    answered = true;
+    var correct = program.every(function (s, i) { return s.order === i; });
+    // colour the program steps
+    Array.prototype.forEach.call($('progList').children, function (el, i) {
+      el.classList.add(program[i].order === i ? 'okstep' : 'badstep');
+    });
+    if (correct) {
+      nSolved++; streak++;
+      var pts = 100 + streak * 15 + steps.length * 5;
+      score += pts;
+      $('scoreVal').textContent = score;
+      ding();
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+      EduSDK.finishLesson(q + 1, { solved: true });
+      next();
+    } else {
+      streak = 0;
+      crash();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' Green steps are right — fix the red ones!';
+      $('toast').className = 'toast bad';
+      // let them retry: move everything back to the bank after a beat
+      setTimeout(function () {
+        answered = false;
+        bank = shuffle(program.slice()); program = [];
+        render();
+        $('toast').textContent = 'Try again — put the steps in order.';
+      }, 1600);
+      EduSDK.finishLesson(q + 1, { solved: false });
+    }
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1700);
+    if (q === Math.floor(ROUNDS / 2)) setTimeout(function(){ EduSDK.adBreak('interlevel').then(newRound); }, 1700);
+    else setTimeout(newRound, 1700);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nSolved >= 7 ? '🤖🏆' : nSolved >= 4 ? '🤖🍽️' : '🤖💥';
+    $('finalLine').textContent = grade.label + ' — ' + nSolved + '/' + ROUNDS + ' recipes cooked. ' +
+      (nSolved >= 7 ? 'Head chef of the robot kitchen! Every algorithm was flawless.' :
+       nSolved >= 4 ? 'Tasty coding — a couple of recipes got a bit scrambled.' :
+       'Chef Bolt is covered in flour but believes in you. Order matters — try again!');
+    EduSDK.submitScore(score, { grade: grade.id, solved: nSolved })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nSolved = 0; usedRecipes = [];
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newRound();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('cookBtn').addEventListener('click', cook);
+  $('undoBtn').addEventListener('click', undo);
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'recipe-robot' });
+})();
+</script>
+</body>
+</html>

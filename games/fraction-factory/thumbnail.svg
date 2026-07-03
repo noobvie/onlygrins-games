@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#13204a"/><stop offset=".5" stop-color="#1a1140"/><stop offset="1" stop-color="#0c2a3a"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3ee87a"/><stop offset=".4" stop-color="#5ad8ff"/><stop offset=".7" stop-color="#c77dff"/><stop offset="1" stop-color="#ff8a5c"/>
+    </linearGradient>
+    <linearGradient id="fizz" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8be9ff"/><stop offset="1" stop-color="#31a8d8"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- fizz bubbles -->
+  <g fill="#aee9ff" opacity=".1">
+    <circle cx="110" cy="110" r="24"/><circle cx="860" cy="80" r="16"/><circle cx="790" cy="440" r="28"/><circle cx="150" cy="430" r="14"/><circle cx="480" cy="70" r="10"/>
+  </g>
+  <!-- robot -->
+  <g>
+    <rect x="120" y="150" width="200" height="180" rx="28" fill="#5ad8ff"/>
+    <rect x="150" y="120" width="140" height="70" rx="20" fill="#7db8ff"/>
+    <circle cx="185" cy="155" r="12" fill="#06122a"/><circle cx="255" cy="155" r="12" fill="#06122a"/>
+    <path d="M170 230 Q220 290 270 230" stroke="#06122a" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <text x="220" y="105" font-size="40" text-anchor="middle">💨</text>
+    <text x="330" y="140" font-size="30" font-weight="800" fill="#ff8a5c" transform="rotate(12 330 140)">BURP!</text>
+  </g>
+  <!-- fraction bottle bar: 3/4 filled -->
+  <g>
+    <rect x="420" y="210" width="440" height="90" rx="18" fill="#0a1130" stroke="#2b3a77" stroke-width="6"/>
+    <rect x="434" y="224" width="98" height="62" rx="10" fill="url(#fizz)"/>
+    <rect x="540" y="224" width="98" height="62" rx="10" fill="url(#fizz)"/>
+    <rect x="646" y="224" width="98" height="62" rx="10" fill="url(#fizz)"/>
+    <rect x="752" y="224" width="94" height="62" rx="10" fill="#1b2a5e" stroke="#3a4f9e" stroke-width="3" stroke-dasharray="8 6"/>
+  </g>
+  <text x="640" y="170" fill="#9be7ff" font-size="64" font-weight="800" text-anchor="middle">3/4</text>
+  <text x="640" y="360" fill="#bfe6ff" font-size="24" font-weight="600" text-anchor="middle" letter-spacing="3">FEED THE MACHINE</text>
+  <!-- title -->
+  <text x="480" y="500" fill="url(#ttl)" font-size="52" font-weight="800" text-anchor="middle">Burp-o-Matic Fraction Factory</text>
+</svg>

@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Shape Burglar — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="shape-burglar"></script>
+
+<style>
+  :root{
+    --bg1:#1c1030; --bg2:#241640; --bg3:#101a38;
+    --card:#1b1438; --line:#3a2b6e; --text:#f3ecff; --muted:#b3a4d9;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--purple),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#12082a;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .poster{background:#f7e3b0;color:#4a2c10;border-radius:14px;border:4px solid #c99b57;
+    max-width:460px;margin:0 auto 14px;padding:12px 18px;text-align:center;
+    box-shadow:0 8px 22px rgba(0,0,0,.45);transform:rotate(-1.2deg);}
+  .poster .wanted{font-size:15px;font-weight:800;letter-spacing:4px;color:#8a5a1e;}
+  .poster .want{font-size:clamp(19px,3.6vw,25px);font-weight:800;margin:2px 0;}
+  .poster .reward{font-size:12px;font-weight:700;color:#8a5a1e;}
+  .burglar{text-align:center;font-size:42px;min-height:54px;}
+  .room{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .shapeBtn{cursor:pointer;border:2px solid var(--line);background:#251c4d;border-radius:16px;
+    padding:10px;box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .shapeBtn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .shapeBtn svg{display:block;width:100%;height:auto;}
+  .shapeBtn.right{background:#123f2a;border-color:var(--green);}
+  .shapeBtn.wrong{background:#4a1626;border-color:var(--bad);}
+  .shapeBtn:disabled{cursor:default;opacity:.9;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#12082a;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#2c2258;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#6f5fa8;}
+  @media (max-width:560px){ .room{grid-template-columns:repeat(2,1fr);} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🦝 Shape Burglar</h1>
+      <p class="sub">Marcel is a very polite burglar. He only steals objects of the EXACT shape
+        on his wanted poster — anything else would be rude. Tap the right shape to help him
+        pull off the heist. Tap the wrong one and he sets off his own alarm.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>circles, squares &amp; friends</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>sides, corners, big names</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>3D solids &amp; faces</small></button>
+      </div>
+      <p class="sub">10 heists · streaks earn bonus loot</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Heist 1/10</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="poster">
+        <div class="wanted">★ WANTED ★</div>
+        <div class="want" id="qtext">a TRIANGLE</div>
+        <div class="reward">reward: points &amp; polite applause</div>
+      </div>
+      <div class="burglar" id="burglar">🦝</div>
+      <div class="room" id="room"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🦝</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Another heist ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- shape drawing ----------
+  var COLORS = ['#5ad8ff', '#3ee87a', '#c77dff', '#ffb84d', '#ff8fa3', '#7de3c8'];
+  function svgFor(name, color) {
+    var c = color, dark = 'rgba(0,0,0,.28)', lite = 'rgba(255,255,255,.35)';
+    var body = {
+      circle:    '<circle cx="50" cy="50" r="38" fill="' + c + '"/>',
+      oval:      '<ellipse cx="50" cy="50" rx="43" ry="27" fill="' + c + '"/>',
+      square:    '<rect x="15" y="15" width="70" height="70" fill="' + c + '"/>',
+      rectangle: '<rect x="8" y="26" width="84" height="48" fill="' + c + '"/>',
+      triangle:  '<polygon points="50,12 88,85 12,85" fill="' + c + '"/>',
+      diamond:   '<polygon points="50,8 88,50 50,92 12,50" fill="' + c + '"/>',
+      pentagon:  '<polygon points="50,10 88,38 74,84 26,84 12,38" fill="' + c + '"/>',
+      hexagon:   '<polygon points="50,10 85,30 85,70 50,90 15,70 15,30" fill="' + c + '"/>',
+      octagon:   '<polygon points="31,10 69,10 90,31 90,69 69,90 31,90 10,69 10,31" fill="' + c + '"/>',
+      star:      '<polygon points="50,6 61,37 94,37 67,56 77,89 50,69 23,89 33,56 6,37 39,37" fill="' + c + '"/>',
+      heart:     '<path d="M50,88 C20,64 8,42 20,26 C30,13 46,18 50,30 C54,18 70,13 80,26 C92,42 80,64 50,88 Z" fill="' + c + '"/>',
+      semicircle:'<path d="M10,72 A40,40 0 0 1 90,72 Z" fill="' + c + '"/>',
+      cube:      '<polygon points="20,32 38,16 88,16 70,32" fill="' + lite + '" stroke="' + c + '" stroke-width="3"/>' +
+                 '<polygon points="70,32 88,16 88,66 70,82" fill="' + dark + '" stroke="' + c + '" stroke-width="3"/>' +
+                 '<rect x="20" y="32" width="50" height="50" fill="' + c + '"/>',
+      cuboid:    '<polygon points="10,42 26,26 92,26 76,42" fill="' + lite + '" stroke="' + c + '" stroke-width="3"/>' +
+                 '<polygon points="76,42 92,26 92,64 76,80" fill="' + dark + '" stroke="' + c + '" stroke-width="3"/>' +
+                 '<rect x="10" y="42" width="66" height="38" fill="' + c + '"/>',
+      sphere:    '<circle cx="50" cy="50" r="38" fill="' + c + '"/><ellipse cx="38" cy="36" rx="13" ry="8" fill="' + lite + '"/>',
+      cylinder:  '<rect x="24" y="26" width="52" height="50" fill="' + c + '"/>' +
+                 '<ellipse cx="50" cy="76" rx="26" ry="11" fill="' + c + '"/>' +
+                 '<ellipse cx="50" cy="26" rx="26" ry="11" fill="' + lite + '" stroke="' + c + '" stroke-width="3"/>',
+      cone:      '<polygon points="50,8 82,76 18,76" fill="' + c + '"/>' +
+                 '<ellipse cx="50" cy="76" rx="32" ry="12" fill="' + lite + '" stroke="' + c + '" stroke-width="3"/>',
+      pyramid:   '<polygon points="50,10 12,82 50,82" fill="' + dark + '" stroke="' + c + '" stroke-width="3"/>' +
+                 '<polygon points="50,10 88,82 50,82" fill="' + c + '"/>'
+    }[name];
+    return '<svg viewBox="0 0 100 100" data-shape="' + name + '" aria-label="' + name + '">' + body + '</svg>';
+  }
+
+  // ---------- question banks (content block — edit here for new topics) ----------
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var NAME1 = ['circle', 'square', 'triangle', 'rectangle', 'star', 'heart', 'diamond', 'oval'];
+  var NAME2 = ['pentagon', 'hexagon', 'octagon', 'semicircle', 'diamond', 'oval', 'triangle', 'rectangle'];
+  var PROPS2 = [
+    { q: 'the shape with 3 sides',            a: 'triangle',  d: ['square', 'pentagon', 'hexagon'] },
+    { q: 'the shape with 5 sides',            a: 'pentagon',  d: ['triangle', 'square', 'hexagon'] },
+    { q: 'the shape with 6 sides',            a: 'hexagon',   d: ['pentagon', 'octagon', 'square'] },
+    { q: 'the shape with 8 sides',            a: 'octagon',   d: ['hexagon', 'pentagon', 'star'] },
+    { q: 'the shape with NO corners',         a: 'circle',    d: ['square', 'triangle', 'diamond'] },
+    { q: 'the shape with 4 EQUAL sides and 4 square corners', a: 'square', d: ['rectangle', 'triangle', 'circle'] },
+    { q: 'HALF a circle',                     a: 'semicircle',d: ['circle', 'oval', 'triangle'] }
+  ];
+  var NAME3 = ['cube', 'sphere', 'cylinder', 'cone', 'pyramid', 'cuboid'];
+  var PROPS3 = [
+    { q: 'the solid with 6 SQUARE faces',       a: 'cube',     d: ['cuboid', 'pyramid', 'cylinder'] },
+    { q: 'the solid with NO flat faces at all', a: 'sphere',   d: ['cube', 'cylinder', 'cone'] },
+    { q: 'the solid with 2 circle faces',       a: 'cylinder', d: ['cone', 'sphere', 'cube'] },
+    { q: 'the solid with 1 circle face and a point on top', a: 'cone', d: ['cylinder', 'pyramid', 'sphere'] },
+    { q: 'the solid with triangle faces meeting at a point', a: 'pyramid', d: ['cube', 'cylinder', 'cone'] },
+    { q: 'the solid with 6 faces that are NOT all squares',  a: 'cuboid', d: ['cube', 'sphere', 'pyramid'] }
+  ];
+
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', kind: 'names1' },
+    { id: 3, label: 'Grade 3',   kind: 'mixed2' },
+    { id: 4, label: 'Grade 4–5', kind: 'mixed3' }
+  ];
+  var ROUNDS = 10;
+
+  var CAUGHT = ['Ooh la la! Marcel tips his beret. 🎩', 'Swiped it! So polite, so smooth. ✨',
+                'Into the loot bag it goes! 💼', 'The museum guard is impressed AND annoyed. 😤'];
+  var ALARM  = ['WEE-OO WEE-OO! Marcel set off his OWN alarm. 🚨',
+                'Wrong shape — Marcel is hiding in the lampshade. 🛋️',
+                'A shape burglar NEVER steals the wrong shape. He is devastated. 😭',
+                'Marcel knocked over a vase while apologising. 💥'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var current = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function ding(){ tone(520,.2,'sine',1040); }
+  function alarm(){ tone(700,.5,'square',400); }
+
+  function makeQuestion() {
+    var kind = grade.kind, prompt, correct, options;
+    if (kind === 'names1' || (kind === 'mixed2' && Math.random() < 0.5) ||
+        (kind === 'mixed3' && Math.random() < 0.4)) {
+      var pool = kind === 'names1' ? NAME1 : kind === 'mixed2' ? NAME2 : NAME3;
+      options = shuffle(pool).slice(0, 4);
+      correct = pick(options);
+      prompt = 'a ' + correct.toUpperCase();
+    } else {
+      var bank = kind === 'mixed2' ? PROPS2 : PROPS3;
+      var p = pick(bank);
+      correct = p.a;
+      options = shuffle([p.a].concat(shuffle(p.d).slice(0, 3)));
+      prompt = p.q;
+    }
+    return { prompt: prompt, correct: correct, options: options };
+  }
+
+  function newQuestion() {
+    answered = false;
+    current = makeQuestion();
+    $('roundLbl').textContent = 'Heist ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('qtext').textContent = current.prompt;
+    $('burglar').textContent = '🦝';
+    var room = $('room'); room.innerHTML = '';
+    current.options.forEach(function (name, i) {
+      var b = document.createElement('button');
+      b.className = 'shapeBtn';
+      b.innerHTML = svgFor(name, COLORS[i % COLORS.length]);
+      b.addEventListener('click', function(){ choose(b, name); });
+      room.appendChild(b);
+    });
+    EduSDK.startLesson(q + 1, { question: current.prompt });
+  }
+
+  function choose(btn, name) {
+    if (answered) return;
+    answered = true;
+    Array.prototype.forEach.call(document.querySelectorAll('.shapeBtn'), function(b){
+      b.disabled = true;
+    });
+    var correct = name === current.correct;
+    if (correct) {
+      streak++; nCorrect++;
+      var pts = 100 + streak * 15;
+      score += pts;
+      $('scoreVal').textContent = score;
+      btn.classList.add('right');
+      $('burglar').textContent = '🦝💼';
+      ding();
+      $('toast').textContent = pick(CAUGHT) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      btn.classList.add('wrong');
+      $('burglar').textContent = '🚨🦝🚨';
+      alarm();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(ALARM) + '  (he wanted ' + current.correct + ')';
+      $('toast').className = 'toast bad';
+      Array.prototype.forEach.call(document.querySelectorAll('.shapeBtn'), function(b){
+        if (b.querySelector('svg').getAttribute('data-shape') === current.correct) b.classList.add('right');
+      });
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1600);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 1600);
+    } else setTimeout(newQuestion, 1600);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 8 ? '🦝🏆' : nCorrect >= 5 ? '🦝💼' : '🦝🚨';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' shapes stolen ' +
+      (nCorrect >= 8 ? 'with impeccable manners!' : nCorrect >= 5 ? '— a respectable heist.' :
+       '… and quite a few alarms. The lampshade is getting crowded.');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'shape-burglar' });
+})();
+</script>
+</body>
+</html>

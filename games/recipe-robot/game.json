@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "recipe-robot",
+  "title": "Recipe Robot",
+  "category": "coding",
+  "short_description": "Chef Bolt the robot only cooks if the steps are in the right order — unscramble each recipe into a working algorithm before you hit Cook.",
+  "description": "Chef Bolt the robot does EXACTLY what you tell him, in exactly the order you say — just like a computer. Tap the scrambled steps to drop them into your program, put them in the right order, then hit Cook. Butter the plate before the bread and you'll get a delicious disaster! It teaches sequencing and debugging: order the steps of an algorithm, spot which ones are out of place, and fix the bug. Grade bands ramp from 3-step recipes, to 4–5 steps, to 6-step sequences with sneaky ordering. A free online coding, sequencing and debugging game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 680,
+  "controls": "Mouse / tap steps to add them to your program in order, Undo to fix, then Cook.",
+  "tags": [
+    "coding",
+    "sequencing",
+    "algorithms",
+    "debugging",
+    "strand-sequencing",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:recipe-robot"
+}

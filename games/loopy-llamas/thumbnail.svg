@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a1533"/><stop offset=".5" stop-color="#3a1d47"/><stop offset="1" stop-color="#1c0d24"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- grid board -->
+  <g>
+    <rect x="80" y="90" width="360" height="360" rx="16" fill="#1c0d24" stroke="#7a4a9a" stroke-width="4"/>
+    <g fill="#3a2450">
+      <rect x="96" y="106" width="76" height="76" rx="8"/><rect x="184" y="106" width="76" height="76" rx="8"/>
+      <rect x="272" y="106" width="76" height="76" rx="8"/><rect x="360" y="106" width="76" height="76" rx="8"/>
+      <rect x="96" y="194" width="76" height="76" rx="8"/><rect x="272" y="194" width="76" height="76" rx="8"/>
+      <rect x="360" y="194" width="76" height="76" rx="8"/>
+      <rect x="96" y="282" width="76" height="76" rx="8"/><rect x="184" y="282" width="76" height="76" rx="8"/>
+      <rect x="272" y="282" width="76" height="76" rx="8"/><rect x="360" y="282" width="76" height="76" rx="8"/>
+      <rect x="96" y="370" width="76" height="76" rx="8"/><rect x="184" y="370" width="76" height="76" rx="8"/>
+      <rect x="272" y="370" width="76" height="76" rx="8"/>
+    </g>
+    <rect x="184" y="194" width="76" height="76" rx="8" fill="#160a1e"/>
+    <text x="222" y="248" font-size="44" text-anchor="middle">🧱</text>
+    <text x="134" y="428" font-size="54" text-anchor="middle">🦙</text>
+    <text x="398" y="420" font-size="54" text-anchor="middle">🌾</text>
+  </g>
+  <!-- program blocks -->
+  <g>
+    <rect x="520" y="150" width="360" height="70" rx="14" fill="#4a2a5e" stroke="#7a4a9a" stroke-width="4"/>
+    <text x="560" y="198" font-size="40" text-anchor="middle">➡️</text>
+    <text x="620" y="198" font-size="40" text-anchor="middle">⬆️</text>
+    <rect x="660" y="160" width="200" height="50" rx="10" fill="#5e2a4a" stroke="#a84a7a" stroke-width="3"/>
+    <text x="760" y="196" font-size="30" font-weight="800" fill="#ffb84d" text-anchor="middle">🔁 4 ➡️</text>
+  </g>
+  <text x="700" y="300" font-size="46" font-weight="800" fill="#3ee87a" text-anchor="middle">▶ RUN</text>
+  <text x="700" y="490" fill="url(#ttl)" font-size="64" font-weight="800" text-anchor="middle">Loopy Llamas</text>
+</svg>

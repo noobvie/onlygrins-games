@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "savings-sloth",
+  "title": "Savings Sloth",
+  "category": "money",
+  "short_description": "Sydney the Sloth wants big things but saves slowly — help her plan how much more to save, how many weeks it takes, and how much to tuck away each week.",
+  "description": "Sydney the Sloth dreams of BIG things — a skateboard, a telescope, a whole pizza mountain — but she can only save slowly, so she needs a plan. Help her work out how much more she needs, how many weeks of saving it will take, and how much to tuck into the jar each week. It teaches goal-setting and the money-planning maths behind saving up. Grade bands ramp from 'how much more to save', to 'how many weeks to reach the goal', to planning the exact weekly amount to hit a deadline. A free online saving-money and financial-planning game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 700,
+  "controls": "Mouse / tap the amount or number of weeks that reaches the goal.",
+  "tags": [
+    "money",
+    "saving",
+    "financial-literacy",
+    "planning",
+    "strand-saving",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:savings-sloth"
+}

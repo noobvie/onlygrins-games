@@ -81,8 +81,11 @@ bash tools/dev-serve.sh times-table-towers   # build it in the dev host
 ```
 
 Edit `games/<slug>/index.html` (the game) and `games/<slug>/game.json` (catalog
-metadata — see PLAN.md §5). Add a `thumbnail.png` or `thumbnail.svg` (16:9) for
-catalog art and reference it in `game.json` (`"thumbnail": "thumbnail.svg"`).
+metadata — see PLAN.md §5). Author catalog art as `thumbnail.svg` (960×540),
+export it to `thumbnail.png` (social crawlers can't render SVG — see PLAN.md
+§5.2 for the headless-Chrome one-liner) and reference the PNG in `game.json`
+(`"thumbnail": "thumbnail.png"`). Follow the new-game standards checklist in
+PLAN.md §12.
 
 ## Workflow 3 — Validate & commit
 

@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Artifact Attic — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="history" data-seed="artifact-attic"></script>
+
+<style>
+  :root{
+    --bg1:#241a2e; --bg2:#33253f; --bg3:#180f20;
+    --card:#2b1f38; --line:#7a5a9a; --text:#f4ecff; --muted:#cdb0e4;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#241a2e;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .shelf{display:flex;align-items:center;gap:4px;justify-content:center;font-size:20px;
+    background:#1a1226;border:2px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
+  .shelf .step{opacity:.4;} .shelf .step.done{opacity:1;}
+  .display{display:flex;flex-direction:column;align-items:center;gap:6px;margin:8px 0 12px;
+    background:radial-gradient(circle at 50% 35%,#3a2a50,#1a1226 75%);border:3px solid var(--orange);
+    border-radius:16px;padding:16px 20px;max-width:420px;margin-left:auto;margin-right:auto;}
+  .display .pic{font-size:70px;line-height:1;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5));}
+  .display .nm{font-weight:800;font-size:clamp(16px,3.2vw,22px);text-align:center;}
+  .q{font-size:clamp(15px,2.8vw,19px);font-weight:800;text-align:center;margin:0 0 10px;color:var(--muted);}
+  .answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .ans{cursor:pointer;border:3px solid #7a5a9a;font-family:inherit;font-weight:800;font-size:clamp(15px,2.8vw,19px);
+    padding:15px 10px;border-radius:16px;color:var(--text);background:#3a2a50;
+    box-shadow:0 5px 0 rgba(0,0,0,.4);display:flex;align-items:center;gap:8px;justify-content:center;}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.4);}
+  .ans.right{background:var(--green);border-color:var(--green);color:#241a2e;}
+  .ans.wrong{background:var(--bad);border-color:var(--bad);color:#241a2e;}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:16px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#241a2e;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#3a2a50;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#9a7ac0;}
+  @media (max-width:520px){ .answers{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🏺 Artifact Attic</h1>
+      <p class="sub">The museum's grumpy curator lost all the labels in a sneeze, and the artifacts are
+        muddled up! Study each treasure and send it back to the right civilization.
+        Get it right and Professor Dustworth stops glaring at you.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 2–3<small>famous treasures</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 4<small>more civilizations</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 5<small>tricky &amp; less famous</small></button>
+      </div>
+      <p class="sub">10 artifacts to re-label · streaks earn bonus dusting cloths</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Artifact 1/10</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="shelf" id="shelf"></div>
+      <div class="display"><div class="pic" id="pic">🔺</div><div class="nm" id="artNm">Pyramids &amp; mummies</div></div>
+      <div class="q">Which civilization made this?</div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🏺</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">New crates ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // artifact → civilization. band: 0 famous, 1 medium, 2 hard. fact shown on wrong.
+  var ARTIFACTS = [
+    { nm:'Pyramids & mummies',       ic:'🔺', civ:'Ancient Egypt',   band:0, fact:'The Egyptians mummified pharaohs for the afterlife.' },
+    { nm:'The Colosseum & togas',    ic:'🏟️', civ:'Ancient Rome',    band:0, fact:'Romans watched gladiators here 2,000 years ago.' },
+    { nm:'Olympic games & columns',  ic:'🏛️', civ:'Ancient Greece',  band:0, fact:'The Greeks invented the Olympics and democracy.' },
+    { nm:'The Great Wall',           ic:'🧱', civ:'Ancient China',   band:0, fact:'Built to keep out invaders — over 21,000 km long!' },
+    { nm:'Longships & horned helmets',ic:'🛶', civ:'The Vikings',    band:0, fact:'Vikings sailed from Scandinavia to explore and trade.' },
+    { nm:'Stone castles & knights',  ic:'🏰', civ:'Medieval Europe', band:0, fact:'Knights in armour defended castles in the Middle Ages.' },
+    { nm:'Hieroglyphic writing',     ic:'📜', civ:'Ancient Egypt',   band:1, fact:'Egyptian picture-writing was decoded from the Rosetta Stone.' },
+    { nm:'Marble statues of gods',   ic:'🗿', civ:'Ancient Greece',  band:1, fact:'Greeks carved gods like Zeus and Athena in marble.' },
+    { nm:'Aqueducts & roads',        ic:'🌉', civ:'Ancient Rome',    band:1, fact:'Roman aqueducts carried water for many kilometres.' },
+    { nm:'Terracotta Army',          ic:'🪖', civ:'Ancient China',   band:1, fact:'Thousands of clay soldiers guard an emperor\'s tomb.' },
+    { nm:'Step pyramids in the jungle',ic:'🛕', civ:'The Maya',       band:1, fact:'The Maya built pyramids and tracked the stars in Central America.' },
+    { nm:'Golden masks & llamas',    ic:'🦙', civ:'The Inca',        band:1, fact:'The Inca built Machu Picchu high in the Andes.' },
+    { nm:'Cuneiform clay tablets',   ic:'📋', civ:'Ancient Mesopotamia', band:2, fact:'Mesopotamia had the world\'s first writing and cities.' },
+    { nm:'Bronze chariots',          ic:'🛞', civ:'Ancient Mesopotamia', band:2, fact:'The wheel was first used for transport here.' },
+    { nm:'Feathered serpent temples',ic:'🐍', civ:'The Aztec',       band:2, fact:'The Aztecs built a great city on a lake — Tenochtitlan.' },
+    { nm:'Samurai swords & armour',  ic:'⚔️', civ:'Feudal Japan',    band:2, fact:'Samurai were warriors who followed a strict code.' },
+    { nm:'Great Zimbabwe stone walls',ic:'🪨', civ:'The Kingdom of Zimbabwe', band:2, fact:'Huge stone walls built without any mortar in Africa.' },
+    { nm:'Sphinx & sun temples',     ic:'🦁', civ:'Ancient Egypt',   band:2, fact:'The Sphinx has a lion\'s body and a pharaoh\'s head.' }
+  ];
+  var ALL_CIVS = ['Ancient Egypt','Ancient Rome','Ancient Greece','Ancient China','The Vikings',
+    'Medieval Europe','The Maya','The Inca','Ancient Mesopotamia','The Aztec','Feudal Japan',
+    'The Kingdom of Zimbabwe'];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 2, label: 'Grade 2–3', bands: [0] },
+    { id: 4, label: 'Grade 4',   bands: [0, 1] },
+    { id: 5, label: 'Grade 5',   bands: [1, 2] }
+  ];
+  var ROUNDS = 10;
+
+  var CHEER = ['Correctly labelled! Professor Dustworth almost smiles. 🧐✨', 'Museum-quality work! 🏛️',
+               'The artifact goes home happy. 🏺💚', 'Historically spot-on! 📚'];
+  var OOPS  = ['Wrong shelf! The curator sighs into his tea. ☕😔', 'Mislabelled! The mummy is offended. 🧟',
+               'Oops — that\'s the wrong civilization. 🗺️', 'The artifact rattles in protest. 🏺'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var current = null, deck = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function chime(){ tone(700,.14,'sine',1100); }
+  function thud(){ tone(200,.35,'sawtooth',90); }
+
+  function buildDeck() {
+    var pool = ARTIFACTS.filter(function (a) { return grade.bands.indexOf(a.band) >= 0; });
+    deck = shuffle(pool).slice(0, ROUNDS);
+    while (deck.length < ROUNDS) deck.push(pick(pool));
+  }
+
+  function drawShelf() {
+    var el = $('shelf'), html = '';
+    for (var i = 0; i < ROUNDS; i++) {
+      if (i === q) html += '<span class="step done">🔦</span>';
+      else if (i < q) html += '<span class="step done">🏷️</span>';
+      else html += '<span class="step">📦</span>';
+    }
+    el.innerHTML = html;
+  }
+
+  function newQuestion() {
+    answered = false;
+    var a = deck[q];
+    var wrong = shuffle(ALL_CIVS.filter(function (c) { return c !== a.civ; })).slice(0, 3);
+    current = { art: a, answer: a.civ, options: shuffle([a.civ].concat(wrong)) };
+    $('roundLbl').textContent = 'Artifact ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    drawShelf();
+    $('pic').textContent = a.ic;
+    $('artNm').textContent = a.nm;
+    var box = $('answers'); box.innerHTML = '';
+    current.options.forEach(function (v) {
+      var b = document.createElement('button');
+      b.className = 'ans'; b.textContent = v;
+      b.addEventListener('click', function(){ choose(b, v); });
+      box.appendChild(b);
+    });
+    EduSDK.startLesson(q + 1, { artifact: a.nm });
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (b.textContent === current.answer) b.classList.add('right');
+    });
+    var correct = v === current.answer;
+    if (correct) {
+      streak++; nCorrect++;
+      var pts = 100 + streak * 15;
+      score += pts;
+      $('scoreVal').textContent = score;
+      chime();
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      btn.classList.add('wrong');
+      thud();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' It\'s from ' + current.answer + '. ' + current.art.fact;
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 2200);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 2200);
+    } else setTimeout(newQuestion, 2200);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 8 ? '🏺🏆' : nCorrect >= 5 ? '🏺🏛️' : '🏺❓';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' artifacts re-labelled. ' +
+      (nCorrect >= 8 ? 'Head Curator material! Professor Dustworth is (quietly) thrilled.' :
+       nCorrect >= 5 ? 'Good work — a few treasures are on the wrong shelf, but close.' :
+       'The attic is still a muddle. Study the civilizations and try again!');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    buildDeck();
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'artifact-attic' });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Grin Change Maker — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="grin-change-maker"></script>
+
+<style>
+  :root{
+    --bg1:#13204a; --bg2:#1a1140; --bg3:#0c2a3a;
+    --card:#141c3f; --line:#2b3a77; --text:#eaf2ff; --muted:#9fb4e0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ff8a5c; --bad:#ff6b81;
+    --gold:#ffd166;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(940px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--gold),var(--orange),var(--purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 18px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:22px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:16px 22px;border-radius:16px;color:#06122a;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .shelf{display:flex;justify-content:center;gap:14px;font-size:30px;margin:2px 0 8px;min-height:40px;}
+  .shelf span.eaten{opacity:.25;filter:grayscale(1);}
+
+  .scene{display:flex;align-items:flex-start;gap:16px;margin:4px 0 10px;}
+  .goat{font-size:clamp(54px,10vw,86px);line-height:1;transition:transform .2s;
+    filter:drop-shadow(0 8px 14px rgba(0,0,0,.45));}
+  .goat.mad{animation:stomp .5s ease;}
+  @keyframes stomp{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg) translateY(6px)}60%{transform:rotate(10deg)}}
+  .bubble{flex:1;background:#0d1533;border:2px solid var(--line);border-radius:16px;
+    padding:12px 16px;font-size:clamp(15px,2.4vw,20px);font-weight:700;}
+  .bubble b{color:var(--gold);}
+  .patience{height:12px;border-radius:8px;background:#0a1130;border:1px solid var(--line);
+    overflow:hidden;margin:10px 0 4px;}
+  .patience i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--gold),var(--bad));
+    width:100%;transition:width .25s linear;}
+  .patLbl{font-size:12px;color:var(--muted);text-align:right;margin:0 0 8px;}
+
+  .tray{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+  .coin{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    width:74px;height:74px;border-radius:50%;color:#4a2f00;
+    background:radial-gradient(circle at 35% 30%,#ffe9a8,var(--gold) 60%,#d99a1b 100%);
+    background-color:var(--gold);border:4px solid #b8860b;box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .coin.small{width:60px;height:60px;font-size:14px;background-color:#cfd8ea;border-color:#8fa3c8;color:#1d2b4d;}
+  .coin:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .given{min-height:46px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0;}
+  .chip{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:14px;
+    padding:8px 12px;border-radius:20px;background:#22305f;color:var(--gold);border:1px solid var(--line);}
+  .chip:hover{background:#3a1717;color:var(--bad);}
+  .totals{text-align:center;color:var(--muted);font-weight:700;margin:0 0 10px;}
+  .totals b{color:var(--gold);font-size:1.25em;}
+
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#06122a;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .btn.ghost{background:#22305f;color:var(--text);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:10px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#5f74a8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🐐 Grin Change Maker</h1>
+      <p class="sub">You run the Grin General Store. Your only customer is a goat with <b>zero patience</b>
+        and a taste for your inventory. Give the correct change in the <b>fewest coins</b> —
+        too slow or wrong, and the goat starts EATING THE SHOP.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>whole grin (ツ)</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>+ half grin (ツ0.50)</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>full decimals</small></button>
+      </div>
+      <p class="sub">8 customers · fewest-coins bonus · 3 shop items = your lives</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Customer 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="shelf" id="shelf"></div>
+      <div class="scene">
+        <div class="goat" id="goat">🐐</div>
+        <div class="bubble" id="bubble"></div>
+      </div>
+      <div class="patience"><i id="patBar"></i></div>
+      <p class="patLbl">goat patience 🐐⏳</p>
+      <div class="tray" id="tray"></div>
+      <div class="given" id="given"></div>
+      <p class="totals">Change given: <b id="givenVal">ツ0</b> · needed: <b id="needVal">ツ?</b></p>
+      <div class="actions">
+        <button class="btn" id="giveBtn">Hand it over! 🤝</button>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:80px" id="finalGoat">🐐</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Play again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // All money in centigrin (integer cents) to dodge float rounding.
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', coins: [1000, 500, 200, 100],                 step: 100, maxPrice: 900,  patience: 45 },
+    { id: 3, label: 'Grade 3',   coins: [1000, 500, 200, 100, 50],             step: 50,  maxPrice: 1500, patience: 35 },
+    { id: 4, label: 'Grade 4–5', coins: [1000, 500, 200, 100, 50, 20, 10],     step: 10,  maxPrice: 1900, patience: 30 }
+  ];
+  var ROUNDS = 8, SHOP = ['🎩', '🧸', '🪁', '🛹', '🎺', '🧦', '🪀', '📚', '🌂', '🧀'];
+  var GOAT_ORDERS = [
+    'I bought {item} for {price}. Here is {paid}. CHANGE. NOW.',
+    'One {item}, {price}. I pay {paid}. Hurry, I have grass to attend to.',
+    'This {item} costs {price}?! Fine. {paid}. Count fast, human.',
+    'Gimme {item}. Price {price}, paying {paid}. My patience is SHORT.',
+    'MAAAH. {item}, {price}, here is {paid}. Tick tock.'
+  ];
+  var GOAT_ANGRY = [
+    'MAAAAH! WRONG! *chomps a shop item* 😤',
+    'That is NOT my change! *eats something out of spite*',
+    'Do I LOOK like I can\'t count?! *munch munch*',
+    'MAAAH! My cousin counts better and he\'s a SHEEP!'
+  ];
+  var GOAT_HAPPY = [
+    'Hmph. Correct. I am only mildly furious now.',
+    'MAAAH… acceptable. You may live.',
+    'Exact change! I shall only glare at you a little.',
+    'Fine. FINE. Good change. *chews receipt anyway*'
+  ];
+
+  var grade = GRADES[0], round = 0, score = 0, lives = 3;
+  var needC = 0, givenC = 0, given = [], minCoins = 0, patTimer = null, patLeft = 0, tries = 0;
+  var itemEmoji = '🎩';
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // --- sound effects (Web Audio, no assets) ---
+  var _sAC = window.AudioContext || window.webkitAudioContext, _sac = null;
+  function _sfx(f, d, type, slide, when) { try { _sac = _sac || new _sAC();
+    var t = _sac.currentTime + (when || 0), o = _sac.createOscillator(), g = _sac.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + d);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.14, t + .012);
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(_sac.destination); o.start(t); o.stop(t + d + .03);
+  } catch (e) {} }
+  function sfxGood() { _sfx(523, .13, 'triangle'); _sfx(784, .17, 'triangle', 0, .1); }
+  function sfxBad() { _sfx(196, .3, 'sawtooth', 90); }
+  function sfxWin() { [523, 659, 784, 1047].forEach(function (f, i) { _sfx(f, .2, 'triangle', 0, i * .12); }); }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function fmt(c){ var s = (c/100).toFixed(2).replace(/\.00$/,'').replace(/(\.\d)0$/,'$1'); return 'ツ' + s; }
+  function greedyCount(amount){
+    var n = 0;
+    grade.coins.forEach(function (c) { n += Math.floor(amount / c); amount %= c; });
+    return n;
+  }
+
+  function newRound() {
+    tries = 0; given = []; givenC = 0;
+    itemEmoji = pick(SHOP);
+    var step = grade.step;
+    var price = step * (1 + Math.floor(Math.random() * (grade.maxPrice / step)));
+    var paid = Math.ceil(price / 1000) * 1000;             // pays with next whole 10ツ… or exact-ish note
+    if (paid === price) paid += 1000;
+    if (Math.random() < 0.4) paid = Math.ceil(price / 500) * 500 + (Math.random() < 0.5 ? 500 : 0);
+    if (paid <= price) paid = price + 500;
+    needC = paid - price;
+    minCoins = greedyCount(needC);
+
+    $('roundLbl').textContent = 'Customer ' + (round + 1) + '/' + ROUNDS;
+    $('bubble').innerHTML = pick(GOAT_ORDERS)
+      .replace('{item}', itemEmoji)
+      .replace('{price}', '<b>' + fmt(price) + '</b>')
+      .replace('{paid}', '<b>' + fmt(paid) + '</b>');
+    $('needVal').textContent = '?';
+    $('goat').textContent = '🐐';
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('giveBtn').disabled = false;
+    renderGiven(); renderTray();
+
+    patLeft = grade.patience;
+    clearInterval(patTimer);
+    patTimer = setInterval(function () {
+      patLeft -= 0.25;
+      $('patBar').style.width = Math.max(0, (patLeft / grade.patience) * 100) + '%';
+      if (patLeft <= 0) { clearInterval(patTimer); goatChomps('TOO SLOW! MAAAH! *eats a shop item*'); nextOrRetry(); }
+    }, 250);
+
+    EduSDK.startLesson(round + 1, { change: needC });
+  }
+
+  function renderTray() {
+    var tray = $('tray'); tray.innerHTML = '';
+    grade.coins.forEach(function (c) {
+      var b = document.createElement('button');
+      b.className = 'coin' + (c < 100 ? ' small' : '');
+      b.textContent = fmt(c);
+      b.addEventListener('click', function () {
+        given.push(c); givenC += c; renderGiven();
+      });
+      tray.appendChild(b);
+    });
+  }
+  function renderGiven() {
+    var g = $('given'); g.innerHTML = '';
+    given.forEach(function (c, idx) {
+      var chip = document.createElement('button');
+      chip.className = 'chip'; chip.textContent = fmt(c) + ' ✕';
+      chip.title = 'take back';
+      chip.addEventListener('click', function () {
+        given.splice(idx, 1); givenC -= c; renderGiven();
+      });
+      g.appendChild(chip);
+    });
+    $('givenVal').textContent = fmt(givenC);
+  }
+  function renderShelf() {
+    var s = $('shelf'); s.innerHTML = '';
+    for (var i = 0; i < 3; i++) {
+      var sp = document.createElement('span');
+      sp.textContent = SHOP[i];
+      if (i >= lives) sp.className = 'eaten';
+      s.appendChild(sp);
+    }
+  }
+
+  function goatChomps(line) {
+    lives--;
+    renderShelf();
+    $('goat').textContent = '😤';
+    $('goat').classList.add('mad');
+    sfxBad();
+    $('card').classList.add('shake');
+    $('toast').textContent = line;
+    $('toast').className = 'toast bad';
+    setTimeout(function () {
+      $('goat').classList.remove('mad'); $('card').classList.remove('shake');
+      $('goat').textContent = '🐐';
+    }, 600);
+  }
+
+  function nextOrRetry() {
+    EduSDK.finishLesson(round + 1, { correct: false });
+    if (lives <= 0) return setTimeout(finish, 900);
+    round++;
+    if (round >= ROUNDS) return setTimeout(finish, 900);
+    setTimeout(newRound, 1200);
+  }
+
+  function give() {
+    tries++;
+    if (givenC === needC) {
+      clearInterval(patTimer);
+      var pts = 100;
+      var fewest = given.length === minCoins;
+      if (fewest) pts += 30;
+      pts += Math.round((patLeft / grade.patience) * 40);
+      score += pts;
+      $('scoreVal').textContent = score;
+      $('needVal').textContent = fmt(needC);
+      $('goat').textContent = '😌';
+      $('toast').textContent = pick(GOAT_HAPPY) + (fewest ? '  🏅 Fewest coins! ' : '  ') + '+' + pts;
+      $('toast').className = 'toast good';
+      $('giveBtn').disabled = true;
+      sfxGood();
+      EduSDK.finishLesson(round + 1, { correct: true, coins: given.length, minCoins: minCoins, tries: tries });
+      round++;
+      if (round >= ROUNDS) return setTimeout(finish, 1400);
+      if (round === Math.floor(ROUNDS / 2)) {
+        setTimeout(function(){ EduSDK.adBreak('interlevel').then(newRound); }, 1400);
+      } else setTimeout(newRound, 1400);
+    } else {
+      var gave = givenC;
+      var hint = givenC > needC ? 'too much!' : 'not enough!';
+      goatChomps(pick(GOAT_ANGRY) + ' (' + hint + ')');
+      given = []; givenC = 0; renderGiven();
+      EduSDK.retryLesson(round + 1, { gave: gave, need: needC });
+      if (lives <= 0) { clearInterval(patTimer); setTimeout(finish, 900); }
+    }
+  }
+
+  function finish() {
+    clearInterval(patTimer);
+    sfxWin();
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalGoat').textContent = lives > 0 ? '🐐💖' : '🐐🍽️';
+    $('finalLine').textContent = lives > 0
+      ? grade.label + ' — the goat left ' + lives + ' shop item(s) uneaten. A five-star review!'
+      : grade.label + ' — the goat ate the entire shop. And the shelves. And the door.';
+    EduSDK.submitScore(score, { grade: grade.id, lives: lives })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; round = 0; score = 0; lives = 3;
+    $('scoreVal').textContent = '0';
+    renderShelf();
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newRound();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('giveBtn').addEventListener('click', give);
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'grin-change-maker' });
+})();
+</script>
+</body>
+</html>

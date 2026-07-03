@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3a1a05"/><stop offset=".5" stop-color="#123040"/><stop offset="1" stop-color="#0a2a4a"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#eefaff"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- hot side -->
+  <text x="150" y="130" font-size="90" text-anchor="middle">☀️</text>
+  <text x="150" y="290" font-size="110" text-anchor="middle">🫠</text>
+  <text x="150" y="370" font-size="34" font-weight="800" fill="#ffb84d" text-anchor="middle">MELT?</text>
+  <!-- cold side -->
+  <text x="810" y="130" font-size="90" text-anchor="middle">❄️</text>
+  <text x="810" y="290" font-size="110" text-anchor="middle">🧊</text>
+  <text x="810" y="370" font-size="34" font-weight="800" fill="#5ad8ff" text-anchor="middle">FREEZE?</text>
+  <!-- the yeti and his doomed smoothie in the middle -->
+  <text x="480" y="270" font-size="140" text-anchor="middle">🦣</text>
+  <text x="580" y="250" font-size="64" text-anchor="middle">🥤</text>
+  <text x="600" y="180" font-size="48" text-anchor="middle">♨️</text>
+  <text x="480" y="345" font-size="26" font-weight="800" fill="#eefaff" text-anchor="middle">the lab yeti has never forgiven anyone</text>
+  <!-- beakers -->
+  <text x="330" y="430" font-size="54" text-anchor="middle">🧪</text>
+  <text x="630" y="430" font-size="54" text-anchor="middle">⚗️</text>
+  <text x="480" y="500" fill="url(#ttl)" font-size="64" font-weight="800" text-anchor="middle">Melt or Freeze?</text>
+</svg>

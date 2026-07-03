@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Burp-o-Matic Fraction Factory — OnlyGrins</title>
+
+<!-- Platform SDK (absolute, served by the arcade; no-ops when absent) -->
+<script src="/sdk/arcade-sdk.js"></script>
+<!-- Bundled helper (relative) -->
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="fraction-factory"></script>
+
+<style>
+  :root{
+    --bg1:#13204a; --bg2:#1a1140; --bg3:#0c2a3a;
+    --card:#141c3f; --line:#2b3a77; --text:#eaf2ff; --muted:#9fb4e0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ff8a5c; --bad:#ff6b81;
+    --fizz:#8be9ff;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{
+    background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text); font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;
+  }
+  .wrap{width:min(920px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:22px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--green),var(--blue),var(--purple),var(--orange));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 20px;}
+
+  /* start screen */
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:22px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:16px 22px;border-radius:16px;color:#06122a;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  /* machine */
+  .machine{display:flex;flex-direction:column;align-items:center;gap:6px;margin:6px 0 14px;}
+  .robot{font-size:clamp(56px,11vw,92px);line-height:1;transition:transform .25s;
+    filter:drop-shadow(0 8px 14px rgba(0,0,0,.45));}
+  .bubble{background:#0d1533;border:2px solid var(--line);border-radius:16px;
+    padding:12px 18px;font-size:clamp(16px,2.6vw,22px);font-weight:700;max-width:56ch;text-align:center;}
+  .bubble b{color:var(--orange);font-size:1.25em;}
+  .burping .robot{animation:burp .5s ease;}
+  @keyframes burp{0%{transform:scale(1)}30%{transform:scale(1.35) rotate(-6deg)}60%{transform:scale(.9) rotate(5deg)}100%{transform:scale(1)}}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  /* the bottle bar */
+  .bottleRow{display:flex;align-items:center;justify-content:center;gap:10px;margin:10px 0 16px;}
+  .bottleCap{font-size:30px;}
+  .bar{display:flex;gap:4px;background:#0a1130;border:3px solid var(--line);border-radius:14px;
+    padding:6px;flex:1;max-width:560px;height:74px;}
+  .seg{flex:1;border-radius:8px;background:#1b2a5e;border:2px dashed #3a4f9e;cursor:pointer;
+    transition:.12s;position:relative;}
+  .seg:hover{border-color:var(--fizz);}
+  .seg.on{background:linear-gradient(180deg,var(--fizz),#31a8d8);border:2px solid #bff2ff;
+    box-shadow:inset 0 -8px 0 rgba(255,255,255,.25);}
+  .picked{color:var(--muted);text-align:center;margin:0 0 12px;font-weight:700;}
+  .picked b{color:var(--fizz);font-size:1.3em;}
+
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#06122a;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .btn.ghost{background:#22305f;color:var(--text);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+
+  .toast{min-height:28px;text-align:center;font-weight:800;font-size:19px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+
+  /* final */
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:14px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#5f74a8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🤖 Burp-o-Matic Fraction Factory</h1>
+      <p class="sub">The Burp-o-Matic 3000 is <i>very</i> thirsty — but only for <b>exact fractions</b> of fizzy
+        grin-soda. Tap the bottle segments to fill the right amount. Wrong servings get burped back. Loudly.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>halves &amp; quarters</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>thirds, sixths, eighths</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>equivalent fractions!</small></button>
+      </div>
+      <p class="sub">8 rounds · first-try answers earn the most points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Round 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="machine">
+        <div class="robot" id="robot">🤖</div>
+        <div class="bubble" id="bubble"></div>
+      </div>
+      <div class="bottleRow">
+        <span class="bottleCap">🧃</span>
+        <div class="bar" id="bar"></div>
+        <span class="bottleCap">🥤</span>
+      </div>
+      <p class="picked">You picked <b id="pickedVal">0</b> / <span id="pickedDen">4</span> segments</p>
+      <div class="actions">
+        <button class="btn" id="checkBtn">Feed the machine! 🍽️</button>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div class="robot" style="font-size:80px" id="finalRobot">🤖</div>
+      <p id="finalLine">The Burp-o-Matic is full and extremely grateful.</p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Play again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Grade bands — ONE game, grade picked inside (see PLAN.md §5.1).
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', dens: [2, 4],          equiv: false },
+    { id: 3, label: 'Grade 3',   dens: [2, 3, 4, 6, 8], equiv: false },
+    { id: 4, label: 'Grade 4–5', dens: [2, 3, 4, 5, 6], equiv: true  }
+  ];
+  var ROUNDS = 8;
+
+  var BURP_LINES = [
+    'BRAAAP! That tasted like homework! 🤢',
+    'BUUURRP! My circuits say NOPE.',
+    'BLORP! Not the right amount — my tummy-tank knows!',
+    'BRRRUP! Did you even measure that?!',
+    'BURRRP! I am a machine of PRECISION, thank you.'
+  ];
+  var YUM_LINES = [
+    'GLUG GLUG… mathematically delicious! 😋',
+    'PERFECT pour! My grin gears are spinning!',
+    'Fizzy AND exact — you are hired, tiny scientist!',
+    'Beep boop… flavor levels: OPTIMAL! 🎉',
+    'That hit the spot. The very exact spot.'
+  ];
+
+  // state
+  var grade = GRADES[0], round = 0, score = 0, tries = 0, streak = 0;
+  var need = 1, segs = 4, showNum = 1, showDen = 2;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var startEl = $('start'), gameEl = $('game'), finalEl = $('final');
+
+  // tiny WebAudio burp/chime (self-contained, no assets)
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(freq, dur, type, slideTo) {
+    try {
+      actx = actx || new AC();
+      var o = actx.createOscillator(), g = actx.createGain();
+      o.type = type; o.frequency.value = freq;
+      if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, actx.currentTime + dur);
+      g.gain.setValueAtTime(0.12, actx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + dur);
+      o.connect(g); g.connect(actx.destination);
+      o.start(); o.stop(actx.currentTime + dur);
+    } catch (e) { /* audio blocked — fine */ }
+  }
+  function burpSound() { tone(160, 0.5, 'sawtooth', 55); }
+  function yumSound()  { tone(520, 0.12, 'triangle'); setTimeout(function(){ tone(780, 0.18, 'triangle'); }, 110); }
+
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function rint(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+
+  function newRound() {
+    tries = 0;
+    var den = pick(grade.dens);
+    var num = rint(1, den - 1);
+    showNum = num; showDen = den;
+    // Grade 4–5: sometimes show a simplified fraction over a bigger bar (equivalents)
+    if (grade.equiv && Math.random() < 0.55) {
+      var m = pick([2, 3]);
+      segs = den * m; need = num * m;
+      if (segs > 12) { segs = den * 2; need = num * 2; }
+    } else {
+      segs = den; need = num;
+    }
+    $('roundLbl').textContent = 'Round ' + (round + 1) + '/' + ROUNDS;
+    $('bubble').innerHTML = 'Feed me exactly <b>' + showNum + '/' + showDen + '</b> of that bottle' +
+      (segs !== showDen ? ' — careful, this bottle has <b>' + segs + '</b> segments! 🧐' : '! 🥤');
+    $('robot').textContent = '🤖';
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('checkBtn').disabled = false;
+
+    var bar = $('bar'); bar.innerHTML = '';
+    for (var i = 0; i < segs; i++) {
+      var s = document.createElement('div');
+      s.className = 'seg';
+      s.addEventListener('click', function () {
+        this.classList.toggle('on');
+        updatePicked();
+      });
+      bar.appendChild(s);
+    }
+    $('pickedDen').textContent = segs;
+    updatePicked();
+    EduSDK.startLesson(round + 1, { fraction: showNum + '/' + showDen, segments: segs });
+  }
+
+  function updatePicked() {
+    $('pickedVal').textContent = document.querySelectorAll('.seg.on').length;
+  }
+
+  function check() {
+    var got = document.querySelectorAll('.seg.on').length;
+    tries++;
+    if (got === need) {
+      var pts = tries === 1 ? 100 : (tries === 2 ? 50 : 25);
+      streak = tries === 1 ? streak + 1 : 0;
+      pts += streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      $('robot').textContent = '😋';
+      $('toast').textContent = pick(YUM_LINES) + '  +' + pts;
+      $('toast').className = 'toast good';
+      $('checkBtn').disabled = true;
+      yumSound();
+      EduSDK.finishLesson(round + 1, { correct: true, tries: tries });
+      setTimeout(nextRound, 1400);
+    } else {
+      streak = 0;
+      $('robot').textContent = '🤮';
+      var hint = got > need ? 'Too much soda!' : 'Not enough soda!';
+      $('toast').textContent = pick(BURP_LINES) + '  (' + hint + ')';
+      $('toast').className = 'toast bad';
+      $('card').classList.add('shake');
+      document.querySelector('.machine').classList.add('burping');
+      burpSound();
+      setTimeout(function () {
+        $('card').classList.remove('shake');
+        document.querySelector('.machine').classList.remove('burping');
+        $('robot').textContent = '🤖';
+      }, 550);
+      EduSDK.retryLesson(round + 1, { got: got, need: need });
+    }
+  }
+
+  function nextRound() {
+    round++;
+    if (round >= ROUNDS) return finish();
+    if (round === Math.floor(ROUNDS / 2)) {
+      EduSDK.adBreak('interlevel').then(newRound);
+    } else {
+      newRound();
+    }
+  }
+
+  function finish() {
+    gameEl.classList.add('hidden');
+    finalEl.classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalRobot').textContent = score >= ROUNDS * 100 ? '🤩' : '😋';
+    $('finalLine').textContent = grade.label + ' — the Burp-o-Matic drank ' + ROUNDS +
+      ' perfect fractions and only burped a little.';
+    EduSDK.submitScore(score, { grade: grade.id, rounds: ROUNDS })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; round = 0; score = 0; streak = 0;
+    $('scoreVal').textContent = '0';
+    startEl.classList.add('hidden'); finalEl.classList.add('hidden');
+    gameEl.classList.remove('hidden');
+    newRound();
+  }
+
+  // wire up
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('checkBtn').addEventListener('click', check);
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    finalEl.classList.add('hidden'); startEl.classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'fraction-factory' });
+})();
+</script>
+</body>
+</html>

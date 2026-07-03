@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#33210c"/><stop offset=".5" stop-color="#472e10"/><stop offset="1" stop-color="#241708"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- balance scale (tilted) -->
+  <g stroke="#e8c893" stroke-width="8" stroke-linecap="round" fill="none">
+    <line x1="480" y1="120" x2="480" y2="330"/>
+    <line x1="300" y1="170" x2="660" y2="90"/>
+    <line x1="300" y1="170" x2="300" y2="240"/>
+    <line x1="660" y1="90" x2="660" y2="160"/>
+  </g>
+  <!-- pans -->
+  <path d="M 240 240 Q 300 300 360 240" fill="none" stroke="#94702e" stroke-width="8"/>
+  <path d="M 600 160 Q 660 220 720 160" fill="none" stroke="#94702e" stroke-width="8"/>
+  <circle cx="480" cy="120" r="14" fill="#e8c893"/>
+  <!-- heavy pan: one melon -->
+  <text x="300" y="235" font-size="72" text-anchor="middle">🍉</text>
+  <!-- light pan: cherries -->
+  <text x="632" y="150" font-size="40" text-anchor="middle">🍒🍒</text>
+  <text x="662" y="185" font-size="40" text-anchor="middle">🍒</text>
+  <!-- bandits -->
+  <text x="110" y="320" font-size="90" text-anchor="middle">🦝</text>
+  <text x="120" y="400" font-size="40" text-anchor="middle">📝</text>
+  <text x="850" y="330" font-size="80" text-anchor="middle">🦝</text>
+  <text x="480" y="470" font-size="44" text-anchor="middle">⚖️</text>
+  <text x="480" y="505" fill="url(#ttl)" font-size="58" font-weight="800" text-anchor="middle">Balance Beam Bandits</text>
+</svg>

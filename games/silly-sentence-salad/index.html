@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Silly Sentence Salad — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="language" data-seed="silly-sentence-salad"></script>
+
+<style>
+  :root{
+    --bg1:#13204a; --bg2:#1a1140; --bg3:#0c2a3a;
+    --card:#141c3f; --line:#2b3a77; --text:#eaf2ff; --muted:#9fb4e0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ff8a5c; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(900px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--green),var(--purple),var(--orange));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:20px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:16px 22px;border-radius:16px;color:#06122a;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .robotRow{display:flex;align-items:flex-start;gap:14px;margin:4px 0 12px;}
+  .robot{font-size:clamp(44px,8vw,68px);line-height:1;filter:drop-shadow(0 8px 14px rgba(0,0,0,.45));}
+  .speech{flex:1;background:#0d1533;border:2px solid var(--line);border-radius:16px;
+    padding:12px 16px;font-size:clamp(14px,2.3vw,18px);font-weight:700;min-height:58px;}
+  .speech i{color:var(--muted);font-weight:600;}
+
+  .zone{background:#0a1130;border:2px dashed #3a4f9e;border-radius:16px;min-height:72px;
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px;margin:8px 0;}
+  .zone.answer{border-color:var(--green);}
+  .zoneLbl{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:1px;margin:8px 0 2px;}
+  .word{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:10px 16px;border-radius:12px;color:#06122a;background:var(--blue);
+    box-shadow:0 4px 0 rgba(0,0,0,.35);}
+  .word:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.35);}
+  .zone.answer .word{background:var(--green);}
+
+  .actions{display:flex;justify-content:center;gap:12px;margin-top:12px;flex-wrap:wrap;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:12px 26px;border-radius:14px;color:#06122a;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#22305f;color:var(--text);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:10px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#5f74a8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🥗 Silly Sentence Salad</h1>
+      <p class="sub">Someone tossed these sentences like a salad! Put the words back in order.
+        Get it wrong and BEEP-3PO the robot will read your silly sentence <b>out loud</b>,
+        completely seriously. He judges you. Quietly.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>short sentences</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>longer sentences</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>tricky clauses</small></button>
+      </div>
+      <p class="sub">8 salads · first-try answers earn the most points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Salad 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="robotRow">
+        <div class="robot" id="robot">🤖</div>
+        <div class="speech" id="speech"><i>Assemble the sentence, human. I will wait. Beep.</i></div>
+      </div>
+      <div class="zoneLbl">YOUR SENTENCE</div>
+      <div class="zone answer" id="answerZone"></div>
+      <div class="zoneLbl">WORD SALAD</div>
+      <div class="zone" id="saladZone"></div>
+      <div class="actions">
+        <button class="btn ghost" id="hearBtn">🔊 Make robot read it</button>
+        <button class="btn" id="checkBtn" disabled>Check! ✅</button>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px">🤖🥗</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Play again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', sentences: [
+      'The dog ate my sock',
+      'My cat likes warm milk',
+      'We ride bikes after school',
+      'The frog sat on a log',
+      'I love big red apples',
+      'The sun is very hot',
+      'Dad made pancakes for breakfast',
+      'A crab stole my hat',
+      'The baby laughed at grandpa',
+      'My fish can do tricks'
+    ]},
+    { id: 3, label: 'Grade 3', sentences: [
+      'The sleepy dragon snored louder than a tractor',
+      'My little brother hid the remote in the fridge',
+      'A penguin waddled proudly into the classroom',
+      'The pizza slice vanished before lunchtime ended',
+      'Our teacher juggles apples when we behave',
+      'The hamster escaped during the maths test',
+      'Grandma races skateboards on Sunday mornings',
+      'A seagull grabbed my entire ice cream cone',
+      'The robot vacuum chased our terrified cat',
+      'My homework mysteriously smells like bananas'
+    ]},
+    { id: 4, label: 'Grade 4–5', sentences: [
+      'Although it was raining the parade marched on happily',
+      'The scientist who loved biscuits invented a crumbless cookie',
+      'Before sunrise the bakery fills the street with sweet smells',
+      'The goalkeeper dived bravely but the ball bounced over him',
+      'While everyone slept the cat reorganised the furniture',
+      'The museum guard whispered secrets to the dinosaur bones',
+      'After the storm passed we found a trampoline in our tree',
+      'The chef proudly served spaghetti that glowed in the dark',
+      'Because the wifi died the whole family discovered board games',
+      'The astronaut kept a tiny plant hidden inside her helmet'
+    ]}
+  ];
+  var ROUNDS = 8;
+
+  var ROBOT_SNARK = [
+    'Beep. That is… poetry. Terrible, terrible poetry.',
+    'Processing… no. My circuits refuse.',
+    'I have read it. I need a moment. Beep.',
+    'Grammar module: screaming. Quietly. Beep.',
+    'That sentence made my antenna droop.'
+  ];
+  var ROBOT_PRAISE = [
+    'Beep! Grammar levels: MAGNIFICENT.',
+    'Correct. I am 3% proud of you. That is a lot for a robot.',
+    'Flawless. My circuits are doing a tiny dance.',
+    'Beep boop. Sentence approved. Salad defeated.'
+  ];
+
+  var grade = GRADES[0], round = 0, score = 0, tries = 0, streak = 0;
+  var target = [], pool = [], deck = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // --- sound effects (Web Audio, no assets) ---
+  var _sAC = window.AudioContext || window.webkitAudioContext, _sac = null;
+  function _sfx(f, d, type, slide, when) { try { _sac = _sac || new _sAC();
+    var t = _sac.currentTime + (when || 0), o = _sac.createOscillator(), g = _sac.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + d);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.14, t + .012);
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(_sac.destination); o.start(t); o.stop(t + d + .03);
+  } catch (e) {} }
+  function sfxGood() { _sfx(523, .13, 'triangle'); _sfx(784, .17, 'triangle', 0, .1); }
+  function sfxBad() { _sfx(196, .3, 'sawtooth', 90); }
+  function sfxWin() { [523, 659, 784, 1047].forEach(function (f, i) { _sfx(f, .2, 'triangle', 0, i * .12); }); }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ a = a.slice(); for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;} return a; }
+
+  function speak(text, silly) {
+    try {
+      if (!window.speechSynthesis) return;
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = silly ? 0.85 : 1;
+      u.pitch = silly ? 0.4 : 0.7;   // deadpan robot
+      speechSynthesis.speak(u);
+    } catch (e) { /* no voice — the text bubble still lands the joke */ }
+  }
+
+  function currentWords(zone) {
+    return Array.prototype.map.call($(zone).querySelectorAll('.word'), function (w) { return w.textContent; });
+  }
+
+  function makeWordBtn(word, from) {
+    var b = document.createElement('button');
+    b.className = 'word'; b.textContent = word;
+    b.addEventListener('click', function () {
+      var dest = from === 'salad' ? 'answerZone' : 'saladZone';
+      $(dest).appendChild(makeWordBtn(word, from === 'salad' ? 'answer' : 'salad'));
+      b.remove();
+      $('checkBtn').disabled = $('saladZone').querySelectorAll('.word').length !== 0;
+    });
+    return b;
+  }
+
+  function newRound() {
+    tries = 0;
+    var sentence = deck[round];
+    target = sentence.split(' ');
+    pool = shuffle(target);
+    // ensure it's actually jumbled
+    if (pool.join(' ') === sentence && target.length > 1) pool.reverse();
+
+    $('roundLbl').textContent = 'Salad ' + (round + 1) + '/' + ROUNDS;
+    $('speech').innerHTML = '<i>Assemble the sentence, human. ' + target.length + ' words. I believe in you. Marginally.</i>';
+    $('robot').textContent = '🤖';
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('answerZone').innerHTML = ''; $('saladZone').innerHTML = '';
+    pool.forEach(function (w) { $('saladZone').appendChild(makeWordBtn(w, 'salad')); });
+    $('checkBtn').disabled = true;
+    EduSDK.startLesson(round + 1, { words: target.length });
+  }
+
+  function check() {
+    tries++;
+    var got = currentWords('answerZone').join(' ');
+    var want = target.join(' ');
+    if (got === want) {
+      var pts = tries === 1 ? 100 : (tries === 2 ? 50 : 25);
+      streak = tries === 1 ? streak + 1 : 0;
+      pts += streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      $('robot').textContent = '🤖✨';
+      sfxGood();
+      var line = pick(ROBOT_PRAISE);
+      $('speech').textContent = '“' + want + '.”  ' + line;
+      speak(want, false);
+      $('toast').textContent = line + '  +' + pts;
+      $('toast').className = 'toast good';
+      $('checkBtn').disabled = true;
+      EduSDK.finishLesson(round + 1, { correct: true, tries: tries });
+      setTimeout(nextRound, 1800);
+    } else {
+      streak = 0;
+      $('robot').textContent = '🤖😑';
+      sfxBad();
+      var snark = pick(ROBOT_SNARK);
+      $('speech').innerHTML = '“<b>' + got + '</b>.”  ' + snark;
+      speak(got, true);   // ← the joke: he reads the nonsense perfectly seriously
+      $('toast').textContent = 'Not quite — un-toss it some more!';
+      $('toast').className = 'toast bad';
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      EduSDK.retryLesson(round + 1, { attempt: got });
+    }
+  }
+
+  function hear() {
+    var got = currentWords('answerZone').join(' ');
+    if (!got) got = 'You have not built anything yet, human. Beep.';
+    $('speech').textContent = '“' + got + '.”';
+    speak(got, true);
+  }
+
+  function nextRound() {
+    round++;
+    if (round >= ROUNDS) return finish();
+    if (round === Math.floor(ROUNDS / 2)) {
+      EduSDK.adBreak('interlevel').then(newRound);
+    } else newRound();
+  }
+
+  function finish() {
+    sfxWin();
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalLine').textContent = grade.label + ' — ' + ROUNDS +
+      ' salads un-tossed. BEEP-3PO says he is “moderately impressed,” which is his highest setting.';
+    EduSDK.submitScore(score, { grade: grade.id, rounds: ROUNDS })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; round = 0; score = 0; streak = 0;
+    deck = shuffle(grade.sentences).slice(0, ROUNDS);
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newRound();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('checkBtn').addEventListener('click', check);
+  $('hearBtn').addEventListener('click', hear);
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'silly-sentence-salad' });
+})();
+</script>
+</body>
+</html>

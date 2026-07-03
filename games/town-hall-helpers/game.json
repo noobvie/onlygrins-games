@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "town-hall-helpers",
+  "title": "Town Hall Helpers",
+  "category": "civics",
+  "short_description": "Every community has helpers with special jobs — a townsperson needs help, so tap the right helper (firefighter, judge, mayor…) to keep Grinsville running.",
+  "description": "Every community is full of helpers with special jobs — firefighters, doctors, librarians, and town leaders like the mayor, judge and council. A townsperson needs help! Read what they need and tap the right helper to keep Grinsville running happily. It teaches community roles and responsibilities, a core early-civics idea, and builds toward understanding local government. Grade bands ramp from everyday helpers, to more community roles, to town leaders and officials like the mayor, judge, treasurer and election officer. A free online community-helpers and civics game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 660,
+  "controls": "Mouse / tap the community helper who fits what the townsperson needs.",
+  "tags": [
+    "civics",
+    "community-helpers",
+    "citizenship",
+    "local-government",
+    "strand-community",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:town-hall-helpers"
+}

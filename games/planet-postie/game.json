@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "planet-postie",
+  "title": "Planet Postie",
+  "category": "science",
+  "short_description": "Deliver space mail by knowing your planets — send Mercury's parcel to Neptune and it arrives frozen solid with a passive-aggressive note.",
+  "description": "You're the solar system's only postal worker, and the mail is PILING UP. Deliver each parcel by knowing your planets: which one is third from the Sun? Which is the red one, the ringed one, the giant one? Deliver Mercury's mail to Neptune and it arrives frozen solid with a passive-aggressive note attached. Grade bands ramp from famous planet facts, to the full Sun-to-Neptune order, to neighbour puzzles and the solar system's weirdest trivia. A free online solar system and space science game for kids in grades 2–5, with speed and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap the right planet before the rocket-mail timer runs out.",
+  "tags": [
+    "science",
+    "space",
+    "solar-system",
+    "planets",
+    "strand-space",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:planet-postie"
+}

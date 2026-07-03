@@ -43,8 +43,12 @@ fi
 
 mkdir -p "$ROOT/games"
 cp -R "$TEMPLATE" "$DEST"
-# keep shared/edu-sdk.js the single source of truth — refresh the bundled copy
+# keep shared/*.js the single source of truth — refresh the bundled copies
 [ -f "$ROOT/shared/edu-sdk.js" ] && cp -f "$ROOT/shared/edu-sdk.js" "$DEST/edu-sdk.js"
+[ -f "$ROOT/shared/bgm.js" ] && cp -f "$ROOT/shared/bgm.js" "$DEST/bgm.js"
+# point the background-music tag at this game's slug (data-cat still needs a
+# hand-edit to match the category you set in game.json; default falls back safely)
+sed -i -E "s/(data-seed=\")[^\"]*(\")/\1$SLUG\2/" "$DEST/index.html" 2>/dev/null || true
 echo "→ copied templates/starter-game → games/$SLUG"
 
 # Rewrite game.json. Prefer Node for safe JSON editing; fall back to sed.

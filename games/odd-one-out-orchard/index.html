@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Odd One Out Orchard — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="logic" data-seed="odd-one-out-orchard"></script>
+
+<style>
+  :root{
+    --bg1:#12300e; --bg2:#1a4213; --bg3:#0a1d07;
+    --card:#173a11; --line:#3f7a33; --text:#f0ffe9; --muted:#b9dcab;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#0c2208;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .arena{background:#102a0b;border:2px solid var(--line);border-radius:16px;padding:16px;
+    text-align:center;margin-bottom:12px;}
+  .task{font-size:clamp(16px,3vw,21px);font-weight:800;color:var(--muted);margin-bottom:14px;}
+  .timerbar{height:10px;border-radius:6px;background:#0a1d07;overflow:hidden;margin-top:14px;}
+  .timerbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--orange),var(--bad));}
+  .answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:600px;margin:0 auto;}
+  .ans{cursor:pointer;border:none;font-family:inherit;font-weight:800;
+    padding:16px 8px;border-radius:16px;color:#0c2208;background:#e8f5d8;
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .ans .big{display:block;font-size:44px;line-height:1.1;}
+  .ans .txt{display:block;font-size:20px;padding:8px 0;}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .ans.right{background:var(--green);} .ans.wrong{background:var(--bad);}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:44px;text-align:center;font-weight:800;font-size:17px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#0c2208;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#2b5522;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#6da05c;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🍎 Odd One Out Orchard</h1>
+      <p class="sub">Something strange is growing in Granny Smith's orchard! In every basket,
+        one thing simply does not belong — a shark among the pets, a donut among the socks.
+        Spot the impostor and boot it out before Granny notices!</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>easy to spot</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>think it through</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>sneaky impostors</small></button>
+      </div>
+      <p class="sub">12 baskets · fast spotting = bonus points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Basket 1/12</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="arena">
+        <div class="task">🧺 Which one does <b>NOT</b> belong?</div>
+        <div class="answers" id="answers"></div>
+        <div class="timerbar"><i id="timerFill"></i></div>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">👵</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">More baskets ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Curated baskets. items: 4 entries ({e: emoji} or {t: text}); odd = index of
+  // the impostor; why = shown after answering. band: 0 easy, 1 medium, 2 sneaky.
+  var BASKETS = [
+    { band:0, items:[{e:'🍎'},{e:'🍌'},{e:'🍓'},{e:'🥕'}], odd:3, why:'The carrot is a vegetable — the rest are fruits.' },
+    { band:0, items:[{e:'🐶'},{e:'🐱'},{e:'🦈'},{e:'🐰'}], odd:2, why:'The shark lives in the sea — the others are furry pets.' },
+    { band:0, items:[{e:'🚗'},{e:'🚌'},{e:'✈️'},{e:'🚓'}], odd:2, why:'The plane flies — the rest drive on roads.' },
+    { band:0, items:[{e:'⚽'},{e:'🏀'},{e:'🎾'},{e:'📕'}], odd:3, why:'The book is not a ball!' },
+    { band:0, items:[{e:'🐝'},{e:'🐞'},{e:'🦋'},{e:'🐍'}], odd:3, why:'The snake is not an insect — insects have six legs.' },
+    { band:0, items:[{e:'🥛'},{e:'🧃'},{e:'🥤'},{e:'🍞'}], odd:3, why:'Bread is food — the rest are drinks.' },
+    { band:0, items:[{e:'🧦'},{e:'👟'},{e:'🧤'},{e:'🍩'}], odd:3, why:'The donut is a snack, not something you wear (please don\'t wear it).' },
+    { band:0, items:[{e:'🎸'},{e:'🎺'},{e:'🥁'},{e:'🍕'}], odd:3, why:'The pizza is delicious but it is not a musical instrument.' },
+    { band:0, items:[{e:'🦁'},{e:'🐯'},{e:'🐆'},{e:'🐄'}], odd:3, why:'The cow is a farm animal — the rest are wild big cats.' },
+    { band:0, items:[{e:'☀️'},{e:'🌙'},{e:'⭐'},{e:'☔'}], odd:3, why:'The umbrella is not up in the sky (hopefully).' },
+    { band:1, items:[{e:'🐬'},{e:'🐳'},{e:'🦭'},{e:'🐠'}], odd:3, why:'The fish breathes water — dolphins, whales and seals are mammals that breathe air!' },
+    { band:1, items:[{t:'Mercury'},{t:'Venus'},{t:'Mars'},{t:'The Moon'}], odd:3, why:'The Moon is a moon, not a planet.' },
+    { band:1, items:[{t:'cat'},{t:'dog'},{t:'run'},{t:'fish'}], odd:2, why:'"Run" is an action word (a verb) — the rest are animals (nouns).' },
+    { band:1, items:[{t:'8'},{t:'12'},{t:'16'},{t:'21'}], odd:3, why:'21 is odd — all the others are even numbers.' },
+    { band:1, items:[{t:'triangle'},{t:'square'},{t:'circle'},{t:'cube'}], odd:3, why:'A cube is a 3D solid — the rest are flat 2D shapes.' },
+    { band:1, items:[{t:'red'},{t:'blue'},{t:'loud'},{t:'green'}], odd:2, why:'"Loud" is a sound, not a colour.' },
+    { band:1, items:[{t:'10'},{t:'15'},{t:'20'},{t:'27'}], odd:3, why:'27 is not in the 5-times table — the others count by fives.' },
+    { band:1, items:[{e:'🌧️'},{e:'❄️'},{e:'🌨️'},{e:'🌈'}], odd:3, why:'A rainbow is light, not something that falls from clouds.' },
+    { band:2, items:[{e:'🦇'},{e:'🐦'},{e:'🦅'},{e:'🐧'}], odd:0, why:'Sneaky! The bat is a MAMMAL — the others are birds (yes, even the penguin).' },
+    { band:2, items:[{t:'spider'},{t:'ant'},{t:'bee'},{t:'beetle'}], odd:0, why:'A spider has 8 legs — insects have 6. Spiders are arachnids!' },
+    { band:2, items:[{t:'2'},{t:'3'},{t:'5'},{t:'9'}], odd:3, why:'9 = 3 × 3, so it is not prime. The others are prime numbers.' },
+    { band:2, items:[{t:'12'},{t:'24'},{t:'36'},{t:'44'}], odd:3, why:'44 is not a multiple of 12 — the others are 12, 24, 36.' },
+    { band:2, items:[{t:'happy'},{t:'joyful'},{t:'glad'},{t:'gloomy'}], odd:3, why:'"Gloomy" means sad — the rest are happy words (synonyms).' },
+    { band:2, items:[{t:'km'},{t:'kg'},{t:'cm'},{t:'m'}], odd:1, why:'kg measures how heavy something is — the others measure length.' },
+    { band:2, items:[{t:'Paris'},{t:'London'},{t:'Rome'},{t:'Africa'}], odd:3, why:'Africa is a continent — the others are capital cities.' },
+    { band:2, items:[{t:'snow'},{t:'rain'},{t:'hail'},{t:'thunder'}], odd:3, why:'Thunder is a SOUND — the rest actually fall from the sky.' },
+    { band:2, items:[{t:'square'},{t:'rectangle'},{t:'rhombus'},{t:'pentagon'}], odd:3, why:'A pentagon has 5 sides — the others all have 4.' },
+    { band:2, items:[{t:'16'},{t:'25'},{t:'36'},{t:'42'}], odd:3, why:'42 is not a square number — 16=4², 25=5², 36=6².' }
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', secs: 12, bands: [0] },
+    { id: 3, label: 'Grade 3',   secs: 12, bands: [0,1] },
+    { id: 4, label: 'Grade 4–5', secs: 10, bands: [1,2] }
+  ];
+  var ROUNDS = 12;
+
+  var CHEER = ['Impostor spotted! Out of the basket! 🧺', 'Granny Smith applauds! 👏',
+               'Nothing sneaks past you! 🕵️', 'The orchard is safe again! 🍎'];
+  var OOPS  = ['That one DID belong! The impostor giggles. 😏', 'Granny Smith raises an eyebrow. 🤨',
+               'The real impostor is doing a tiny victory dance. 💃', 'Oops — wrong suspect!'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var current = null, timer = null, tLeft = 0, deck = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function cheer(){ tone(523,.15,'sine',1046); setTimeout(function(){ tone(659,.2,'sine',1318); }, 130); }
+  function womp(){ tone(220,.35,'sawtooth',90); }
+
+  function poolFor(g) { return BASKETS.filter(function (b) { return g.bands.indexOf(b.band) !== -1; }); }
+
+  function makeQuestion() {
+    if (!deck.length) deck = shuffle(poolFor(grade));
+    current = deck.pop();
+    // shuffle item order, track where the odd one lands
+    var order = shuffle(current.items.map(function (_, idx) { return idx; }));
+    var box = $('answers');
+    box.innerHTML = '';
+    order.forEach(function (origIdx) {
+      var it = current.items[origIdx];
+      var b = document.createElement('button');
+      b.className = 'ans';
+      b.innerHTML = it.e ? '<span class="big">' + it.e + '</span>' : '<span class="txt">' + it.t + '</span>';
+      b.dataset.odd = (origIdx === current.odd) ? '1' : '0';
+      b.addEventListener('click', function(){ choose(b); });
+      box.appendChild(b);
+    });
+  }
+
+  function newQuestion() {
+    answered = false;
+    $('roundLbl').textContent = 'Basket ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    makeQuestion();
+    tLeft = grade.secs;
+    clearInterval(timer);
+    timer = setInterval(function () {
+      tLeft -= 0.1;
+      $('timerFill').style.width = Math.max(0, tLeft / grade.secs * 100) + '%';
+      if (tLeft <= 0) timeUp();
+    }, 100);
+    EduSDK.startLesson(q + 1, {});
+  }
+
+  function settle(correct, btn) {
+    clearInterval(timer);
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (b.dataset.odd === '1') b.classList.add('right');
+    });
+    if (correct) {
+      streak++; nCorrect++;
+      var pts = 100 + Math.round(tLeft / grade.secs * 40) + streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      cheer();
+      $('toast').textContent = pick(CHEER) + ' ' + current.why + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      if (btn) btn.classList.add('wrong');
+      womp();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' ' + current.why;
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 2000);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 2000);
+    } else setTimeout(newQuestion, 2000);
+  }
+
+  function choose(btn) {
+    if (answered) return;
+    answered = true;
+    settle(btn.dataset.odd === '1', btn);
+  }
+
+  function timeUp() {
+    if (answered) return;
+    answered = true;
+    settle(false, null);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 10 ? '👵🏆' : nCorrect >= 6 ? '👵🍎' : '👵🤨';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' impostors spotted. ' +
+      (nCorrect >= 10 ? 'Granny Smith bakes you a victory pie!' :
+       nCorrect >= 6 ? 'The orchard is mostly impostor-free.' :
+       'The impostors have started a book club in basket four.');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0; deck = [];
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'odd-one-out-orchard' });
+})();
+</script>
+</body>
+</html>

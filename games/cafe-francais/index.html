@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Café Français — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="language" data-seed="cafe-francais"></script>
+
+<style>
+  :root{
+    --bg1:#13204a; --bg2:#1a1140; --bg3:#0c2a3a;
+    --card:#141c3f; --line:#2b3a77; --text:#eaf2ff; --muted:#9fb4e0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ff8a5c; --bad:#ff6b81;
+    --cream:#ffd166;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(920px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,#4d7cff,#eaf2ff,#ff6b81);
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:20px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:16px 22px;border-radius:16px;color:#06122a;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .scene{display:flex;align-items:flex-start;gap:14px;margin:6px 0 10px;}
+  .customer{font-size:clamp(50px,9vw,80px);line-height:1;transition:transform .3s;
+    filter:drop-shadow(0 8px 14px rgba(0,0,0,.45));}
+  .customer.faint{animation:faint .8s ease forwards;}
+  @keyframes faint{0%{transform:rotate(0)}60%{transform:rotate(80deg) translateY(10px)}100%{transform:rotate(90deg) translateY(18px)}}
+  .customer.happy{animation:bounce .5s ease;}
+  @keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}}
+  .bubble{flex:1;background:#0d1533;border:2px solid var(--line);border-radius:16px;
+    padding:12px 16px;}
+  .order{font-size:clamp(17px,3vw,24px);font-weight:800;color:var(--cream);}
+  .translation{color:var(--muted);font-size:14px;font-weight:600;min-height:20px;margin-top:4px;}
+  .hearBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:14px;
+    margin-top:8px;padding:7px 14px;border-radius:10px;background:#22305f;color:var(--blue);
+    border:1px solid var(--line);}
+
+  .tray{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:12px 0;}
+  .dish{cursor:pointer;border:none;font-family:inherit;
+    background:#0d1533;border:3px solid var(--line);border-radius:18px;padding:12px 18px;
+    box-shadow:0 5px 0 rgba(0,0,0,.35);transition:.12s;font-size:46px;line-height:1;}
+  .dish:hover{border-color:var(--cream);transform:translateY(-2px);}
+  .dish:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .dish.right{border-color:var(--green);background:#103b29;}
+  .dish.wrong{border-color:var(--bad);background:#3a1717;}
+
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:8px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#06122a;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#22305f;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#5f74a8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>☕ Café Français</h1>
+      <p class="sub">Welcome to your café — where every customer orders <b>in French</b> and
+        faints <i>dramatically</i> if you bring the wrong thing. Serve them what they asked for.
+        Tap 🔊 to hear the order out loud!</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Débutant<small>single words (Grade 1–2)</small></button>
+        <button class="gradeBtn g2" data-grade="1">Intermédiaire<small>polite phrases (Grade 3)</small></button>
+        <button class="gradeBtn g3" data-grade="2">Avancé<small>tricky orders (Grade 4–5)</small></button>
+      </div>
+      <p class="sub">10 customers · translations revealed after each order — c'est parti !</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Customer 1/10</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="scene">
+        <div class="customer" id="customer">🐐</div>
+        <div class="bubble">
+          <div class="order" id="order">« Une pomme ! »</div>
+          <div class="translation" id="translation"></div>
+          <button class="hearBtn" id="hearBtn">🔊 Écouter (hear it)</button>
+        </div>
+      </div>
+      <div class="tray" id="tray"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px">👨‍🍳🇫🇷</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Encore ! ▸</button>
+        <button class="btn ghost" id="changeBtn">Change level</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Menu items: [emoji, french, english]. Advanced set includes qualifier pairs
+  // (green vs red apple etc.) so reading the WHOLE phrase matters.
+  var MENU_BASIC = [
+    ['🍎','une pomme','an apple'], ['🧀','du fromage','some cheese'],
+    ['🥖','une baguette','a baguette'], ['🥐','un croissant','a croissant'],
+    ['🍌','une banane','a banana'], ['🍓','une fraise','a strawberry'],
+    ['🥛','du lait','some milk'], ['🍰','un gâteau','a cake'],
+    ['🍦','une glace','an ice cream'], ['🐟','un poisson','a fish'],
+    ['🥚','un œuf','an egg'], ['🍫','du chocolat','some chocolate'],
+    ['🥗','une salade','a salad'], ['☕','un café','a coffee'],
+    ['🍪','un biscuit','a biscuit'], ['🧃','un jus','a juice']
+  ];
+  var MENU_ADVANCED = MENU_BASIC.concat([
+    ['🍏','une pomme verte','a green apple'],
+    ['🍵','un thé vert','a green tea'],
+    ['🍨','une glace à la vanille','a vanilla ice cream'],
+    ['🍧','une glace à la fraise','a strawberry ice cream'],
+    ['🥤','une limonade froide','a cold lemonade'],
+    ['🍩','deux beignets','two doughnuts'],
+    ['🥐🥐','deux croissants','two croissants'],
+    ['🧦','une chaussette','a sock (?!)']
+  ]);
+
+  var GRADES = [
+    { id: 1, label: 'Débutant', menu: MENU_BASIC, opts: 4,
+      wrap: function (fr) { return '« ' + cap(fr) + ' ! »'; } },
+    { id: 3, label: 'Intermédiaire', menu: MENU_BASIC, opts: 5,
+      wrap: function (fr) { return '« Je voudrais ' + fr + ', s’il vous plaît. »'; } },
+    { id: 4, label: 'Avancé', menu: MENU_ADVANCED, opts: 6,
+      wrap: function (fr) { return pick([
+        '« Je voudrais ' + fr + ', s’il vous plaît. »',
+        '« Bonjour ! Pour moi, ' + fr + '. »',
+        '« Avez-vous ' + fr + ' ? J’en rêve ! »'
+      ]); } }
+  ];
+  var ROUNDS = 10;
+  var CUSTOMERS = ['🐐','🦊','🐸','👵','🧙','🐧','🤖','👨‍🎨','🐻','👸','🦖','🧛'];
+  var FAINT_LINES = [
+    'Quelle horreur ! The customer has fainted. Dramatically. Onto a chair they placed there first.',
+    'MON DIEU ! That is NOT the order! *faints in French*',
+    'Sacrebleu ! The customer collapsed — but gracefully, like a baguette in the wind.',
+    'Non non NON ! *swoons* *checks you saw the swoon* *swoons again*'
+  ];
+  var HAPPY_LINES = [
+    'Magnifique ! The customer is delighted! 💯',
+    'C’est parfait ! A generous tip appears!',
+    'Délicieux ! The customer does a tiny happy dance!',
+    'Merci beaucoup ! Five stars on FrenchYelp!'
+  ];
+
+  var grade = GRADES[0], round = 0, score = 0, tries = 0, streak = 0;
+  var deck = [], current = null, locked = false;
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // --- sound effects (Web Audio, no assets) ---
+  var _sAC = window.AudioContext || window.webkitAudioContext, _sac = null;
+  function _sfx(f, d, type, slide, when) { try { _sac = _sac || new _sAC();
+    var t = _sac.currentTime + (when || 0), o = _sac.createOscillator(), g = _sac.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + d);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.14, t + .012);
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(_sac.destination); o.start(t); o.stop(t + d + .03);
+  } catch (e) {} }
+  function sfxGood() { _sfx(523, .13, 'triangle'); _sfx(784, .17, 'triangle', 0, .1); }
+  function sfxBad() { _sfx(196, .3, 'sawtooth', 90); }
+  function sfxWin() { [523, 659, 784, 1047].forEach(function (f, i) { _sfx(f, .2, 'triangle', 0, i * .12); }); }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;} return a; }
+  function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  var orderText = '';
+  function speakFrench(text) {
+    try {
+      if (!window.speechSynthesis) return;
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = 'fr-FR';
+      u.rate = 0.9;
+      var fr = speechSynthesis.getVoices().filter(function (v) { return v.lang && v.lang.indexOf('fr') === 0; })[0];
+      if (fr) u.voice = fr;
+      speechSynthesis.speak(u);
+    } catch (e) { /* no voice available — reading works fine */ }
+  }
+
+  function newRound() {
+    tries = 0; locked = false;
+    current = deck[round];
+    orderText = grade.wrap(current[1]).replace(/[«»]/g, '').trim();
+    $('roundLbl').textContent = 'Customer ' + (round + 1) + '/' + ROUNDS;
+    $('customer').textContent = pick(CUSTOMERS);
+    $('customer').className = 'customer';
+    $('order').textContent = grade.wrap(current[1]);
+    $('translation').textContent = '';
+    $('toast').textContent = ''; $('toast').className = 'toast';
+
+    // build the tray: the right dish + decoys from the same menu
+    var options = [current];
+    var poolLeft = grade.menu.filter(function (m) { return m[1] !== current[1]; });
+    shuffle(poolLeft).slice(0, grade.opts - 1).forEach(function (m) { options.push(m); });
+    options = shuffle(options);
+    var tray = $('tray'); tray.innerHTML = '';
+    options.forEach(function (m) {
+      var b = document.createElement('button');
+      b.className = 'dish'; b.textContent = m[0]; b.title = '???';
+      b.addEventListener('click', function () { serve(m, b); });
+      tray.appendChild(b);
+    });
+    EduSDK.startLesson(round + 1, { order: current[1] });
+  }
+
+  function serve(m, btn) {
+    if (locked) return;
+    tries++;
+    if (m[1] === current[1]) {
+      locked = true;
+      var pts = tries === 1 ? 100 : (tries === 2 ? 50 : 25);
+      streak = tries === 1 ? streak + 1 : 0;
+      pts += streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      btn.classList.add('right');
+      $('customer').classList.add('happy');
+      sfxGood();
+      $('translation').textContent = '✅ ' + cap(current[1]) + ' = ' + current[2];
+      $('toast').textContent = pick(HAPPY_LINES) + '  +' + pts;
+      $('toast').className = 'toast good';
+      EduSDK.finishLesson(round + 1, { correct: true, tries: tries });
+      setTimeout(nextRound, 2000);
+    } else {
+      streak = 0;
+      btn.classList.add('wrong');
+      $('customer').classList.add('faint');
+      sfxBad();
+      $('translation').textContent = '❌ You served: ' + m[1] + ' (' + m[2] + ')';
+      $('toast').textContent = pick(FAINT_LINES);
+      $('toast').className = 'toast bad';
+      $('card').classList.add('shake');
+      setTimeout(function () {
+        $('card').classList.remove('shake');
+        $('customer').classList.remove('faint');
+      }, 900);
+      EduSDK.retryLesson(round + 1, { served: m[1], wanted: current[1] });
+    }
+  }
+
+  function nextRound() {
+    round++;
+    if (round >= ROUNDS) return finish();
+    if (round === Math.floor(ROUNDS / 2)) {
+      EduSDK.adBreak('interlevel').then(newRound);
+    } else newRound();
+  }
+
+  function finish() {
+    sfxWin();
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalLine').textContent = grade.label + ' — service terminé ! ' + ROUNDS +
+      ' customers served, and only a few of them fainted. The café earns a Michelin grin.';
+    EduSDK.submitScore(score, { grade: grade.id, rounds: ROUNDS })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; round = 0; score = 0; streak = 0;
+    deck = shuffle(grade.menu).slice(0, ROUNDS);
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newRound();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('hearBtn').addEventListener('click', function () { speakFrench(orderText); });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'cafe-francais' });
+})();
+</script>
+</body>
+</html>

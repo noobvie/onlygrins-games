@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a1a0e"/><stop offset=".5" stop-color="#3a2413"/><stop offset="1" stop-color="#1c1208"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- cuckoo clock -->
+  <g transform="translate(330 30)">
+    <rect x="0" y="30" width="300" height="330" rx="30" fill="#5a3a1a" stroke="#3a2510" stroke-width="10"/>
+    <polygon points="150,-16 -20,44 320,44" fill="#3a2510"/>
+    <circle cx="150" cy="200" r="120" fill="#ffefda" stroke="#3a2510" stroke-width="10"/>
+    <g fill="#3a2510" font-size="30" font-weight="800" text-anchor="middle">
+      <text x="150" y="115">12</text><text x="150" y="305">6</text>
+      <text x="62" y="212">9</text><text x="238" y="212">3</text>
+    </g>
+    <line x1="150" y1="200" x2="150" y2="135" stroke="#3a2510" stroke-width="14" stroke-linecap="round"/>
+    <line x1="150" y1="200" x2="210" y2="230" stroke="#c2571f" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="150" cy="200" r="11" fill="#3a2510"/>
+  </g>
+  <!-- screaming cuckoo -->
+  <text x="480" y="70" font-size="76" text-anchor="middle">🐦</text>
+  <text x="590" y="70" font-size="40" font-weight="800" fill="#ff6b81" transform="rotate(8 590 70)">CUCKOO!!</text>
+  <!-- angry gnomes -->
+  <g font-size="52">
+    <text x="90" y="440">🍄😡</text><text x="740" y="420">🍄😡</text><text x="130" y="230">💤</text>
+  </g>
+  <text x="480" y="490" fill="url(#ttl)" font-size="62" font-weight="800" text-anchor="middle">Cuckoo Clock Chaos</text>
+</svg>

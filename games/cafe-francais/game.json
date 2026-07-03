@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "cafe-francais",
+  "title": "Café Français",
+  "category": "language",
+  "short_description": "Run a café where customers order in French — and faint dramatically if you get it wrong.",
+  "description": "Bienvenue! You run a café where every customer orders in French. Read (or listen to) the order and serve the right dish from the tray — bring the wrong thing and the customer faints with maximum drama. Levels ramp from single words (une pomme) to polite phrases (Je voudrais… s'il vous plaît) to tricky qualified orders (une glace à la fraise vs à la vanille). Every order's translation is revealed, and a 🔊 button speaks the French out loud. Teaches French vocabulary and listening, with first-try and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap the dish the customer ordered. Tap 🔊 to hear the order in French.",
+  "tags": [
+    "language",
+    "french",
+    "vocabulary",
+    "strand-vocabulary",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:cafe-francais"
+}

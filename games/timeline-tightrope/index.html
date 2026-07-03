@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Timeline Tightrope — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="history" data-seed="timeline-tightrope"></script>
+
+<style>
+  :root{
+    --bg1:#2a1a0c; --bg2:#3d2712; --bg3:#1c1108;
+    --card:#33220f; --line:#9a6e2e; --text:#fff4e0; --muted:#e8c890;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#2a1a0c;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .rope{display:flex;align-items:center;gap:4px;justify-content:center;font-size:20px;
+    background:#241608;border:2px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
+  .rope .step{opacity:.4;} .rope .step.done{opacity:1;}
+  .q{font-size:clamp(16px,3vw,21px);font-weight:800;text-align:center;margin:6px 0 14px;color:var(--muted);}
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:680px;margin:0 auto;}
+  .evt{cursor:pointer;border:3px solid #9a6e2e;font-family:inherit;font-weight:800;
+    padding:16px 12px;border-radius:18px;color:var(--text);background:#4a340f;
+    box-shadow:0 5px 0 rgba(0,0,0,.4);text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;}
+  .evt .ic{font-size:48px;line-height:1;}
+  .evt .nm{font-size:clamp(14px,2.7vw,18px);}
+  .evt .yr{font-size:13px;opacity:0;font-weight:800;color:var(--orange);}
+  .evt.reveal .yr{opacity:1;}
+  .evt:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.4);}
+  .evt.right{background:var(--green);border-color:var(--green);color:#2a1a0c;}
+  .evt.right .yr{color:#204010;}
+  .evt.wrong{background:var(--bad);border-color:var(--bad);color:#2a1a0c;}
+  .evt:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:17px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#2a1a0c;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#4a340f;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#b08840;}
+  @media (max-width:520px){ .cards{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>⏳ Timeline Tightrope</h1>
+      <p class="sub">Tick the Time Cat is walking a tightrope across history — help him step in the right
+        order! Look at the event cards and tap the one that happened <b id="modeWord">FIRST</b>.
+        One wrong step and he lands in the wrong century (he's fine, just embarrassed).</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 2–3<small>far apart in time</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 4<small>closer together</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 5<small>4 cards, tight dates</small></button>
+      </div>
+      <p class="sub">10 steps across time · streaks earn bonus seconds</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Step 1/10</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="rope" id="rope"></div>
+      <div class="q" id="qtext">Which happened FIRST?</div>
+      <div class="cards" id="cards"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">⏳</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Cross again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // year is approximate; negative = BCE. Kid-friendly, well-known events.
+  var EVENTS = [
+    { nm:'The first pyramids are built in Egypt', ic:'🔺', year:-2600 },
+    { nm:'Ancient Greeks hold the first Olympics', ic:'🏛️', year:-776 },
+    { nm:'The Great Wall of China is started', ic:'🧱', year:-700 },
+    { nm:'Roman gladiators fight in the Colosseum', ic:'🏟️', year:80 },
+    { nm:'The Vikings sail the seas', ic:'🛶', year:800 },
+    { nm:'Knights build stone castles', ic:'🏰', year:1100 },
+    { nm:'The printing press is invented', ic:'🖨️', year:1440 },
+    { nm:'Columbus sails across the ocean', ic:'⛵', year:1492 },
+    { nm:'The first steam train chugs along', ic:'🚂', year:1804 },
+    { nm:'The telephone is invented', ic:'☎️', year:1876 },
+    { nm:'The first cars hit the road', ic:'🚗', year:1886 },
+    { nm:'The Wright brothers fly the first plane', ic:'✈️', year:1903 },
+    { nm:'The Titanic sets sail', ic:'🚢', year:1912 },
+    { nm:'The first TV broadcasts appear', ic:'📺', year:1927 },
+    { nm:'Humans land on the Moon', ic:'🌕', year:1969 },
+    { nm:'The internet connects the world', ic:'🌐', year:1983 },
+    { nm:'The first smartphone touchscreen', ic:'📱', year:2007 },
+    { nm:'Dinosaurs roam the Earth', ic:'🦕', year:-100000000 },
+    { nm:'The first humans paint cave walls', ic:'🖼️', year:-40000 },
+    { nm:'Electric light bulbs glow', ic:'💡', year:1879 }
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  // nCards + minGap = how many events shown and how far apart in years.
+  var GRADES = [
+    { id: 2, label: 'Grade 2–3', nCards: 2, minGap: 300 },
+    { id: 4, label: 'Grade 4',   nCards: 3, minGap: 60 },
+    { id: 5, label: 'Grade 5',   nCards: 4, minGap: 15 }
+  ];
+  var ROUNDS = 10;
+
+  var CHEER = ['Perfect step! Tick struts across the rope. 🐱✨', 'Historically accurate! 📜✅',
+               'Time-travel genius! ⏳', 'The history books applaud. 📚👏'];
+  var OOPS  = ['Wrong century! Tick wobbles dramatically. 🙀', 'Oops — that\'s out of order in time. ⏰',
+               'Tick lands in the wrong era. He\'s fine, just confused. 🐱❓', 'History says otherwise! 📖'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var current = null, askFirst = true;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+  function yrText(y){ return y < 0 ? Math.abs(y).toLocaleString() + ' BCE' : y + ' CE'; }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function tick(){ tone(900,.1,'sine',1300); }
+  function wobble(){ tone(240,.35,'sawtooth',90); }
+
+  function makeQuestion() {
+    // pick nCards events with sufficient gaps between sorted years
+    for (var attempt = 0; attempt < 80; attempt++) {
+      var chosen = shuffle(EVENTS).slice(0, grade.nCards);
+      var sorted = chosen.slice().sort(function (a, b) { return a.year - b.year; });
+      var okGap = true;
+      for (var i = 1; i < sorted.length; i++) {
+        if (Math.abs(sorted[i].year - sorted[i-1].year) < grade.minGap) { okGap = false; break; }
+      }
+      if (okGap) {
+        askFirst = Math.random() < 0.6;
+        var target = askFirst ? sorted[0] : sorted[sorted.length - 1];
+        return { cards: shuffle(chosen), answer: target };
+      }
+    }
+    var c = shuffle(EVENTS).slice(0, grade.nCards);
+    var s = c.slice().sort(function (a, b) { return a.year - b.year; });
+    askFirst = true;
+    return { cards: c, answer: s[0] };
+  }
+
+  function drawRope() {
+    var el = $('rope'), html = '';
+    for (var i = 0; i < ROUNDS; i++) {
+      if (i === q) html += '<span class="step done">🐱</span>';
+      else if (i < q) html += '<span class="step done">🐾</span>';
+      else html += '<span class="step">·</span>';
+    }
+    el.innerHTML = html;
+  }
+
+  function newQuestion() {
+    answered = false;
+    current = makeQuestion();
+    $('roundLbl').textContent = 'Step ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    drawRope();
+    $('qtext').textContent = askFirst ? 'Which happened FIRST (longest ago)?' : 'Which happened MOST RECENTLY?';
+    var box = $('cards'); box.innerHTML = '';
+    current.cards.forEach(function (ev) {
+      var b = document.createElement('button');
+      b.className = 'evt'; b.dataset.nm = ev.nm;
+      b.innerHTML = '<span class="ic">' + ev.ic + '</span><span class="nm">' + ev.nm +
+        '</span><span class="yr">' + yrText(ev.year) + '</span>';
+      b.addEventListener('click', function(){ choose(b, ev); });
+      box.appendChild(b);
+    });
+    EduSDK.startLesson(q + 1, { askFirst: askFirst, cards: current.cards.length });
+  }
+
+  function choose(btn, ev) {
+    if (answered) return;
+    answered = true;
+    Array.prototype.forEach.call(document.querySelectorAll('.evt'), function(b){
+      b.disabled = true; b.classList.add('reveal');
+      if (b.dataset.nm === current.answer.nm) b.classList.add('right');
+    });
+    var correct = ev.nm === current.answer.nm;
+    if (correct) {
+      streak++; nCorrect++;
+      var pts = 100 + streak * 15;
+      score += pts;
+      $('scoreVal').textContent = score;
+      tick();
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      btn.classList.add('wrong');
+      wobble();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' ' + current.answer.nm + ' — ' + yrText(current.answer.year) + '.';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 2100);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 2100);
+    } else setTimeout(newQuestion, 2100);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 8 ? '⏳🏆' : nCorrect >= 5 ? '⏳🐱' : '🐱❓';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' steps in order. ' +
+      (nCorrect >= 8 ? 'Master of the timeline! Tick names a star after you.' :
+       nCorrect >= 5 ? 'Good crossing — Tick slipped a couple of centuries but recovered.' :
+       'History is a wobbly rope. Practice the order and try again!');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'timeline-tightrope' });
+})();
+</script>
+</body>
+</html>

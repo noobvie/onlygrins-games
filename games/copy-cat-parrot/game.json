@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "copy-cat-parrot",
+  "title": "Copy-Cat Parrot",
+  "category": "memory",
+  "short_description": "Pablo the Parrot shows off a dance — watch the moves light up, then copy them back in order. Each round adds one more move.",
+  "description": "Pablo the Parrot LOVES to show off his dance moves! Watch the sequence light up, then copy it back in the exact same order — and each round he sneaks in one more move. It's a classic Simon-style workout for working memory and concentration, with cheerful sounds and a wiggling parrot. Grade bands ramp from four moves at a gentle pace, to a quicker four-move tempo, to six speedy moves for grade 4–5. A free online memory and concentration game for kids in grades 1–5, with every copied move feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Watch the moves light up, then tap them in the same order. Sound optional.",
+  "tags": [
+    "memory",
+    "working-memory",
+    "sequence",
+    "concentration",
+    "strand-sequence-memory",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:copy-cat-parrot"
+}

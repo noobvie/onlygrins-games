@@ -1,0 +1,31 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "remainder-reindeer",
+  "title": "Remainder Reindeer",
+  "category": "math",
+  "short_description": "Share sled cargo evenly among reindeer — the leftovers always go to Kevin, the greediest reindeer, and he gets smugger every time.",
+  "description": "The sled won't fly unless the cargo is shared fairly! Divide crates of snacks among the reindeer team and work out how many each one gets — and how many are LEFT OVER, because leftovers always go to Kevin, the greediest reindeer in the Arctic, who gets visibly smugger with every crate. Divide wrong and the sled tips over mid-takeoff. Grade bands ramp from sharing with the 2, 5 and 10 times tables, to division with remainders, to bigger dividends and trickier divisors under time pressure. A free online division and remainders game for kids in grades 2–5, with speed and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap the right answer before the sled-launch timer runs out.",
+  "tags": [
+    "math",
+    "division",
+    "remainders",
+    "strand-number",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:remainder-reindeer"
+}

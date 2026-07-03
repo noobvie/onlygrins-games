@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Froggy French Phrases — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="language" data-seed="froggy-french"></script>
+
+<style>
+  :root{
+    --bg1:#13204a; --bg2:#1a1140; --bg3:#0c2a3a;
+    --card:#141c3f; --line:#2b3a77; --text:#eaf2ff; --muted:#9fb4e0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ff8a5c; --bad:#ff6b81;
+    --pond:#123c6b;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(920px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--green),var(--blue),var(--purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:20px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:16px 22px;border-radius:16px;color:#06122a;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .flies{font-size:18px;}
+  .top .score{color:var(--green);font-size:20px;}
+
+  .pond{position:relative;background:linear-gradient(180deg,#0e2c50,var(--pond));
+    border:2px solid var(--line);border-radius:16px;height:96px;margin:6px 0 12px;overflow:hidden;}
+  .pads{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;}
+  .pad{font-size:30px;opacity:.55;}
+  .pad.done{opacity:1;}
+  .froggy{position:absolute;bottom:26px;font-size:38px;transition:left .6s cubic-bezier(.3,1.5,.5,1);
+    transform:translateX(-50%);z-index:2;}
+  .froggy.splash{animation:splash .8s ease;}
+  @keyframes splash{0%{transform:translateX(-50%) translateY(0)}45%{transform:translateX(-50%) translateY(34px) rotate(50deg)}70%{transform:translateX(-50%) translateY(30px) rotate(45deg)}100%{transform:translateX(-50%) translateY(0)}}
+  .splashFx{position:absolute;bottom:10px;font-size:26px;opacity:0;transform:translateX(-50%);}
+  .splashFx.go{animation:fx .8s ease;}
+  @keyframes fx{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+
+  .ask{background:#0d1533;border:2px solid var(--line);border-radius:16px;padding:14px 18px;
+    text-align:center;margin:0 0 12px;}
+  .ask .en{font-size:clamp(18px,3.4vw,28px);font-weight:800;color:var(--orange);}
+  .ask .hint{color:var(--muted);font-size:13px;font-weight:600;margin-top:2px;}
+  .lilies{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+  .lily{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:clamp(15px,2.6vw,19px);
+    padding:16px 20px;border-radius:50px;color:#06301c;background:radial-gradient(circle at 40% 30%,#7ef2ad,#2fae66);
+    border:3px solid #1d7a45;box-shadow:0 5px 0 rgba(0,0,0,.35);max-width:100%;}
+  .lily:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .lily.right{background:radial-gradient(circle at 40% 30%,#b9ffd6,#3ee87a);border-color:var(--green);}
+  .lily.wrong{background:radial-gradient(circle at 40% 30%,#ffb9c4,#e5566d);border-color:var(--bad);color:#3a0a12;}
+  .lily:disabled{cursor:default;}
+
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:8px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#06122a;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#22305f;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#5f74a8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🐸 Froggy French Phrases</h1>
+      <p class="sub">Gaston the frog wants to cross the pond, but the lily pads only hold him
+        if he says the <b>right French</b>. Pick the correct translation to hop forward —
+        pick wrong and… SPLOOSH. Gaston is a strong swimmer. His dignity is not.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Débutant<small>hello, colours, numbers</small></button>
+        <button class="gradeBtn g2" data-grade="1">Intermédiaire<small>animals, school, days</small></button>
+        <button class="gradeBtn g3" data-grade="2">Avancé<small>whole phrases</small></button>
+      </div>
+      <p class="sub">10 lily pads to cross · 3 splashes and Gaston goes home to sulk</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Pad 1/10</span>
+        <span class="spacer"></span>
+        <span class="flies" id="fliesLbl">🪰🪰🪰</span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="pond" id="pond">
+        <div class="pads" id="pads"></div>
+        <div class="froggy" id="froggy">🐸</div>
+        <div class="splashFx" id="splashFx">💦💦</div>
+      </div>
+      <div class="ask">
+        <div class="en" id="askEn">“hello”</div>
+        <div class="hint">how does Gaston say it in French?</div>
+      </div>
+      <div class="lilies" id="lilies"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🐸🏆</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Hop again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change level</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // [french, english] pairs per level. Distractors come from the same pool.
+  var GRADES = [
+    { id: 1, label: 'Débutant', opts: 3, pairs: [
+      ['bonjour','hello'], ['au revoir','goodbye'], ['merci','thank you'],
+      ['oui','yes'], ['non','no'], ['s’il vous plaît','please'],
+      ['rouge','red'], ['bleu','blue'], ['vert','green'], ['jaune','yellow'],
+      ['un','one'], ['deux','two'], ['trois','three'], ['quatre','four'],
+      ['le chat','the cat'], ['le chien','the dog']
+    ]},
+    { id: 3, label: 'Intermédiaire', opts: 3, pairs: [
+      ['la grenouille','the frog'], ['l’oiseau','the bird'], ['le poisson','the fish'],
+      ['la maison','the house'], ['l’école','the school'], ['le livre','the book'],
+      ['l’eau','the water'], ['le soleil','the sun'], ['la lune','the moon'],
+      ['le frère','the brother'], ['la sœur','the sister'], ['la famille','the family'],
+      ['lundi','Monday'], ['samedi','Saturday'], ['aujourd’hui','today'], ['demain','tomorrow']
+    ]},
+    { id: 4, label: 'Avancé', opts: 4, pairs: [
+      ['je mange','I eat'], ['tu chantes','you sing'], ['nous jouons','we play'],
+      ['il pleut','it is raining'], ['il fait beau','the weather is nice'],
+      ['j’ai faim','I am hungry'], ['je suis fatigué','I am tired'],
+      ['je ne sais pas','I don’t know'], ['c’est délicieux','it is delicious'],
+      ['bonne nuit','good night'], ['comment ça va ?','how are you?'],
+      ['à demain','see you tomorrow'], ['je parle français','I speak French'],
+      ['où est le chat ?','where is the cat?'], ['j’adore les frites','I love fries']
+    ]}
+  ];
+  var ROUNDS = 10;
+
+  var SPLASH_LINES = [
+    'SPLOOSH! Gaston belly-flopped. The fish are applauding. 🐟👏',
+    'SPLASH! “Zut alors !” gurgles Gaston.',
+    'KERSPLOOSH! A duck is now wearing Gaston as a hat. 🦆',
+    'PLOUF ! (That is French for sploosh. Even the splash is bilingual.)'
+  ];
+  var HOP_LINES = [
+    'BOING! Perfect French, perfect hop! 🎉',
+    'Magnifique ! The lily pad is honored!',
+    'Gaston hops with the confidence of a thousand baguettes!',
+    'Très bien ! Even the dragonflies are impressed!'
+  ];
+
+  var grade = GRADES[0], round = 0, score = 0, flies = 3, streak = 0;
+  var deck = [], current = null, locked = false;
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // --- sound effects (Web Audio, no assets) ---
+  var _sAC = window.AudioContext || window.webkitAudioContext, _sac = null;
+  function _sfx(f, d, type, slide, when) { try { _sac = _sac || new _sAC();
+    var t = _sac.currentTime + (when || 0), o = _sac.createOscillator(), g = _sac.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + d);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.14, t + .012);
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(_sac.destination); o.start(t); o.stop(t + d + .03);
+  } catch (e) {} }
+  function sfxGood() { _sfx(523, .13, 'triangle'); _sfx(784, .17, 'triangle', 0, .1); }
+  function sfxBad() { _sfx(196, .3, 'sawtooth', 90); }
+  function sfxWin() { [523, 659, 784, 1047].forEach(function (f, i) { _sfx(f, .2, 'triangle', 0, i * .12); }); }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;} return a; }
+
+  function speakFrench(text) {
+    try {
+      if (!window.speechSynthesis) return;
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text.replace(/[?!.]/g,''));
+      u.lang = 'fr-FR'; u.rate = 0.9;
+      var fr = speechSynthesis.getVoices().filter(function (v) { return v.lang && v.lang.indexOf('fr') === 0; })[0];
+      if (fr) u.voice = fr;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  function renderPond() {
+    var pads = $('pads'); pads.innerHTML = '';
+    for (var i = 0; i <= ROUNDS; i++) {
+      var p = document.createElement('span');
+      p.className = 'pad' + (i <= round ? ' done' : '');
+      p.textContent = i === ROUNDS ? '🏝️' : '🪷';
+      pads.appendChild(p);
+    }
+    $('froggy').style.left = (4 + (round / ROUNDS) * 90) + '%';
+  }
+
+  function renderFlies() {
+    $('fliesLbl').textContent = '🪰'.repeat(flies) + '▫️'.repeat(3 - flies);
+  }
+
+  function newRound() {
+    locked = false;
+    current = deck[round];
+    $('roundLbl').textContent = 'Pad ' + (round + 1) + '/' + ROUNDS;
+    $('askEn').textContent = '“' + current[1] + '”';
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    renderPond();
+
+    var options = [current];
+    var pool = grade.pairs.filter(function (p) { return p[0] !== current[0]; });
+    shuffle(pool).slice(0, grade.opts - 1).forEach(function (p) { options.push(p); });
+    options = shuffle(options);
+
+    var box = $('lilies'); box.innerHTML = '';
+    options.forEach(function (p) {
+      var b = document.createElement('button');
+      b.className = 'lily'; b.textContent = p[0];
+      b.addEventListener('click', function () { hop(p, b); });
+      box.appendChild(b);
+    });
+    EduSDK.startLesson(round + 1, { english: current[1] });
+  }
+
+  function hop(p, btn) {
+    if (locked) return;
+    if (p[0] === current[0]) {
+      locked = true;
+      streak++;
+      var pts = 100 + streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      btn.classList.add('right');
+      sfxGood();
+      Array.prototype.forEach.call(document.querySelectorAll('.lily'), function (l) { l.disabled = true; });
+      speakFrench(current[0]);
+      $('toast').textContent = pick(HOP_LINES) + '  +' + pts;
+      $('toast').className = 'toast good';
+      round++;
+      renderPond();
+      EduSDK.finishLesson(round, { correct: true });
+      if (round >= ROUNDS) return setTimeout(finish, 1600);
+      if (round === Math.floor(ROUNDS / 2)) {
+        setTimeout(function(){ EduSDK.adBreak('interlevel').then(newRound); }, 1600);
+      } else setTimeout(newRound, 1600);
+    } else {
+      streak = 0;
+      flies--;
+      renderFlies();
+      btn.classList.add('wrong');
+      btn.disabled = true;
+      $('froggy').classList.add('splash');
+      sfxBad();
+      var fx = $('splashFx');
+      fx.style.left = $('froggy').style.left;
+      fx.classList.add('go');
+      $('card').classList.add('shake');
+      $('toast').textContent = pick(SPLASH_LINES) + '  (“' + p[0] + '” means “' + p[1] + '”)';
+      $('toast').className = 'toast bad';
+      setTimeout(function () {
+        $('froggy').classList.remove('splash');
+        fx.classList.remove('go');
+        $('card').classList.remove('shake');
+      }, 850);
+      EduSDK.retryLesson(round + 1, { picked: p[0], wanted: current[0] });
+      if (flies <= 0) {
+        locked = true;
+        EduSDK.finishLesson(round + 1, { correct: false });
+        setTimeout(finish, 1200);
+      }
+    }
+  }
+
+  function finish() {
+    sfxWin();
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    var crossed = round >= ROUNDS;
+    $('finalEmoji').textContent = crossed ? '🐸🏆' : '🐸💦';
+    $('finalLine').textContent = crossed
+      ? grade.label + ' — Gaston crossed the whole pond! He is telling every tadpole about it. In French.'
+      : grade.label + ' — Gaston ran out of flies at pad ' + (round + 1) + ' and swam home to sulk. Très dramatique.';
+    EduSDK.submitScore(score, { grade: grade.id, pads: round, crossed: crossed })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; round = 0; score = 0; flies = 3; streak = 0;
+    deck = shuffle(grade.pairs).slice(0, ROUNDS);
+    $('scoreVal').textContent = '0';
+    renderFlies();
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newRound();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'froggy-french' });
+})();
+</script>
+</body>
+</html>

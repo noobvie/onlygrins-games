@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#13204a"/><stop offset=".5" stop-color="#1a1140"/><stop offset="1" stop-color="#0c2a3a"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff8a5c"/><stop offset=".5" stop-color="#ff6b81"/><stop offset="1" stop-color="#c77dff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- erupting volcano -->
+  <text x="200" y="330" font-size="170" text-anchor="middle">🌋</text>
+  <g font-size="40">
+    <text x="120" y="140">💥</text><text x="230" y="100">🔥</text><text x="300" y="160">💥</text>
+  </g>
+  <text x="360" y="120" font-size="30" font-weight="800" fill="#ff6b81" transform="rotate(-6 360 120)">PTOOEY!</text>
+  <!-- monsters -->
+  <g text-anchor="middle">
+    <rect x="430" y="200" width="150" height="150" rx="20" fill="#0d1533" stroke="#2b3a77" stroke-width="4"/>
+    <text x="505" y="290" font-size="64">🦖</text>
+    <text x="505" y="332" font-size="17" font-weight="800" fill="#5ad8ff">LIVING</text>
+    <rect x="600" y="200" width="150" height="150" rx="20" fill="#0d1533" stroke="#2b3a77" stroke-width="4"/>
+    <text x="675" y="290" font-size="64">🗿</text>
+    <text x="675" y="332" font-size="17" font-weight="800" fill="#5ad8ff">NON-LIVING</text>
+  </g>
+  <!-- flying item -->
+  <text x="590" y="140" font-size="60" text-anchor="middle" transform="rotate(15 590 140)">🐌</text>
+  <text x="660" y="110" font-size="24" font-weight="800" fill="#9fb4e0">who eats this?</text>
+  <text x="480" y="490" fill="url(#ttl)" font-size="58" font-weight="800" text-anchor="middle">Don't Feed the Lava</text>
+</svg>

@@ -225,6 +225,45 @@ for every new educational game.
 > an optional `"grades": [1,5]` to the manifest schema and have `games:sync` map
 > it into `tags` — but tags are sufficient today, no schema/app change required.
 
+### 5.2 SEO & metadata standard (per game)
+
+**Where SEO actually happens:** the platform's public `/play/<slug>` page. The
+app builds JSON-LD (`VideoGame` + breadcrumbs — `app/Services/JsonLdService.php`)
+and the Open Graph social card (`app/Services/SocialMetaService.php`) from the
+`games` DB row — i.e. from this repo's `game.json` via `games:sync`. The game's
+own `index.html` is iframe content and is **not** the indexed surface. Hence:
+
+1. **`noindex` the raw game file (required).** Every game `index.html` (and the
+   starter template) must carry, right after the viewport meta:
+   ```html
+   <meta name="robots" content="noindex" />
+   ```
+   The raw files are publicly reachable at
+   `/storage/uploads/games/html5/<slug>/index.html` and would otherwise be
+   indexed as thin, chrome-less duplicates competing with `/play/<slug>`.
+2. **Write `description` / `short_description` as search snippets.** They become
+   the meta description and JSON-LD description of the public game page. Name
+   the subject, skill and grade range in natural language ("free online French
+   vocabulary game for kids in grades 1–5 …"), lead with what the player does,
+   keep `short_description` ≲ 160 chars. `tags` feed the platform's indexable
+   tag pages — include subject, strand and grade tags.
+3. **`thumbnail.png` is required (960×540, 16:9).** `og:image` must be PNG/JPG —
+   social crawlers (Facebook/X/Discord) do not render SVG, and `games:sync`
+   points every platform image size at this one file. Keep `thumbnail.svg` as
+   the editable source and export the PNG:
+   ```
+   chrome --headless=new --disable-gpu --window-size=960,540 --hide-scrollbars \
+     --screenshot=games/<slug>/thumbnail.png  file:///…/games/<slug>/thumbnail.svg
+   ```
+   `game.json` must reference it: `"thumbnail": "thumbnail.png"`.
+4. **Language attributes:** page `lang="en"`; wrap foreign-language vocabulary
+   (e.g. the French games) in `lang="fr"` spans — mainly a screen-reader /
+   pronunciation win, minor SEO.
+
+**Do not** add per-game OG tags, JSON-LD, sitemaps or meta descriptions inside
+game files — search engines will always prefer the platform page; it's
+duplicated effort and extra standardization surface.
+
 ---
 
 ## 6. `games:sync` artisan command (lives in the OnlyGrins overlay, vendor-safe)
@@ -442,7 +481,11 @@ never random pairing of minors — and only if it becomes a real product goal.
       `deploy/deploy-games.sh`, and `deploy/games-manifest.schema.json`.
 - [x] Author game #1 (Grin Coin Counter) end-to-end — `games/grin-coin-counter/`,
       scaffolded via `new-game.sh`, validates clean.
-- [ ] Add a `thumbnail.png` (16:9) to each game for catalog art (optional).
+- [x] Add a `thumbnail.png` (960×540, 16:9) to each game — exported from each
+      game's `thumbnail.svg` via headless Chrome; `game.json` now references the
+      PNG (required by the SEO standard, §5.2).
+- [ ] Add `tools/sync-sdk.sh` (re-stamp bundled `edu-sdk.js` from the master)
+      and a hash-compare in `validate.sh` so bundled copies can't drift (§12.2).
 - [ ] Decide repo remote (GitHub `noobvie/onlygrins-games`?) + CI to run
       `validate.sh` on push.
 - [ ] Commit + push `GamesSyncCommand.php` to the `onlygrins` repo's
@@ -462,3 +505,47 @@ never random pairing of minors — and only if it becomes a real product goal.
   command.
 - **Familiar:** same git-repo → bash-pull → sync-to-server-dir pattern as the
   Grin-Node-Toolkit.
+
+---
+
+## 12. Standards checklist for every new game (scale rules)
+
+Every new game MUST follow these; they exist so the catalog stays uniform as it
+grows across topics and tech. `tools/validate.sh` enforces the mechanical ones.
+
+1. **Scaffold, don't hand-roll.** `bash tools/new-game.sh <slug> "Title"` from
+   `templates/starter-game/` — folder is self-contained (§4): `index.html`,
+   bundled `edu-sdk.js`, `game.json`, `thumbnail.svg` + `thumbnail.png`.
+2. **`edu-sdk.js` never forks.** The bundled copy must stay byte-identical to
+   the master `shared/edu-sdk.js`. Fix bugs in the master, then re-stamp every
+   game's copy (planned: `tools/sync-sdk.sh` + a hash check in `validate.sh` —
+   see §10). Never patch one game's copy in place.
+3. **`import_id` = `edu:<slug>`, and the `edu:` prefix is load-bearing forever.**
+   It is the idempotency/ownership key that protects operator-uploaded games
+   from `games:sync`. Even if the catalog expands beyond education, `edu:`
+   means "owned by this repo's pipeline" — never rename it (renaming orphans
+   every synced row and its scores).
+4. **One subject category; honest grade tags.** `category` = exactly one subject
+   slug (`math`, `language`, `science`; new subjects are fine — `games:sync`
+   auto-creates them). Grade tags (`grade-1`…`grade-5`) must reflect the range
+   the in-game grade picker *actually* supports — don't blanket-tag all five or
+   the grade filter carries no information.
+5. **One game per concept; grade picked inside the game** (§5.1). Pass
+   `extra.grade` (and `extra.mode` if there's a race/solo toggle) to `saveScore`.
+6. **SEO standard (§5.2):** `noindex` meta in `index.html`, snippet-quality
+   descriptions in `game.json`, `thumbnail.png` 960×540 referenced from the
+   manifest.
+7. **Game families — reuse the engine, rewrite only the content.** Most quiz /
+   drag-and-drop games are the same engine reskinned. When authoring a sibling
+   of an existing game, copy that game as the engine and isolate topic content
+   (word lists, question banks) in one clearly-marked data block or `data.json`
+   — a new topic should be a content edit, not new code.
+8. **Other tech is welcome, same contract.** The platform contract is just
+   "files in `games/<slug>/` with `index.html` at the root". Phaser/Kaboom/Godot
+   HTML5 exports work unchanged — commit the *built output* into the game
+   folder; keep sources/build chains out of this repo (or in an untracked
+   sibling). No npm build step in the pipeline.
+9. **Competitive play = tunable AI bot, never live matchmaking of minors**
+   (§9.1). Knobs: `speed`, `react`, `mistake`.
+10. **Ship gate:** `bash tools/validate.sh` clean before commit; test via
+    `tools/dev-serve.sh` (Tier 1) and, when it matters, STAGING deploy (Tier 2).

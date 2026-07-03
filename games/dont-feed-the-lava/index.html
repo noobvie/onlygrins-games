@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Don't Feed the Lava — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="science" data-seed="dont-feed-the-lava"></script>
+
+<style>
+  :root{
+    --bg1:#13204a; --bg2:#1a1140; --bg3:#0c2a3a;
+    --card:#141c3f; --line:#2b3a77; --text:#eaf2ff; --muted:#9fb4e0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ff8a5c; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(920px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--bad),var(--purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:20px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:16px 22px;border-radius:16px;color:#06122a;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .lives{font-size:18px;}
+  .top .score{color:var(--green);font-size:20px;}
+
+  .itemBox{display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0 14px;}
+  .item{font-size:clamp(56px,11vw,90px);line-height:1.1;filter:drop-shadow(0 8px 14px rgba(0,0,0,.5));
+    transition:transform .3s;}
+  .item.fly{animation:fly .6s ease;}
+  @keyframes fly{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-60px) scale(.8) rotate(20deg)}100%{transform:translateY(0) scale(1)}}
+  .itemName{font-weight:800;font-size:clamp(17px,3vw,24px);}
+  .prompt{color:var(--muted);font-weight:700;}
+
+  .monsters{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+  .monster{cursor:pointer;border:none;font-family:inherit;font-weight:800;
+    background:#0d1533;border:3px solid var(--line);border-radius:20px;padding:14px 18px;
+    color:var(--text);min-width:150px;box-shadow:0 6px 0 rgba(0,0,0,.35);transition:.12s;}
+  .monster:hover{border-color:var(--blue);transform:translateY(-2px);}
+  .monster:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .monster .face{font-size:46px;display:block;}
+  .monster .lbl{font-size:16px;color:var(--blue);}
+  .monster.chomp{animation:chomp .5s ease;border-color:var(--green);}
+  @keyframes chomp{0%,100%{transform:scale(1)}40%{transform:scale(1.18) rotate(-4deg)}70%{transform:scale(.94)}}
+
+  .lava{margin:10px auto 0;text-align:center;}
+  .lava .volcano{font-size:52px;display:inline-block;transition:transform .2s;}
+  .lava.erupt .volcano{animation:erupt .7s ease;}
+  @keyframes erupt{0%{transform:scale(1)}30%{transform:scale(1.5) translateY(-14px)}60%{transform:scale(1.2) rotate(6deg)}100%{transform:scale(1)}}
+  .lavaLine{min-height:24px;font-weight:800;color:var(--bad);}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:18px;margin-top:6px;}
+  .toast.good{color:var(--green);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#06122a;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#22305f;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#5f74a8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🌋 Don't Feed the Lava</h1>
+      <p class="sub">The sorting monsters are hungry — each one only eats ONE kind of thing.
+        Feed the right monster and it does a happy chomp. Feed the wrong one and the
+        <b>Lava Monster erupts</b> and spits it back over everyone. He's so dramatic.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>living vs non-living</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>solid · liquid · gas</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>mammal · bird · reptile</small></button>
+      </div>
+      <p class="sub">12 items · 3 eruptions and the volcano wins</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Item 1/12</span>
+        <span class="spacer"></span>
+        <span class="lives" id="livesLbl">❤️❤️❤️</span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="itemBox">
+        <div class="prompt">Who eats this?</div>
+        <div class="item" id="item">🐶</div>
+        <div class="itemName" id="itemName">dog</div>
+      </div>
+      <div class="monsters" id="monsters"></div>
+      <div class="lava" id="lava">
+        <span class="volcano">🌋</span>
+        <div class="lavaLine" id="lavaLine"></div>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🌋</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Play again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Each grade: monster buckets + items tagged with their bucket.
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', buckets: [
+        { key: 'living',    face: '🦖', lbl: 'LIVING things' },
+        { key: 'nonliving', face: '🗿', lbl: 'NON-LIVING things' }
+      ],
+      items: [
+        ['🐶','dog','living'],['🌳','tree','living'],['🌸','flower','living'],['🐟','fish','living'],
+        ['🦋','butterfly','living'],['🍄','mushroom','living'],['🐌','snail','living'],['🌵','cactus','living'],
+        ['🪨','rock','nonliving'],['🚗','car','nonliving'],['🥄','spoon','nonliving'],['🧸','teddy bear','nonliving'],
+        ['📱','phone','nonliving'],['🎈','balloon','nonliving'],['⚽','football','nonliving'],['🕶️','sunglasses','nonliving']
+      ]},
+    { id: 3, label: 'Grade 3', buckets: [
+        { key: 'solid',  face: '🧌', lbl: 'SOLIDS' },
+        { key: 'liquid', face: '🐙', lbl: 'LIQUIDS' },
+        { key: 'gas',    face: '👻', lbl: 'GASES' }
+      ],
+      items: [
+        ['🧊','ice cube','solid'],['🪨','rock','solid'],['📚','book','solid'],['🧱','brick','solid'],['🍎','apple','solid'],
+        ['💧','water','liquid'],['🥛','milk','liquid'],['🧃','juice','liquid'],['🍯','honey','liquid'],['🌊','sea water','liquid'],
+        ['💨','air','gas'],['♨️','steam','gas'],['🎈','helium (in a balloon)','gas'],['🫧','the air in bubbles','gas'],['🔥','smoke from a fire','gas']
+      ]},
+    { id: 4, label: 'Grade 4–5', buckets: [
+        { key: 'mammal',  face: '🦁', lbl: 'MAMMALS' },
+        { key: 'bird',    face: '🦤', lbl: 'BIRDS' },
+        { key: 'reptile', face: '🐲', lbl: 'REPTILES' }
+      ],
+      items: [
+        ['🐶','dog','mammal'],['🐘','elephant','mammal'],['🐋','whale','mammal'],['🦇','bat','mammal'],['🦭','seal','mammal'],['🐬','dolphin','mammal'],
+        ['🦅','eagle','bird'],['🐧','penguin','bird'],['🦆','duck','bird'],['🦉','owl','bird'],['🐔','chicken','bird'],
+        ['🐍','snake','reptile'],['🐢','turtle','reptile'],['🦎','lizard','reptile'],['🐊','crocodile','reptile']
+      ]}
+  ];
+  var ROUNDS = 12;
+
+  var SPIT_LINES = [
+    'PTOOEY! The Lava Monster spat it back! 🌋💥',
+    'BLEGH! “WRONG FLAVOUR!” screams the volcano.',
+    'The Lava Monster erupted. Everyone is covered in soot. Again.',
+    'SPLAT! It bounced off three monsters and a cloud.',
+    '“I AM A VOLCANO, NOT A BIN!” — the Lava Monster, just now.'
+  ];
+  var CHOMP_LINES = [
+    'CHOMP! Delicious and scientifically correct! ✨',
+    'NOM NOM. The monster gives you a thumbs up. It has no thumbs. Impressive.',
+    'GULP! Sorted like a pro!',
+    'The monster purrs. Monsters can purr. Who knew!'
+  ];
+  var GOTCHAS = {
+    'whale': 'Yes! A whale is a MAMMAL — it breathes air and feeds its babies milk! 🐋',
+    'bat': 'Yes! A bat is a MAMMAL — the only one that truly flies! 🦇',
+    'penguin': 'Yes! A penguin is a BIRD — feathers and a beak, even if it can\'t fly! 🐧',
+    'dolphin': 'Yes! A dolphin is a MAMMAL, not a fish! 🐬',
+    'mushroom': 'Yes! A mushroom is LIVING — it grows! (It\'s a fungus, not a plant!) 🍄'
+  };
+
+  var grade = GRADES[0], round = 0, score = 0, lives = 3, streak = 0;
+  var deck = [], current = null, locked = false;
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // --- sound effects (Web Audio, no assets) ---
+  var _sAC = window.AudioContext || window.webkitAudioContext, _sac = null;
+  function _sfx(f, d, type, slide, when) { try { _sac = _sac || new _sAC();
+    var t = _sac.currentTime + (when || 0), o = _sac.createOscillator(), g = _sac.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + d);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.14, t + .012);
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(_sac.destination); o.start(t); o.stop(t + d + .03);
+  } catch (e) {} }
+  function sfxGood() { _sfx(523, .13, 'triangle'); _sfx(784, .17, 'triangle', 0, .1); }
+  function sfxBad() { _sfx(196, .3, 'sawtooth', 90); }
+  function sfxWin() { [523, 659, 784, 1047].forEach(function (f, i) { _sfx(f, .2, 'triangle', 0, i * .12); }); }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;} return a; }
+
+  function renderMonsters() {
+    var box = $('monsters'); box.innerHTML = '';
+    grade.buckets.forEach(function (bk) {
+      var b = document.createElement('button');
+      b.className = 'monster';
+      b.innerHTML = '<span class="face">' + bk.face + '</span><span class="lbl">' + bk.lbl + '</span>';
+      b.addEventListener('click', function () { feed(bk, b); });
+      box.appendChild(b);
+    });
+  }
+
+  function renderLives() {
+    $('livesLbl').textContent = '❤️'.repeat(lives) + '🖤'.repeat(3 - lives);
+  }
+
+  function newRound() {
+    locked = false;
+    current = deck[round];
+    $('roundLbl').textContent = 'Item ' + (round + 1) + '/' + ROUNDS;
+    $('item').textContent = current[0];
+    $('item').className = 'item fly';
+    $('itemName').textContent = current[1];
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('lavaLine').textContent = '';
+    EduSDK.startLesson(round + 1, { item: current[1] });
+  }
+
+  function feed(bucket, btn) {
+    if (locked) return;
+    if (bucket.key === current[2]) {
+      locked = true;
+      streak++;
+      var pts = 100 + streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      btn.classList.add('chomp');
+      sfxGood();
+      var line = GOTCHAS[current[1]] || pick(CHOMP_LINES);
+      $('toast').textContent = line + '  +' + pts;
+      $('toast').className = 'toast good';
+      EduSDK.finishLesson(round + 1, { correct: true, item: current[1] });
+      setTimeout(function () {
+        btn.classList.remove('chomp');
+        next();
+      }, GOTCHAS[current[1]] ? 2200 : 1300);
+    } else {
+      streak = 0;
+      lives--;
+      renderLives();
+      $('lava').classList.add('erupt');
+      sfxBad();
+      $('card').classList.add('shake');
+      $('lavaLine').textContent = pick(SPIT_LINES);
+      EduSDK.retryLesson(round + 1, { item: current[1], fed: bucket.key });
+      setTimeout(function () {
+        $('lava').classList.remove('erupt');
+        $('card').classList.remove('shake');
+      }, 700);
+      if (lives <= 0) {
+        locked = true;
+        EduSDK.finishLesson(round + 1, { correct: false });
+        setTimeout(finish, 1200);
+      }
+    }
+  }
+
+  function next() {
+    round++;
+    if (round >= ROUNDS) return finish();
+    if (round === Math.floor(ROUNDS / 2)) {
+      EduSDK.adBreak('interlevel').then(newRound);
+    } else newRound();
+  }
+
+  function finish() {
+    sfxWin();
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = lives > 0 ? '🦖🎉' : '🌋😤';
+    $('finalLine').textContent = lives > 0
+      ? grade.label + ' — the monsters are full and the Lava Monster only erupted ' + (3 - lives) + ' time(s). A quiet day!'
+      : grade.label + ' — the Lava Monster erupted three times and is now doing a victory rumble.';
+    EduSDK.submitScore(score, { grade: grade.id, lives: lives })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; round = 0; score = 0; lives = 3; streak = 0;
+    deck = shuffle(grade.items).slice(0, ROUNDS);
+    $('scoreVal').textContent = '0';
+    renderLives();
+    renderMonsters();
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newRound();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'dont-feed-the-lava' });
+})();
+</script>
+</body>
+</html>

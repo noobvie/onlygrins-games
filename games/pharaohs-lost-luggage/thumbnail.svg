@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a2c07"/><stop offset=".5" stop-color="#4d3a0a"/><stop offset="1" stop-color="#241b04"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd76a"/><stop offset=".5" stop-color="#ffb84d"/><stop offset="1" stop-color="#c77dff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- pyramids -->
+  <polygon points="120,340 260,340 190,190" fill="#c9a24a" stroke="#8a6d2a" stroke-width="4"/>
+  <polygon points="240,340 420,340 330,160" fill="#d8b158" stroke="#8a6d2a" stroke-width="4"/>
+  <circle cx="800" cy="130" r="55" fill="#ffd76a" opacity=".85"/>
+  <text x="620" y="330" font-size="150" text-anchor="middle">🏺</text>
+  <text x="470" y="270" font-size="70">🧳</text>
+  <text x="150" y="150" font-size="60">👑</text>
+  <text x="480" y="430" fill="url(#ttl)" font-size="52" font-weight="800" text-anchor="middle">Pharaoh's Lost Luggage</text>
+  <text x="480" y="476" fill="#e2ca8e" font-size="26" font-weight="700" text-anchor="middle">Quiz the ancient world to win it back!</text>
+</svg>

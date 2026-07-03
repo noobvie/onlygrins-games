@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Branch Manager — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="civics" data-seed="branch-manager"></script>
+
+<style>
+  :root{
+    --bg1:#0c2e1e; --bg2:#123f2a; --bg3:#082014;
+    --card:#0e3622; --line:#2e8a5a; --text:#e6fff0; --muted:#9fe0c0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#0c2e1e;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .prog{display:flex;align-items:center;gap:4px;justify-content:center;font-size:20px;
+    background:#08241a;border:2px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
+  .prog .step{opacity:.4;} .prog .step.done{opacity:1;}
+  .taskcard{background:#08241a;border:2px dashed var(--orange);border-radius:16px;padding:16px;
+    text-align:center;max-width:520px;margin:0 auto 14px;}
+  .taskcard .ic{font-size:52px;line-height:1;}
+  .taskcard .txt{font-weight:800;font-size:clamp(16px,3.2vw,22px);margin-top:6px;}
+  .q{font-size:clamp(14px,2.7vw,18px);font-weight:800;text-align:center;margin:0 0 12px;color:var(--muted);}
+  .branches{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:640px;margin:0 auto;}
+  .branch{cursor:pointer;border:3px solid var(--line);font-family:inherit;font-weight:800;
+    padding:14px 8px;border-radius:16px;color:var(--text);background:#124430;
+    box-shadow:0 5px 0 rgba(0,0,0,.4);text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center;}
+  .branch .ic{font-size:40px;line-height:1;}
+  .branch .nm{font-size:clamp(13px,2.5vw,16px);}
+  .branch .desc{font-size:11px;font-weight:700;color:var(--muted);}
+  .branch:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.4);}
+  .branch.right{background:var(--green);border-color:var(--green);color:#0c2e1e;}
+  .branch.right .desc{color:#0c2e1e;}
+  .branch.wrong{background:var(--bad);border-color:var(--bad);color:#0c2e1e;}
+  .branch:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:16px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#0c2e1e;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#124430;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#4fa880;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🏛️ Branch Manager</h1>
+      <p class="sub">A government has three teams called <b>branches</b>, and each has a different job:
+        one <b>makes</b> the laws, one <b>carries them out</b>, and one <b>decides</b> what's fair.
+        Read each job and drop it in the right branch!</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 2–3<small>the big idea</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 4<small>trickier jobs</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 5<small>real government terms</small></button>
+      </div>
+      <p class="sub">10 jobs to sort · streaks earn bonus gavels</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Job 1/10</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="prog" id="prog"></div>
+      <div class="taskcard"><div class="ic" id="taskIc">📜</div><div class="txt" id="taskTxt">Write a new law</div></div>
+      <div class="q">Which branch does this job belong to?</div>
+      <div class="branches" id="branches"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🏛️</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Three branches (kid-friendly names + the formal term)
+  var BRANCHES = [
+    { key:'make',  ic:'📜', nm:'Lawmakers', desc:'MAKE the laws (Legislative)' },
+    { key:'carry', ic:'🎖️', nm:'Leaders',   desc:'CARRY OUT laws (Executive)' },
+    { key:'judge', ic:'⚖️', nm:'Judges',    desc:'DECIDE what\'s fair (Judicial)' }
+  ];
+
+  // jobs → branch. band: 0 simple, 1 medium, 2 real terms.
+  var JOBS = [
+    { ic:'📜', t:'Write a brand-new law',                  b:'make',  band:0 },
+    { ic:'🗳️', t:'Vote on whether a rule should pass',      b:'make',  band:0 },
+    { ic:'🎖️', t:'Lead the country and carry out the laws', b:'carry', band:0 },
+    { ic:'👮', t:'Make sure people follow the laws',        b:'carry', band:0 },
+    { ic:'⚖️', t:'Decide if someone broke a law',           b:'judge', band:0 },
+    { ic:'🧑‍⚖️', t:'Settle an argument between two people',  b:'judge', band:0 },
+    { ic:'📝', t:'Suggest a new bill for the town',         b:'make',  band:1 },
+    { ic:'🏛️', t:'Run the government day to day',           b:'carry', band:1 },
+    { ic:'🔨', t:'Hold a fair trial in a courtroom',        b:'judge', band:1 },
+    { ic:'💰', t:'Decide how to spend the town budget',     b:'make',  band:1 },
+    { ic:'✍️', t:'Sign a bill so it becomes a law',         b:'carry', band:1 },
+    { ic:'📖', t:'Explain what a confusing law really means',b:'judge', band:1 },
+    { ic:'🏦', t:'A member of Congress or Parliament',      b:'make',  band:2 },
+    { ic:'👔', t:'The President or Prime Minister',         b:'carry', band:2 },
+    { ic:'⚖️', t:'A Supreme Court justice',                 b:'judge', band:2 },
+    { ic:'🗂️', t:'Debate and pass the national budget',    b:'make',  band:2 },
+    { ic:'🌍', t:'Represent the country to the world',      b:'carry', band:2 },
+    { ic:'📜', t:'Decide if a law follows the constitution',b:'judge', band:2 }
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 2, label: 'Grade 2–3', bands: [0] },
+    { id: 4, label: 'Grade 4',   bands: [0, 1] },
+    { id: 5, label: 'Grade 5',   bands: [1, 2] }
+  ];
+  var ROUNDS = 10;
+
+  var CHEER = ['Correct branch! Government runs smoothly. 🏛️✨', 'Nailed it! ⚖️', 'You know your branches! 📜', 'Fair and balanced! 🎖️'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var current = null, deck = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+  function branchOf(k){ return BRANCHES.filter(function(x){ return x.key===k; })[0]; }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function gavel(){ tone(520,.12,'sine',780); }
+  function nope(){ tone(200,.32,'sawtooth',90); }
+
+  function buildDeck() {
+    var pool = JOBS.filter(function (j) { return grade.bands.indexOf(j.band) >= 0; });
+    deck = shuffle(pool).slice(0, ROUNDS);
+    while (deck.length < ROUNDS) deck.push(pick(pool));
+  }
+
+  function drawProg() {
+    var el = $('prog'), html = '';
+    for (var i = 0; i < ROUNDS; i++) {
+      if (i === q) html += '<span class="step done">🏛️</span>';
+      else if (i < q) html += '<span class="step done">✅</span>';
+      else html += '<span class="step">·</span>';
+    }
+    el.innerHTML = html;
+  }
+
+  function newQuestion() {
+    answered = false;
+    current = deck[q];
+    $('roundLbl').textContent = 'Job ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    drawProg();
+    $('taskIc').textContent = current.ic;
+    $('taskTxt').textContent = current.t;
+    var box = $('branches'); box.innerHTML = '';
+    BRANCHES.forEach(function (br) {
+      var b = document.createElement('button');
+      b.className = 'branch'; b.dataset.key = br.key;
+      b.innerHTML = '<span class="ic">' + br.ic + '</span><span class="nm">' + br.nm +
+        '</span><span class="desc">' + br.desc + '</span>';
+      b.addEventListener('click', function(){ choose(b, br.key); });
+      box.appendChild(b);
+    });
+    EduSDK.startLesson(q + 1, { branch: current.b });
+  }
+
+  function choose(btn, key) {
+    if (answered) return;
+    answered = true;
+    Array.prototype.forEach.call(document.querySelectorAll('.branch'), function(b){
+      b.disabled = true;
+      if (b.dataset.key === current.b) b.classList.add('right');
+    });
+    var correct = key === current.b;
+    if (correct) {
+      streak++; nCorrect++;
+      var pts = 100 + streak * 15;
+      score += pts;
+      $('scoreVal').textContent = score;
+      gavel();
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      btn.classList.add('wrong');
+      nope();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      var b = branchOf(current.b);
+      $('toast').textContent = 'That job belongs to the ' + b.nm + ' — they ' +
+        b.desc.split('(')[0].toLowerCase().trim() + '.';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 2100);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 2100);
+    } else setTimeout(newQuestion, 2100);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 8 ? '🏛️🏆' : nCorrect >= 5 ? '🏛️⚖️' : '🏛️📜';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' jobs sorted. ' +
+      (nCorrect >= 8 ? 'You understand how a government stays balanced. Bravo!' :
+       nCorrect >= 5 ? 'Solid work — a few jobs landed in the wrong branch.' :
+       'Three branches: make, carry out, decide. Study the labels and try again!');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    buildDeck();
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'branch-manager' });
+})();
+</script>
+</body>
+</html>

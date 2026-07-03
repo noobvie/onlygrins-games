@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "punctuation-panic",
+  "title": "Punctuation Panic",
+  "category": "language",
+  "short_description": "Defuse sentence-bombs with the right punctuation before the timer hits zero — a missed comma means \"Let's eat Grandma!\" and Grandma is NOT amused.",
+  "description": "The Punctuation Bomb Squad needs you! Sentences are ticking down to zero and only the right punctuation can defuse them. Choose the correct end mark, spot the properly punctuated sentence, and place apostrophes like a pro — because one missed comma turns \"Let's eat, Grandma!\" into something horrifying, and Grandma is NOT amused. Grade bands ramp from full stops, question marks and exclamation marks, to commas, capitals and speech marks, to apostrophes for its/it's and ownership. A free online punctuation and grammar game for kids in grades 1–5, with speed and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap the right punctuation (or the correctly punctuated sentence) before the bomb timer hits zero.",
+  "tags": [
+    "language",
+    "punctuation",
+    "grammar",
+    "writing",
+    "strand-grammar",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:punctuation-panic"
+}

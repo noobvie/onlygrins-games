@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Melody Mimic — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+
+<style>
+  :root{
+    --bg1:#1a0c33; --bg2:#2a1247; --bg3:#100820;
+    --card:#20103a; --line:#6a3a9a; --text:#f4ecff; --muted:#c9a8e8;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#1a0c33;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .status{text-align:center;font-weight:800;font-size:clamp(16px,3.2vw,22px);margin:10px 0;min-height:30px;}
+  .status.listen{color:var(--orange);} .status.your{color:var(--green);}
+  .pads{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:600px;margin:0 auto 12px;}
+  .pad{cursor:pointer;border:none;border-radius:18px;aspect-ratio:1;font-size:40px;
+    box-shadow:0 6px 0 rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;
+    transition:transform .08s,filter .08s;filter:brightness(.7);}
+  .pad:active{transform:translateY(3px);}
+  .pad.lit{filter:brightness(1.5);transform:scale(1.04);}
+  .pad.p0{background:#ff6b81;} .pad.p1{background:#ffb84d;} .pad.p2{background:#3ee87a;}
+  .pad.p3{background:#5ad8ff;} .pad.p4{background:#c77dff;} .pad.p5{background:#f473c4;}
+  .pads.n6{grid-template-columns:repeat(3,1fr);max-width:460px;}
+  .bar{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:16px;
+    padding:11px 24px;border-radius:12px;color:#1a0c33;background:var(--green);box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#33205a;color:var(--text);}
+  .btn:disabled{opacity:.4;cursor:default;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:16px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#9a6ac0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🎵 Melody Mimic</h1>
+      <p class="sub">Maestro Macaw plays a tune on the glowing pads — listen closely, then play it back!
+        Each round the melody grows by one note. Train your musical ear and memory.
+        🔊 Turn your sound ON for the full concert.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>4 pads, slow</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>4 pads, quicker</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>6 pads, speedy</small></button>
+      </div>
+      <p class="sub">Echo as many notes as you can — every correct note scores!</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Melody length: 1</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="status" id="status">Get ready…</div>
+      <div class="pads" id="pads"></div>
+      <div class="bar">
+        <button class="btn ghost" id="replayBtn">🔁 Hear it again</button>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🎵</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Play again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Pentatonic-ish notes (Hz) so any sequence sounds pleasant.
+  var NOTES = [261.6, 293.7, 329.6, 392.0, 440.0, 523.3]; // C D E G A C'
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', pads: 4, gap: 620, maxLen: 8 },
+    { id: 3, label: 'Grade 3',   pads: 4, gap: 430, maxLen: 12 },
+    { id: 4, label: 'Grade 4–5', pads: 6, gap: 340, maxLen: 16 }
+  ];
+
+  var CHEER = ['Perfect echo! Maestro Macaw squawks with joy! 🦜🎶', 'Golden ears! 👂✨',
+               'You played it note-perfect! 🎹', 'Bravo! The parrot takes a bow. 🦜'];
+
+  var grade = GRADES[0];
+  var score = 0, seq = [], input = [], accepting = false, nPads = 4, best = 0;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function ensureCtx(){ if(!actx) actx = new AC(); if(actx.state === 'suspended') actx.resume(); }
+  function play(i, dur){ try{ ensureCtx();
+    var o=actx.createOscillator(), g=actx.createGain();
+    o.type='sine'; o.frequency.value=NOTES[i];
+    g.gain.setValueAtTime(.0001,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.25,actx.currentTime+.02);
+    g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+(dur||.35));
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+(dur||.35));
+  }catch(e){} }
+  function buzz(){ try{ ensureCtx(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type='sawtooth'; o.frequency.value=120; g.gain.setValueAtTime(.2,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+.4);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+.4);}catch(e){} }
+
+  function buildPads() {
+    var pads = $('pads'); pads.innerHTML = '';
+    pads.className = 'pads' + (nPads === 6 ? ' n6' : '');
+    for (var i = 0; i < nPads; i++) {
+      var b = document.createElement('button');
+      b.className = 'pad p' + i; b.dataset.i = i; b.textContent = '🎵';
+      (function (idx, el) {
+        el.addEventListener('click', function(){ tapPad(idx, el); });
+      })(i, b);
+      pads.appendChild(b);
+    }
+  }
+
+  function litPad(i, dur) {
+    var el = document.querySelector('.pad[data-i="' + i + '"]');
+    if (!el) return;
+    el.classList.add('lit');
+    setTimeout(function(){ el.classList.remove('lit'); }, (dur || 300));
+  }
+
+  function playSequence() {
+    accepting = false;
+    $('status').textContent = '🔊 Listen…';
+    $('status').className = 'status listen';
+    $('replayBtn').disabled = true;
+    var i = 0;
+    var t = setInterval(function () {
+      if (i >= seq.length) {
+        clearInterval(t);
+        setTimeout(function () {
+          accepting = true; input = [];
+          $('status').textContent = '🎤 Your turn — play it back!';
+          $('status').className = 'status your';
+          $('replayBtn').disabled = false;
+        }, 400);
+        return;
+      }
+      litPad(seq[i], grade.gap * 0.6);
+      play(seq[i], grade.gap / 1000 * 0.7);
+      i++;
+    }, grade.gap);
+  }
+
+  function tapPad(i, el) {
+    if (!accepting) return;
+    play(i, 0.3); litPad(i, 200);
+    input.push(i);
+    var idx = input.length - 1;
+    if (input[idx] !== seq[idx]) return wrong();
+    if (input.length === seq.length) {
+      // completed this melody
+      accepting = false;
+      score += seq.length * 10;
+      $('scoreVal').textContent = score;
+      best = Math.max(best, seq.length);
+      $('toast').textContent = '🎶 +' + (seq.length * 10);
+      $('toast').className = 'toast good';
+      if (seq.length >= grade.maxLen) return setTimeout(function(){ finish(true); }, 700);
+      setTimeout(nextRound, 900);
+    }
+  }
+
+  function nextRound() {
+    seq.push(rint(0, nPads - 1));
+    $('roundLbl').textContent = 'Melody length: ' + seq.length;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    if (seq.length === 5) { EduSDK.adBreak('interlevel').then(playSequence); }
+    else playSequence();
+    EduSDK.startLesson(seq.length, { length: seq.length });
+  }
+
+  function wrong() {
+    accepting = false;
+    buzz();
+    $('card').classList.add('shake');
+    setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+    $('status').textContent = '';
+    $('toast').textContent = 'Oops — wrong note! The melody was ' + seq.length + ' notes long.';
+    $('toast').className = 'toast bad';
+    EduSDK.finishLesson(seq.length, { reached: seq.length });
+    setTimeout(function(){ finish(false); }, 1400);
+  }
+
+  function finish(maxed) {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = best >= 8 ? '🦜🏆' : best >= 4 ? '🦜🎶' : '🦜🎵';
+    $('finalLine').textContent = grade.label + ' — longest melody echoed: ' + best + ' notes. ' +
+      (maxed ? 'You maxed out the melody — golden-eared genius!' :
+       best >= 8 ? 'Incredible musical memory! Maestro Macaw is speechless.' :
+       best >= 4 ? 'Lovely playing — your ear is getting sharper every round.' :
+       'Every musician starts here. Listen closely and try again!');
+    EduSDK.submitScore(score, { grade: grade.id, best: best })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; nPads = g.pads; score = 0; seq = []; input = []; best = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    buildPads();
+    ensureCtx();
+    setTimeout(nextRound, 500);
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('replayBtn').addEventListener('click', function () { if ($('replayBtn').disabled) return; playSequence(); });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'melody-mimic' });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Time Machine Tangle — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="history" data-seed="time-machine-tangle"></script>
+
+<style>
+  :root{
+    --bg1:#20143a; --bg2:#2c1c4e; --bg3:#120a22;
+    --card:#271947; --line:#513a86; --text:#f2ecff; --muted:#c1b0e6;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --gold:#ffd76a; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--gold),var(--purple),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#170e2a;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .arena{background:#1d1238;border:2px solid var(--line);border-radius:16px;padding:16px;
+    margin-bottom:12px;}
+  .task{font-size:clamp(15px,2.8vw,19px);font-weight:800;color:var(--muted);text-align:center;margin-bottom:12px;}
+  .task b{color:var(--gold);}
+  .cards{display:flex;flex-direction:column;gap:9px;max-width:640px;margin:0 auto;}
+  .ev{display:flex;gap:12px;align-items:center;background:#271947;border:2px solid var(--line);
+    border-radius:12px;padding:11px 14px;font-weight:700;font-size:16px;transition:.15s;}
+  .ev .em{font-size:26px;flex:0 0 auto;}
+  .ev .body{flex:1;}
+  .ev .arrows{display:flex;flex-direction:column;gap:3px;}
+  .ev .arrows button{cursor:pointer;border:none;background:var(--purple);color:#170e2a;
+    width:30px;height:22px;border-radius:6px;font-weight:800;font-size:13px;line-height:1;}
+  .ev .arrows button:disabled{opacity:.25;cursor:default;}
+  .ev.locked{opacity:.9;}
+  .ev.good{border-color:var(--green);background:#1c3a26;}
+  .ev.bad{border-color:var(--bad);background:#3a1720;}
+  .ev .when{display:none;font-weight:800;color:var(--gold);font-size:14px;margin-left:6px;}
+  .ev.locked .when{display:inline;}
+
+  .checkRow{display:flex;justify-content:center;margin-top:14px;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#170e2a;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#3d2d6b;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#8271b5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>⏳ Time Machine Tangle</h1>
+      <p class="sub">Professor Tick's time machine hiccuped and scrambled history! Events from the
+        past are all jumbled up. Use the ⬆️⬇️ arrows to put them back in order — oldest at the
+        top, newest at the bottom — then hit CHECK to mend the timeline.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>order 3 events</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>order 4 events</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>order 5 events</small></button>
+      </div>
+      <p class="sub">8 timelines · fast &amp; correct = bonus points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Timeline 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="arena">
+        <div class="task">📜 Put these in order: <b>oldest at the top</b>, newest at the bottom.</div>
+        <div class="cards" id="cards"></div>
+        <div class="checkRow"><button class="btn" id="checkBtn">✓ CHECK the timeline</button></div>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">⏳</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Mend more time ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Each set = events that are easy to *sequence* by everyday reasoning or
+  // famous history. year is the sort key; label is what kids see. band: 0..2.
+  var SETS = [
+    // band 0 — everyday / life sequences (no dates needed)
+    { band:0, theme:'A person grows up', events:[
+      { em:'👶', label:'A baby is born', when:'day 1' },
+      { em:'🧒', label:'They start school', when:'age 5' },
+      { em:'🧑', label:'They become a grown-up', when:'age 25' },
+    ]},
+    { band:0, theme:'Making bread through history', events:[
+      { em:'🌾', label:'Wheat grows in the field', when:'first' },
+      { em:'🏺', label:'It is ground into flour', when:'next' },
+      { em:'🍞', label:'The baker bakes a loaf', when:'last' },
+    ]},
+    { band:0, theme:'A tree\'s life', events:[
+      { em:'🌰', label:'A seed falls to the ground', when:'first' },
+      { em:'🌱', label:'A little sprout appears', when:'next' },
+      { em:'🌳', label:'A tall tree gives shade', when:'last' },
+    ]},
+    { band:0, theme:'Travel gets faster', events:[
+      { em:'🐴', label:'People ride horses', when:'long ago' },
+      { em:'🚂', label:'Steam trains are invented', when:'1800s' },
+      { em:'✈️', label:'Aeroplanes fly across the world', when:'1900s' },
+    ]},
+    // band 1 — 4 events, famous history within reach
+    { band:1, theme:'Ancient wonders', events:[
+      { em:'🦕', label:'Dinosaurs roam the Earth', when:'millions of years ago' },
+      { em:'🔺', label:'The Egyptians build the pyramids', when:'~4,500 years ago' },
+      { em:'🏛️', label:'Ancient Rome rules an empire', when:'~2,000 years ago' },
+      { em:'🏰', label:'Knights live in stone castles', when:'~800 years ago' },
+    ]},
+    { band:1, theme:'How we send messages', events:[
+      { em:'📜', label:'Messengers carry paper letters', when:'long ago' },
+      { em:'📮', label:'The postage stamp is invented', when:'1840' },
+      { em:'☎️', label:'The telephone lets us talk far away', when:'1876' },
+      { em:'📱', label:'Smartphones send instant texts', when:'today' },
+    ]},
+    { band:1, theme:'Getting around town', events:[
+      { em:'🚶', label:'People travel on foot', when:'always' },
+      { em:'🚲', label:'The bicycle is invented', when:'1800s' },
+      { em:'🚗', label:'Cars fill the roads', when:'1900s' },
+      { em:'🚀', label:'Rockets carry people to space', when:'1960s' },
+    ]},
+    { band:1, theme:'Learning to write', events:[
+      { em:'🖐️', label:'Cave people paint on walls', when:'prehistory' },
+      { em:'🪶', label:'People write with feather quills', when:'middle ages' },
+      { em:'✒️', label:'The printing press prints books', when:'1400s' },
+      { em:'💻', label:'We type on computers', when:'today' },
+    ]},
+    // band 2 — 5 events, real dated history
+    { band:2, theme:'Big moments in history', events:[
+      { em:'🔺', label:'The Great Pyramid is built', when:'~2560 BC' },
+      { em:'🏛️', label:'The Roman Empire begins', when:'27 BC' },
+      { em:'⛵', label:'Columbus sails to the Americas', when:'1492' },
+      { em:'💡', label:'The light bulb is invented', when:'1879' },
+      { em:'🌕', label:'Humans first walk on the Moon', when:'1969' },
+    ]},
+    { band:2, theme:'Inventions that changed the world', events:[
+      { em:'☸️', label:'The wheel is invented', when:'~3500 BC' },
+      { em:'📖', label:'The printing press is built', when:'1440' },
+      { em:'🚂', label:'The steam engine powers trains', when:'1804' },
+      { em:'📞', label:'The telephone is invented', when:'1876' },
+      { em:'🌐', label:'The World Wide Web goes live', when:'1991' },
+    ]},
+    { band:2, theme:'Explorers and discovery', events:[
+      { em:'🧭', label:'Vikings reach North America', when:'~1000' },
+      { em:'⛵', label:'Columbus crosses the Atlantic', when:'1492' },
+      { em:'🌍', label:'Magellan\'s crew sails around the world', when:'1522' },
+      { em:'🏔️', label:'Everest is climbed for the first time', when:'1953' },
+      { em:'🚀', label:'A rover explores Mars', when:'2021' },
+    ]},
+    { band:2, theme:'The story of flight', events:[
+      { em:'🪁', label:'People fly the first kites', when:'~1000 BC' },
+      { em:'🎈', label:'The first hot-air balloon rises', when:'1783' },
+      { em:'🛩️', label:'The Wright brothers\' first flight', when:'1903' },
+      { em:'🌕', label:'Apollo 11 lands on the Moon', when:'1969' },
+      { em:'🛰️', label:'Reusable rockets land themselves', when:'2015' },
+    ]}
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', bands: [0], n: 3 },
+    { id: 3, label: 'Grade 3',   bands: [1], n: 4 },
+    { id: 4, label: 'Grade 4–5', bands: [2], n: 5 }
+  ];
+  var ROUNDS = 8;
+
+  var CHEER = ['Timeline mended! History is safe! ⏳✨', 'Professor Tick cheers! 🎉',
+               'Perfectly in order! 🥇', 'The time machine hums happily! 🛸'];
+  var PARTIAL = ['Almost! A couple are out of order. 🤏', 'The timeline is a little wobbly…',
+                 'So close — check the order again!'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nSolved = 0, locked = false;
+  var order = [], correctOrder = [], deck = [];
+  var startTime = 0;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function blip(){ tone(600,.06,'square'); }
+  function cheer(){ tone(523,.15,'sine',1046); setTimeout(function(){ tone(659,.2,'sine',1318); }, 130); }
+  function womp(){ tone(240,.3,'sawtooth',110); }
+
+  function poolFor(g) { return SETS.filter(function (s) { return g.bands.indexOf(s.band) !== -1; }); }
+
+  function makeQuestion() {
+    if (!deck.length) deck = shuffle(poolFor(grade));
+    var set = deck.pop();
+    // correctOrder = events already in chronological order (as authored)
+    correctOrder = set.events.map(function (e) { return e; });
+    // present shuffled — ensure not already sorted
+    do { order = shuffle(correctOrder); }
+    while (order.length > 1 && order.every(function (e, i) { return e === correctOrder[i]; }));
+    render();
+  }
+
+  function render() {
+    var box = $('cards');
+    box.innerHTML = '';
+    order.forEach(function (e, i) {
+      var row = document.createElement('div');
+      row.className = 'ev';
+      row.innerHTML =
+        '<span class="em">' + e.em + '</span>' +
+        '<span class="body">' + e.label + '<span class="when">— ' + e.when + '</span></span>' +
+        '<span class="arrows">' +
+          '<button data-up="' + i + '"' + (i === 0 ? ' disabled' : '') + '>▲</button>' +
+          '<button data-down="' + i + '"' + (i === order.length - 1 ? ' disabled' : '') + '>▼</button>' +
+        '</span>';
+      box.appendChild(row);
+    });
+    Array.prototype.forEach.call(box.querySelectorAll('[data-up]'), function (b) {
+      b.addEventListener('click', function () { move(Number(b.dataset.up), -1); });
+    });
+    Array.prototype.forEach.call(box.querySelectorAll('[data-down]'), function (b) {
+      b.addEventListener('click', function () { move(Number(b.dataset.down), 1); });
+    });
+  }
+
+  function move(i, dir) {
+    if (locked) return;
+    var j = i + dir;
+    if (j < 0 || j >= order.length) return;
+    var tmp = order[i]; order[i] = order[j]; order[j] = tmp;
+    blip();
+    render();
+  }
+
+  function newQuestion() {
+    locked = false;
+    $('checkBtn').disabled = false;
+    $('roundLbl').textContent = 'Timeline ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    makeQuestion();
+    startTime = Date.now();
+    EduSDK.startLesson(q + 1, { n: grade.n });
+  }
+
+  function check() {
+    if (locked) return;
+    locked = true;
+    $('checkBtn').disabled = true;
+    var rows = $('cards').querySelectorAll('.ev');
+    var nRight = 0;
+    order.forEach(function (e, i) {
+      rows[i].classList.add('locked');
+      var isRight = e === correctOrder[i];
+      rows[i].classList.add(isRight ? 'good' : 'bad');
+      if (isRight) nRight++;
+    });
+    var perfect = nRight === order.length;
+    var secs = (Date.now() - startTime) / 1000;
+    if (perfect) {
+      streak++; nSolved++;
+      var speedBonus = Math.max(0, Math.round(40 - secs));
+      var pts = 100 + speedBonus + streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      cheer();
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      womp();
+      // partial credit for pairs in correct relative order
+      $('toast').textContent = pick(PARTIAL) + ' (' + nRight + '/' + order.length + ' in the right spot)';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: perfect, right: nRight });
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 2200);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 2200);
+    } else setTimeout(newQuestion, 2200);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nSolved >= 7 ? '⏳🏆' : nSolved >= 4 ? '⏳📜' : '⏳🌀';
+    $('finalLine').textContent = grade.label + ' — ' + nSolved + '/' + ROUNDS + ' timelines mended. ' +
+      (nSolved >= 7 ? 'Professor Tick makes you Keeper of History!' :
+       nSolved >= 4 ? 'History is mostly back in order.' :
+       'A few dinosaurs are still wandering around the wrong century.');
+    EduSDK.submitScore(score, { grade: grade.id, solved: nSolved })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nSolved = 0; deck = [];
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  $('checkBtn').addEventListener('click', check);
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'time-machine-tangle' });
+})();
+</script>
+</body>
+</html>

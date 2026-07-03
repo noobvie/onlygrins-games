@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "loopy-llamas",
+  "title": "Loopy Llamas",
+  "category": "coding",
+  "short_description": "Program Larry the Llama to the hay with arrow commands — and use repeat loops so you don't tap the same arrow ten times. Fewer commands, more points.",
+  "description": "Program Larry the Llama to reach his hay! Tap arrow commands to build his program, then hit RUN and watch him walk it out step by step. Long path ahead? Use the repeat block instead of tapping the same arrow ten times — that's exactly what loops are for, and it's real algorithmic thinking: sequencing, debugging when he face-plants a wall, and spotting patterns you can loop. Grade bands ramp from short straight paths, to turns and repeat blocks, to walls and longer loops on bigger grids. Shorter, tidier programs score bonus points. A free online coding, loops and algorithm game for kids in grades 1–5, with brevity bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "width": 960,
+  "height": 640,
+  "thumbnail": "thumbnail.png",
+  "controls": "Mouse / tap arrow and repeat blocks to build a program, then Run. Undo and Clear to edit.",
+  "tags": [
+    "coding",
+    "loops",
+    "algorithms",
+    "sequencing",
+    "strand-loops",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:loopy-llamas"
+}

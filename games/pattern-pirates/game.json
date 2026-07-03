@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "pattern-pirates",
+  "title": "Pattern Pirates",
+  "category": "math",
+  "short_description": "Cross Croc Swamp by finding the missing number in each pattern — step wrong and a crocodile files a formal complaint.",
+  "description": "Captain Grinbeard's treasure map is a trail of number stones across Croc Swamp — but some stones are missing! Work out each number pattern and tap the right stone to cross. Step wrong and you step on Gerald the crocodile, who files an extremely formal complaint. Grade bands ramp from counting by 2s, 5s and 10s, to counting by 3s and 4s, backwards patterns and doubling, to sneaky two-step rules like double-then-add-one with missing middle stones. A free online number patterns and sequences game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap the stone with the missing number of the pattern.",
+  "tags": [
+    "math",
+    "patterns",
+    "sequences",
+    "skip-counting",
+    "strand-patterns",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:pattern-pirates"
+}

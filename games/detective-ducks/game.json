@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "detective-ducks",
+  "title": "Detective Ducks",
+  "category": "logic",
+  "short_description": "Someone stole the pond's breadcrumbs and every suspect is a duck — read the witness clues, rule ducks out one by one, and arrest the crumb culprit.",
+  "description": "Someone keeps stealing the pond's breadcrumbs, and every single suspect is a duck. Read the witness clues — hats, sunglasses, bows and umbrellas — rule ducks out one by one, and arrest the crumb culprit. Warning: all four ducks will say 'quack' under questioning; it's not helpful. Every case is a freshly generated process-of-elimination puzzle. Grade bands ramp from two friendly positive clues, to three-clue cases, to tricky lineups that hinge on NOT-clues and careful elimination. A free online logical deduction and reasoning game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 700,
+  "controls": "Mouse / tap the duck that matches every witness clue.",
+  "tags": [
+    "logic",
+    "deduction",
+    "puzzles",
+    "elimination",
+    "strand-deduction",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:detective-ducks"
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "budget-birthday",
+  "title": "Budget Birthday",
+  "category": "money",
+  "short_description": "Grandma gave you a party budget and a shopping list — buy exactly what's needed and spend it all without going a single coin over.",
+  "description": "You're planning the coolest party ever, but Grandma gave you an exact budget and a shopping list — buy everything on the list without going a single coin over! It's real financial-literacy budgeting: add up prices, hit a target total, and learn to plan spending. Grade bands ramp from whole-dollar coins and small budgets, to bigger sums with more choices, to dollars-and-cents prices on a tight budget. A free online money and budgeting game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 720,
+  "controls": "Mouse / tap items to add them to your cart, then Check out.",
+  "tags": [
+    "money",
+    "budgeting",
+    "financial-literacy",
+    "addition",
+    "strand-budgeting",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:budget-birthday"
+}

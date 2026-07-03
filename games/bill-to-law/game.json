@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "bill-to-law",
+  "title": "Bill to Law",
+  "category": "civics",
+  "short_description": "How does an idea become a real law? Put the scrambled steps of each civic process in order and pass it — skip a step and it gets stuck in committee.",
+  "description": "How does an idea become a real law? Step by step! Put the scrambled steps of each civic process in the right order, then pass it — democracy has an order of operations, and skipping a step gets the whole thing stuck in committee. It teaches sequencing and how government actually works, with kid-friendly walkthroughs of how a bill becomes a law, how an election runs, how a town fixes a problem, how a court trial works and more. Grade bands ramp from 3-step processes, to 4–5 steps, to the full 6-step law-making sequence. A free online civics and government-process game for kids in grades 2–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 680,
+  "controls": "Mouse / tap steps to add them to the ordered list, Undo to fix, then Pass it.",
+  "tags": [
+    "civics",
+    "government",
+    "sequencing",
+    "how-laws-are-made",
+    "citizenship",
+    "strand-government-process",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:bill-to-law"
+}

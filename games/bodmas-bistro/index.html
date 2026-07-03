@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>BODMAS Bistro — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="bodmas-bistro"></script>
+
+<style>
+  :root{
+    --bg1:#2e0a1c; --bg2:#40102a; --bg3:#1a0612;
+    --card:#331024; --line:#6e2b4e; --text:#ffeaf4; --muted:#dda4bf;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--bad),var(--purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#2a0416;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--blue);} .g2{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .kitchen{background:#22081a;border:2px solid var(--line);border-radius:16px;padding:16px;
+    text-align:center;margin-bottom:12px;}
+  .chef{font-size:44px;min-height:56px;}
+  .hint{color:var(--muted);font-weight:800;font-size:15px;margin-bottom:10px;}
+  .expr{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center;min-height:74px;}
+  .tok{font-size:clamp(24px,5vw,38px);font-weight:800;padding:10px 14px;border-radius:12px;}
+  .tok.num{background:#40102a;border:2px solid var(--line);}
+  .tok.paren{color:var(--muted);padding:10px 2px;}
+  .tok.op{cursor:pointer;border:none;font-family:inherit;color:#2a0416;background:var(--orange);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .tok.op:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .tok.op:disabled{cursor:default;opacity:.85;}
+  .tok.right{background:var(--green);}
+  .tok.wrong{background:var(--bad);}
+  .toast{min-height:44px;text-align:center;font-weight:800;font-size:18px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#2a0416;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#4e1c3a;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#a85f84;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>👨‍🍳 BODMAS Bistro</h1>
+      <p class="sub">Chef Grinjamin's recipes are maths expressions — and maths has RULES about
+        what cooks first: Brackets, then × and ÷, then + and −. Tap the operation that must
+        happen FIRST, step by step. Stir in the addition too early and the dish literally explodes.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 4<small>× ÷ before + −</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 5<small>brackets join the menu</small></button>
+      </div>
+      <p class="sub">8 dishes · every correct step scores · finish the dish for a bonus</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Dish 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="kitchen">
+        <div class="chef" id="chef">👨‍🍳 🍲</div>
+        <div class="hint">Tap the operation that cooks FIRST</div>
+        <div class="expr" id="expr"></div>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">👨‍🍳</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Next service ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 4, label: 'Grade 4', parens: false },
+    { id: 5, label: 'Grade 5', parens: true }
+  ];
+  var ROUNDS = 8;
+  var DISHES = ['🍲', '🍕', '🥞', '🍰', '🌮', '🍜', '🥧', '🍩'];
+
+  var SIZZLE = ['Sizzling in the right order! 🔥', 'Chef Grinjamin kisses his fingers! 💋',
+                "That's how maths cooks! 🍳", 'The pot purrs. Pots can purr here. 🍲'];
+  var SERVED = ['DISH SERVED! The customer weeps with joy. 😭✨', 'Order up! Perfection! 🛎️',
+                'Michelin star incoming! ⭐', 'The dish took a bow. 🍽️'];
+  var BOOM  = ['💥 KA-BOOM! You stirred that in too early!',
+               '💥 The dish EXPLODED. The chef hat is smoking.',
+               '💥 That was NOT next. There is soup on the ceiling.',
+               '💥 BODMAS, chef! BODMAS! The pot is very upset.'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, dishesServed = 0, busy = false;
+  var tokens = [], dish = '🍲';
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function sizzle(){ tone(500,.15,'sine',1000); }
+  function serve(){ tone(523,.15,'sine'); setTimeout(function(){ tone(659,.15,'sine'); }, 140);
+    setTimeout(function(){ tone(784,.25,'sine'); }, 280); }
+  function boom(){ tone(120,.6,'sawtooth',40); }
+
+  // ---------- expression recipes (content block) ----------
+  function makeExpr() {
+    var a, b, c, d, k;
+    if (!grade.parens) {
+      switch (rint(0, 4)) {
+        case 0: a = rint(2, 9); b = rint(2, 9); c = rint(2, 9); return [a, '+', b, '×', c];
+        case 1: a = rint(2, 9); b = rint(2, 9); c = rint(2, Math.max(2, a * b - 1)); return [a, '×', b, '−', c];
+        case 2: k = rint(2, 6); c = rint(2, 6); b = k * c; a = rint(k + 1, k + 12); return [a, '−', b, '÷', c];
+        case 3: k = rint(2, 8); c = rint(2, 6); b = k * c; a = rint(2, 15); return [a, '+', b, '÷', c];
+        default: a = rint(2, 9); b = rint(2, 9); c = rint(2, 20); return [a, '×', b, '+', c];
+      }
+    }
+    switch (rint(0, 3)) {
+      case 0: a = rint(2, 9); b = rint(2, 9); c = rint(2, 6); d = rint(2, Math.min(12, (a + b) * c - 1));
+        return ['(', a, '+', b, ')', '×', c, '−', d];
+      case 1: a = rint(2, 6); b = rint(4, 12); c = rint(2, b - 1); d = rint(2, 15);
+        return [a, '×', '(', b, '−', c, ')', '+', d];
+      case 2: a = rint(2, 12); b = rint(2, 9); c = rint(2, 9); d = rint(2, Math.min(12, a + b * c - 1));
+        return [a, '+', b, '×', c, '−', d];
+      default: k = rint(2, 9); c = rint(2, 5); var total = k * c; a = rint(1, total - 1); b = total - a;
+        return ['(', a, '+', b, ')', '÷', c];
+    }
+  }
+
+  function isOp(t) { return t === '+' || t === '−' || t === '×' || t === '÷'; }
+  function apply(op, x, y) {
+    if (op === '+') return x + y;
+    if (op === '−') return x - y;
+    if (op === '×') return x * y;
+    return x / y;
+  }
+
+  // Index of the operator that BODMAS says goes next.
+  function nextOpIndex(toks) {
+    var lo = 0, hi = toks.length - 1;
+    var close = toks.indexOf(')');
+    if (close >= 0) {
+      var open = -1;
+      for (var i = close; i >= 0; i--) if (toks[i] === '(') { open = i; break; }
+      lo = open + 1; hi = close - 1;
+    }
+    var firstMul = -1, firstAdd = -1;
+    for (var j = lo; j <= hi; j++) {
+      if ((toks[j] === '×' || toks[j] === '÷') && firstMul < 0) firstMul = j;
+      if ((toks[j] === '+' || toks[j] === '−') && firstAdd < 0) firstAdd = j;
+    }
+    return firstMul >= 0 ? firstMul : firstAdd;
+  }
+
+  function collapseParens(toks) {
+    for (var i = 0; i + 2 < toks.length; i++) {
+      if (toks[i] === '(' && typeof toks[i + 1] === 'number' && toks[i + 2] === ')') {
+        toks.splice(i, 3, toks[i + 1]);
+        return collapseParens(toks);
+      }
+    }
+    return toks;
+  }
+
+  function fullAnswer(toks) {
+    var t = toks.slice();
+    while (true) {
+      var i = nextOpIndex(t);
+      if (i < 0) return t[0];
+      t.splice(i - 1, 3, apply(t[i], t[i - 1], t[i + 1]));
+      collapseParens(t);
+    }
+  }
+
+  function render() {
+    var box = $('expr'); box.innerHTML = '';
+    tokens.forEach(function (t, i) {
+      var e;
+      if (isOp(t)) {
+        e = document.createElement('button');
+        e.className = 'tok op';
+        e.textContent = t;
+        e.addEventListener('click', function(){ tap(e, i); });
+      } else {
+        e = document.createElement('span');
+        e.className = 'tok ' + (typeof t === 'number' ? 'num' : 'paren');
+        e.textContent = t;
+      }
+      box.appendChild(e);
+    });
+  }
+
+  function newDish() {
+    busy = false;
+    tokens = makeExpr();
+    dish = DISHES[q % DISHES.length];
+    $('roundLbl').textContent = 'Dish ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('chef').textContent = '👨‍🍳 ' + dish;
+    render();
+    EduSDK.startLesson(q + 1, { recipe: tokens.join(' ') });
+  }
+
+  function tap(btn, i) {
+    if (busy) return;
+    var want = nextOpIndex(tokens);
+    if (i === want) {
+      streak++;
+      var pts = 50 + streak * 5;
+      score += pts;
+      $('scoreVal').textContent = score;
+      sizzle();
+      tokens.splice(i - 1, 3, apply(tokens[i], tokens[i - 1], tokens[i + 1]));
+      collapseParens(tokens);
+      render();
+      if (tokens.length === 1) {
+        busy = true;
+        dishesServed++;
+        score += 100;
+        $('scoreVal').textContent = score;
+        serve();
+        $('chef').textContent = '👨‍🍳✨ ' + dish + ' = ' + tokens[0];
+        $('toast').textContent = pick(SERVED) + '  +' + (pts + 100);
+        $('toast').className = 'toast good';
+        EduSDK.finishLesson(q + 1, { correct: true, answer: tokens[0] });
+        nextRound();
+      } else {
+        $('toast').textContent = pick(SIZZLE) + '  +' + pts;
+        $('toast').className = 'toast good';
+      }
+    } else {
+      busy = true;
+      streak = 0;
+      btn.classList.add('wrong');
+      var right = nextOpIndex(tokens);
+      var btns = document.querySelectorAll('.tok');
+      if (right >= 0) btns[right].classList.add('right');
+      Array.prototype.forEach.call(document.querySelectorAll('.tok.op'), function (b) { b.disabled = true; });
+      boom();
+      $('chef').textContent = '💥👨‍🍳 🫠';
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(BOOM) + '  (the ' + tokens[right] + ' cooks first; the dish makes ' + fullAnswer(tokens) + ')';
+      $('toast').className = 'toast bad';
+      EduSDK.finishLesson(q + 1, { correct: false });
+      nextRound();
+    }
+  }
+
+  function nextRound() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 2100);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newDish); }, 2100);
+    } else setTimeout(newDish, 2100);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = dishesServed >= 7 ? '👨‍🍳🏆' : dishesServed >= 4 ? '👨‍🍳🍽️' : '👨‍🍳💥';
+    $('finalLine').textContent = grade.label + ' — ' + dishesServed + '/' + ROUNDS + ' dishes served without exploding. ' +
+      (dishesServed >= 7 ? 'The bistro earns a Michelin star!' :
+       dishesServed >= 4 ? 'A respectable dinner service!' :
+       'The ceiling needs re-souping. Again.');
+    EduSDK.submitScore(score, { grade: grade.id, served: dishesServed })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; dishesServed = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newDish();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'bodmas-bistro' });
+})();
+</script>
+</body>
+</html>

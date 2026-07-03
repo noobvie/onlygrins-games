@@ -1,0 +1,31 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "melt-or-freeze",
+  "title": "Melt or Freeze?",
+  "category": "science",
+  "short_description": "Fill a mad scientist's orders by knowing solids, liquids and gases — get it wrong and the lab yeti's smoothie turns to steam in his face.",
+  "description": "Professor Wobble's lab needs YOU on the states-of-matter station. Sort the deliveries into solid, liquid and gas, predict what the heat lamp and the freezer will do to them, and name the changes like a proper scientist — because getting it wrong turns the lab yeti's smoothie to steam right in his face, and he has never once forgiven anyone. Grade bands ramp from spotting solids, liquids and gases, to predicting melting, freezing and evaporating, to naming condensation and the rest of the change family. A free online states of matter science game for kids in grades 2–5, with speed and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap the right state or change before the lab timer runs out.",
+  "tags": [
+    "science",
+    "states-of-matter",
+    "chemistry",
+    "strand-chemistry",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:melt-or-freeze"
+}

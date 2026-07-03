@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "note-name-ninja",
+  "title": "Note Name Ninja",
+  "category": "music",
+  "short_description": "A note flashes onto the treble staff — name it before it vanishes. Learn to read music with FACE and Every Good Boy Deserves Fruit.",
+  "description": "A note flashes onto the musical staff — name it fast, like a true music ninja! It teaches reading the treble clef with the classic memory tricks: the spaces spell FACE and the lines are Every Good Boy Deserves Fruit. Correct answers even play the note so you connect the symbol to its sound. Grade bands ramp from just the space notes, to lines and spaces together, to notes on ledger lines above and below the staff for grade 4–5. A free online music-reading and note-naming game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap the letter name of the note shown on the staff. Sound on to hear each note.",
+  "tags": [
+    "music",
+    "note-reading",
+    "treble-clef",
+    "notation",
+    "strand-notation",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:note-name-ninja"
+}

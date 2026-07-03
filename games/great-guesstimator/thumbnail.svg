@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a0e33"/><stop offset=".5" stop-color="#3a1445"/><stop offset="1" stop-color="#160a2e"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#c77dff"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- stage curtains -->
+  <path d="M0,0 Q60,180 30,540 L0,540 Z" fill="#5e1b3e"/>
+  <path d="M960,0 Q900,180 930,540 L960,540 Z" fill="#5e1b3e"/>
+  <!-- crystal ball -->
+  <circle cx="330" cy="270" r="110" fill="#5ad8ff" opacity=".35"/>
+  <circle cx="330" cy="270" r="110" fill="none" stroke="#c77dff" stroke-width="6"/>
+  <ellipse cx="295" cy="225" rx="30" ry="16" fill="#ffffff" opacity=".5"/>
+  <text x="330" y="300" font-size="64" font-weight="800" fill="#f9edff" text-anchor="middle">≈ 97?</text>
+  <rect x="270" y="378" width="120" height="26" rx="10" fill="#42225e"/>
+  <!-- jellybean jar -->
+  <g>
+    <rect x="600" y="160" width="220" height="250" rx="26" fill="#120621" stroke="#c77dff" stroke-width="6"/>
+    <rect x="640" y="130" width="140" height="34" rx="10" fill="#42225e"/>
+    <g font-size="30">
+      <text x="625" y="220">🟣</text><text x="685" y="205">🟢</text><text x="745" y="225">🔵</text>
+      <text x="655" y="270">🟠</text><text x="720" y="265">🔴</text><text x="775" y="290">🟣</text>
+      <text x="630" y="320">🟡</text><text x="690" y="330">🔵</text><text x="750" y="345">🟢</text>
+      <text x="660" y="385">🔴</text><text x="720" y="390">🟣</text>
+    </g>
+  </g>
+  <!-- turban + gasp -->
+  <text x="140" y="180" font-size="86">🔮</text>
+  <text x="480" y="105" font-size="42" font-weight="800" fill="#3ee87a" text-anchor="middle" transform="rotate(-4 480 105)">THE CROWD GASPS!</text>
+  <text x="480" y="490" fill="url(#ttl)" font-size="58" font-weight="800" text-anchor="middle">The Great Guess-timator</text>
+</svg>

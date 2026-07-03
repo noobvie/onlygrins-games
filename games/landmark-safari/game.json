@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "landmark-safari",
+  "title": "Landmark Safari",
+  "category": "geography",
+  "short_description": "Your camera is full of famous landmarks but the GPS broke — label the Eiffel Tower, Machu Picchu and more with the right country before the jeep leaves.",
+  "description": "You're a wildlife photographer whose GPS broke mid-safari — the camera roll is packed with the world's most famous landmarks, but WHERE were they taken?! Label each photo with the right country (or continent, on higher grades) before the safari jeep runs out of snacks. Grade bands ramp from super-famous sights like the Eiffel Tower and the Great Pyramid, to Machu Picchu and the Taj Mahal, to deep cuts like Petra, Angkor Wat and Uluru with continent rounds mixed in. Every miss teaches a fun fact. A free online world landmarks and continents geography game for kids in grades 2–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 660,
+  "controls": "Mouse / tap the country (or continent) where the pictured landmark is found.",
+  "tags": [
+    "geography",
+    "landmarks",
+    "continents",
+    "countries",
+    "strand-landmarks",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:landmark-safari"
+}

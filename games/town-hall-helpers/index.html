@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Town Hall Helpers — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="civics" data-seed="town-hall-helpers"></script>
+
+<style>
+  :root{
+    --bg1:#33240c; --bg2:#472f12; --bg3:#241808;
+    --card:#3d2c10; --line:#a8802e; --text:#fff5df; --muted:#e8cc8a;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#33240c;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .prog{display:flex;align-items:center;gap:4px;justify-content:center;font-size:20px;
+    background:#2b1e08;border:2px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
+  .prog .step{opacity:.4;} .prog .step.done{opacity:1;}
+  .need{background:#2b1e08;border:2px dashed var(--orange);border-radius:16px;padding:14px;
+    text-align:center;max-width:560px;margin:0 auto 14px;}
+  .need .lbl{color:var(--orange);font-weight:800;font-size:13px;letter-spacing:.5px;}
+  .need .txt{font-weight:800;font-size:clamp(16px,3.2vw,22px);margin-top:4px;}
+  .q{font-size:clamp(14px,2.7vw,18px);font-weight:800;text-align:center;margin:0 0 12px;color:var(--muted);}
+  .roles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .role{cursor:pointer;border:3px solid var(--line);font-family:inherit;font-weight:800;
+    padding:14px 10px;border-radius:16px;color:var(--text);background:#54400f;
+    box-shadow:0 5px 0 rgba(0,0,0,.4);display:flex;align-items:center;gap:10px;justify-content:center;}
+  .role .ic{font-size:38px;line-height:1;}
+  .role .nm{font-size:clamp(15px,2.8vw,19px);}
+  .role:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.4);}
+  .role.right{background:var(--green);border-color:var(--green);color:#33240c;}
+  .role.wrong{background:var(--bad);border-color:var(--bad);color:#33240c;}
+  .role:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:16px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#33240c;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#54400f;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#c09a4a;}
+  @media (max-width:520px){ .roles{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🏛️ Town Hall Helpers</h1>
+      <p class="sub">Every community has helpers with special jobs — the mayor, a judge, firefighters,
+        librarians and more. A townsperson needs help! Tap the right helper for the job and keep
+        Grinsville running happily.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>everyday helpers</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>more community roles</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>town leaders &amp; officials</small></button>
+      </div>
+      <p class="sub">10 townsfolk to help · streaks earn bonus ribbons</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Helper 1/10</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="prog" id="prog"></div>
+      <div class="need"><div class="lbl">🙋 SOMEONE NEEDS HELP</div><div class="txt" id="needTxt">A cat is stuck up a tree!</div></div>
+      <div class="q">Who is the right helper to call?</div>
+      <div class="roles" id="roles"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🏛️</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // role → the need it answers. band: 0 everyday, 1 community, 2 officials.
+  var ROLES = [
+    { nm:'Firefighter',      ic:'🧑‍🚒', need:'A cat is stuck up a tall tree — and there\'s smoke nearby!', band:0 },
+    { nm:'Doctor',           ic:'🧑‍⚕️', need:'Someone has a poorly tummy and needs care.', band:0 },
+    { nm:'Police officer',   ic:'👮', need:'A bike was taken and someone broke a rule.', band:0 },
+    { nm:'Teacher',          ic:'🧑‍🏫', need:'Kids want to learn to read and write.', band:0 },
+    { nm:'Mail carrier',     ic:'📮', need:'A birthday card needs to reach Grandma across town.', band:0 },
+    { nm:'Bus driver',       ic:'🚌', need:'People need a safe ride across the city.', band:0 },
+    { nm:'Librarian',        ic:'📚', need:'Someone wants to borrow a book about dinosaurs.', band:1 },
+    { nm:'Dentist',          ic:'🦷', need:'A wobbly tooth needs a check-up.', band:1 },
+    { nm:'Vet',              ic:'🐾', need:'The town dog is limping and needs care.', band:1 },
+    { nm:'Park ranger',      ic:'🌲', need:'The town forest needs someone to protect it.', band:1 },
+    { nm:'Rubbish collector',ic:'🗑️', need:'The streets need the bins emptied.', band:1 },
+    { nm:'Nurse',            ic:'💉', need:'A patient needs their bandage changed gently.', band:1 },
+    { nm:'Mayor',            ic:'🎩', need:'The town must choose how to spend its money and lead meetings.', band:2 },
+    { nm:'Judge',            ic:'⚖️', need:'Two neighbours are arguing and need a fair decision.', band:2 },
+    { nm:'Council member',   ic:'🏛️', need:'Someone must vote on new rules for the town.', band:2 },
+    { nm:'Election officer',ic:'🗳️', need:'The votes on election day must be counted fairly.', band:2 },
+    { nm:'Town treasurer',  ic:'💰', need:'Someone must look after the town\'s budget and money.', band:2 },
+    { nm:'Town clerk',       ic:'🗂️', need:'The town\'s important records must be kept safe.', band:2 }
+  ];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', bands: [0] },
+    { id: 3, label: 'Grade 3',   bands: [0, 1] },
+    { id: 4, label: 'Grade 4–5', bands: [1, 2] }
+  ];
+  var ROUNDS = 10;
+
+  var CHEER = ['Just the right helper! 🎉', 'Grinsville thanks you! 🏛️', 'Problem solved! ⭐', 'Community hero! 🎖️'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var current = null, deck = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function yay(){ tone(620,.14,'sine',930); }
+  function nope(){ tone(200,.32,'sawtooth',90); }
+
+  function buildDeck() {
+    var pool = ROLES.filter(function (r) { return grade.bands.indexOf(r.band) >= 0; });
+    deck = shuffle(pool).slice(0, ROUNDS);
+    while (deck.length < ROUNDS) deck.push(pick(pool));
+  }
+
+  function drawProg() {
+    var el = $('prog'), html = '';
+    for (var i = 0; i < ROUNDS; i++) {
+      if (i === q) html += '<span class="step done">🙋</span>';
+      else if (i < q) html += '<span class="step done">✅</span>';
+      else html += '<span class="step">·</span>';
+    }
+    el.innerHTML = html;
+  }
+
+  function newQuestion() {
+    answered = false;
+    var r = deck[q];
+    var pool = ROLES.filter(function (x) { return grade.bands.indexOf(x.band) >= 0 && x.nm !== r.nm; });
+    var wrong = shuffle(pool).slice(0, 3);
+    current = { role: r, answer: r.nm, options: shuffle([r].concat(wrong)) };
+    $('roundLbl').textContent = 'Helper ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    drawProg();
+    $('needTxt').textContent = r.need;
+    var box = $('roles'); box.innerHTML = '';
+    current.options.forEach(function (o) {
+      var b = document.createElement('button');
+      b.className = 'role'; b.dataset.nm = o.nm;
+      b.innerHTML = '<span class="ic">' + o.ic + '</span><span class="nm">' + o.nm + '</span>';
+      b.addEventListener('click', function(){ choose(b, o.nm); });
+      box.appendChild(b);
+    });
+    EduSDK.startLesson(q + 1, { role: r.nm });
+  }
+
+  function choose(btn, nm) {
+    if (answered) return;
+    answered = true;
+    Array.prototype.forEach.call(document.querySelectorAll('.role'), function(b){
+      b.disabled = true;
+      if (b.dataset.nm === current.answer) b.classList.add('right');
+    });
+    var correct = nm === current.answer;
+    if (correct) {
+      streak++; nCorrect++;
+      var pts = 100 + streak * 15;
+      score += pts;
+      $('scoreVal').textContent = score;
+      yay();
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      btn.classList.add('wrong');
+      nope();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = 'The right helper was the ' + current.answer + '.';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 2000);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 2000);
+    } else setTimeout(newQuestion, 2000);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 8 ? '🏛️🏆' : nCorrect >= 5 ? '🏛️🎖️' : '🏛️🙋';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' townsfolk helped. ' +
+      (nCorrect >= 8 ? 'Grinsville\'s Citizen of the Year! You know every helper\'s job.' :
+       nCorrect >= 5 ? 'Great community spirit — a couple of calls went to the wrong helper.' :
+       'A town runs on knowing who does what. Try again and keep Grinsville happy!');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    buildDeck();
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'town-hall-helpers' });
+})();
+</script>
+</body>
+</html>

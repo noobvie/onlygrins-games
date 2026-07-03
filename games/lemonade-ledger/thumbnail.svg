@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3d3305"/><stop offset=".5" stop-color="#4f4208"/><stop offset="1" stop-color="#251f03"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffe45e"/><stop offset=".5" stop-color="#ffb84d"/><stop offset="1" stop-color="#3ee87a"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="150" y="270" font-size="150" text-anchor="middle">🍋</text>
+  <text x="150" y="360" font-size="80" text-anchor="middle">🥤</text>
+  <!-- ledger -->
+  <g font-weight="800">
+    <rect x="330" y="120" width="500" height="210" rx="16" fill="#fffbe4"/>
+    <text x="355" y="165" font-size="28" fill="#3d3305">🥤 Cups sold        8</text>
+    <text x="355" y="210" font-size="28" fill="#3d3305">🏷️ Price each      ツ2</text>
+    <text x="355" y="255" font-size="28" fill="#3d3305">🍋 Lemons cost   ツ5</text>
+    <line x1="355" y1="272" x2="805" y2="272" stroke="#c9bd8a" stroke-width="2"/>
+    <text x="355" y="312" font-size="30" fill="#1a7a1a" font-weight="800">💰 Profit = ？</text>
+  </g>
+  <text x="480" y="430" fill="url(#ttl)" font-size="62" font-weight="800" text-anchor="middle">Lemonade Ledger</text>
+  <text x="480" y="476" fill="#e0d494" font-size="26" font-weight="700" text-anchor="middle">Profit or loss? Balance the books!</text>
+</svg>

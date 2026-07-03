@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "cuckoo-clock-chaos",
+  "title": "Cuckoo Clock Chaos",
+  "category": "math",
+  "short_description": "Set the cuckoo clock EXACTLY right — get it wrong and the cuckoo bursts out screaming and wakes the angry gnomes.",
+  "description": "The cuckoo bird refuses to come out unless the clock is set EXACTLY right. Nudge the hour and minute hands on a real analog clock face to match each written time — get it wrong and the cuckoo bursts out screaming at 3 a.m., waking an entire village of tiny furious gnomes. Grade bands ramp from o'clock and half past, to quarter past and 5-minute times, to any time plus elapsed-time challenges (\"set the clock 45 minutes later\"). A free online telling-time game for kids in grades 1–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap the + and − buttons to move the hour and minute hands, then press Release the cuckoo.",
+  "tags": [
+    "math",
+    "time",
+    "clocks",
+    "strand-measurement",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:cuckoo-clock-chaos"
+}

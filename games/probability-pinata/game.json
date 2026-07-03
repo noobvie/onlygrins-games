@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "probability-pinata",
+  "title": "Probability Piñata",
+  "category": "math",
+  "short_description": "Pick the piñata most likely to hold treasure — choose badly and yours is full of angry bees wearing tiny party hats.",
+  "description": "It's fiesta day, and only ONE swing of the stick! Peek at what's inside each piñata and use probability to pick well — is pulling a sweet certain, likely, unlikely or impossible? Which piñata gives the best chance of treasure? What fraction of the sweets are red? Choose badly and your piñata turns out to be full of angry bees wearing tiny party hats. Grade bands ramp from certain/likely/unlikely/impossible, to comparing chances between piñatas, to writing the chance as a fraction. A free online probability and chance game for kids in grades 2–5, with speed and streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 620,
+  "controls": "Mouse / tap the best answer before the fiesta timer runs out.",
+  "tags": [
+    "math",
+    "probability",
+    "chance",
+    "fractions",
+    "strand-data",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:probability-pinata"
+}

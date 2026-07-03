@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "ocean-commotion",
+  "title": "Ocean Commotion",
+  "category": "geography",
+  "short_description": "Tour oceans, rivers, deserts and mountains in Captain Grin's submarine — answer wrong and the opinionated octopus grabs the wheel.",
+  "description": "Captain Grin's submarine is touring the planet's wettest, tallest and driest record-breakers — the five oceans, the longest rivers, the biggest deserts and the mightiest mountains. Answer the crew's questions right to keep the tour on course; answer wrong and the octopus navigator grabs the wheel (he has opinions, and eight of them are wrong). Grade bands ramp from naming the oceans and Earth's biggest things, to rivers, deserts and mountain ranges, to record-breaker trivia like the Mariana Trench and Angel Falls. Every miss teaches a fun fact. A free online physical geography game for kids in grades 2–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 680,
+  "controls": "Mouse / tap the right answer to each ocean and map question.",
+  "tags": [
+    "geography",
+    "oceans",
+    "rivers",
+    "mountains",
+    "physical-geography",
+    "strand-physical-geography",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:ocean-commotion"
+}

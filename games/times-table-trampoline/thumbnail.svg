@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1030"/><stop offset=".55" stop-color="#17306b"/><stop offset="1" stop-color="#2b57a8"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5ad8ff"/><stop offset=".5" stop-color="#3ee87a"/><stop offset="1" stop-color="#ff8a5c"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- clouds -->
+  <g font-size="48" opacity=".7">
+    <text x="90" y="120">☁️</text><text x="800" y="90">☁️</text><text x="700" y="220">☁️</text><text x="160" y="260">☁️</text>
+  </g>
+  <!-- flying walrus -->
+  <text x="430" y="200" font-size="130" text-anchor="middle" transform="rotate(-12 430 200)">🦭</text>
+  <text x="560" y="110" font-size="42" font-weight="800" fill="#3ee87a" transform="rotate(8 560 110)">BOING!</text>
+  <!-- question bubble -->
+  <g>
+    <rect x="600" y="250" width="270" height="110" rx="20" fill="#0d1533" stroke="#2b3a77" stroke-width="4"/>
+    <text x="735" y="322" fill="#eaf2ff" font-size="52" font-weight="800" text-anchor="middle">7 × 8 = ?</text>
+  </g>
+  <!-- trampoline -->
+  <g>
+    <rect x="280" y="420" width="300" height="20" rx="10" fill="#5ad8ff"/>
+    <line x1="310" y1="440" x2="280" y2="490" stroke="#2b3a77" stroke-width="12" stroke-linecap="round"/>
+    <line x1="550" y1="440" x2="580" y2="490" stroke="#2b3a77" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <text x="480" y="505" fill="url(#ttl)" font-size="58" font-weight="800" text-anchor="middle">Times-Table Trampoline</text>
+</svg>

@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Symmetry Salon — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="symmetry-salon"></script>
+
+<style>
+  :root{
+    --bg1:#2a0a36; --bg2:#3a1248; --bg3:#150420;
+    --card:#301040; --line:#7a3a9e; --text:#f8f0ff; --muted:#cfa8e8;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --pink:#ff8fc7; --gold:#ffd166; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(140deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--pink),var(--gold),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#24082e;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--pink);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .arena{background:#240a30;border:2px solid var(--line);border-radius:16px;padding:12px 14px;
+    text-align:center;margin-bottom:12px;overflow:hidden;}
+  .task{font-size:clamp(16px,3vw,20px);font-weight:800;color:var(--muted);}
+  .lookbox{display:flex;align-items:center;justify-content:center;gap:16px;margin:6px 0 8px;min-height:130px;}
+  .lookbox .client{font-size:56px;animation:primp 1.4s infinite;}
+  @keyframes primp{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+  .lookbox svg{display:block;}
+  .lookbox .bigletter{font-size:96px;font-weight:800;color:var(--gold);line-height:1;}
+  .timerbar{height:10px;border-radius:6px;background:#150420;overflow:hidden;}
+  .timerbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--gold),var(--bad));}
+  .answers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:640px;margin:0 auto;}
+  .answers.two{grid-template-columns:1fr 1fr;max-width:460px;}
+  .ans{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:22px;
+    padding:14px 6px;border-radius:14px;color:#24082e;background:var(--pink);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .ans small{display:block;font-size:13px;font-weight:700;opacity:.7;}
+  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .ans.right{background:var(--green);} .ans.wrong{background:var(--bad);}
+  .ans:disabled{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#24082e;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#4a2060;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#8a5aa8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>💇 Symmetry Salon</h1>
+      <p class="sub">Fussy monster clients demand PERFECTLY balanced looks. Study each shape and
+        letter — does it have a mirror line? How many? Answer wrong and the client sobs
+        dramatically into the salon mirror until it cracks. They will NOT be paying.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 2<small>mirror line: yes or no?</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3–4<small>count the mirror lines</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>sneaky shapes (beware!)</small></button>
+      </div>
+      <p class="sub">12 fussy clients · fast styling = bonus points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Client 1/12</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="arena">
+        <div class="task" id="qtext">How many mirror lines?</div>
+        <div class="lookbox"><span class="client" id="client">👹</span><span id="lookArt"></span></div>
+        <div class="timerbar"><i id="timerFill"></i></div>
+      </div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">💇</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Next shift ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  function poly(points) {
+    return '<svg width="120" height="120" viewBox="0 0 120 120"><polygon points="' + points +
+      '" fill="#c77dff" stroke="#ff8fc7" stroke-width="5" stroke-linejoin="round"/></svg>';
+  }
+  // Every design a client can ask about: art + name + number of mirror lines ('inf' = circle).
+  var DESIGNS = [
+    { name: 'square',               lines: 4,     art: poly('25,25 95,25 95,95 25,95') },
+    { name: 'rectangle',            lines: 2,     art: poly('15,35 105,35 105,85 15,85') },
+    { name: 'equilateral triangle', lines: 3,     art: poly('60,18 100,88 20,88') },
+    { name: 'isosceles triangle',   lines: 1,     art: poly('60,15 92,95 28,95') },
+    { name: 'scalene triangle',     lines: 0,     art: poly('25,90 105,80 45,25') },
+    { name: 'circle',               lines: 'inf', art: '<svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="42" fill="#c77dff" stroke="#ff8fc7" stroke-width="5"/></svg>' },
+    { name: 'regular pentagon',     lines: 5,     art: poly('60,20 99.9,49 84.7,96 35.3,96 20.1,49') },
+    { name: 'regular hexagon',      lines: 6,     art: poly('60,18 96.4,39 96.4,81 60,102 23.6,81 23.6,39') },
+    { name: 'parallelogram',        lines: 0,     art: poly('35,85 65,35 105,35 75,85') },
+    { name: 'rhombus',              lines: 2,     art: poly('60,20 95,60 60,100 25,60') },
+    { name: 'plus sign',            lines: 4,     art: poly('45,20 75,20 75,45 100,45 100,75 75,75 75,100 45,100 45,75 20,75 20,45 45,45') },
+    { name: 'heart',                lines: 1,     art: '<span class="bigletter">❤️</span>' }
+  ];
+  var LETTER = function (ch, lines) {
+    return { name: 'letter ' + ch, lines: lines, art: '<span class="bigletter">' + ch + '</span>' };
+  };
+  var LETTERS_YES = 'AHMOTUVWXY'.split('').map(function (c) { return LETTER(c, 1); });
+  var LETTERS_NO  = 'FGJLNPQRSZ'.split('').map(function (c) { return LETTER(c, 0); });
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var byName = function (names) {
+    return DESIGNS.filter(function (d) { return names.indexOf(d.name) >= 0; });
+  };
+  var GRADES = [
+    { id: 2, label: 'Grade 2', secs: 13, mode: 'yesno',
+      pool: LETTERS_YES.concat(LETTERS_NO, byName(['square', 'heart', 'scalene triangle', 'circle', 'parallelogram', 'isosceles triangle'])) },
+    { id: 3, label: 'Grade 3–4', secs: 12, mode: 'count',
+      pool: byName(['square', 'rectangle', 'equilateral triangle', 'isosceles triangle', 'circle', 'heart', 'plus sign', 'scalene triangle']) },
+    { id: 4, label: 'Grade 4–5', secs: 10, mode: 'count',
+      pool: byName(['parallelogram', 'rhombus', 'regular pentagon', 'regular hexagon', 'scalene triangle', 'rectangle', 'plus sign', 'circle', 'isosceles triangle']) }
+  ];
+  var ROUNDS = 12;
+
+  var FAB  = ['FABULOUS. The client kisses the mirror. 💋', 'Perfectly balanced, as all haircuts should be. ✂️✨',
+              'The client tips in gold coins AND compliments! 💰', 'Other monsters are pressing their faces to the window. 👹👀'];
+  var SOB  = ['The client is sobbing into the mirror. It just cracked. 😭🪞', 'Asymmetry DETECTED. The client fainted onto the hairdryer. 💇💥',
+              'One-star review: "my left side is crying". ⭐', 'The client stormed out wearing the salon cape. That\'s theft. 🦹'];
+
+  var CLIENTS = ['👹', '👻', '🧟', '🧛', '👽', '🤖', '🦖', '🐉'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var answer = '', timer = null, tLeft = 0, cur = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function sparkle(){ tone(988,.1,'sine',1976); setTimeout(function(){ tone(1319,.16,'sine'); }, 100); }
+  function crack(){ tone(160,.45,'sawtooth',70); }
+
+  function lineLabel(v) {
+    if (v === 'inf') return 'endless!';
+    return String(v);
+  }
+
+  function makeQuestion() {
+    var prev = cur;
+    do { cur = pick(grade.pool); } while (prev && cur.name === prev.name);
+    $('client').textContent = pick(CLIENTS);
+    $('lookArt').innerHTML = cur.art;
+
+    var opts;
+    if (grade.mode === 'yesno') {
+      answer = cur.lines === 0 ? 'no' : 'yes';
+      $('qtext').textContent = 'The client wants this ' + cur.name + ' look. Does it have a MIRROR LINE?';
+      opts = ['yes', 'no'];
+      $('answers').className = 'answers two';
+    } else {
+      answer = lineLabel(cur.lines);
+      $('qtext').textContent = 'How many LINES OF SYMMETRY does this ' + cur.name + ' have?';
+      var candidates = ['0', '1', '2', '3', '4', '5', '6', 'endless!'].filter(function (v) { return v !== answer; });
+      // keep decoys near the truth so it isn't a giveaway
+      candidates.sort(function (a, b) {
+        var num = function (v) { return v === 'endless!' ? 9 : Number(v); };
+        return Math.abs(num(a) - num(cur.lines === 'inf' ? 9 : cur.lines)) -
+               Math.abs(num(b) - num(cur.lines === 'inf' ? 9 : cur.lines));
+      });
+      opts = shuffle([answer, candidates[0], candidates[1]]);
+      $('answers').className = 'answers';
+    }
+    var box = $('answers');
+    box.innerHTML = '';
+    opts.forEach(function (v) {
+      var b = document.createElement('button');
+      b.className = 'ans';
+      b.innerHTML = v.toUpperCase() + '<small>' + (grade.mode === 'yesno' ? 'mirror line?' : 'mirror lines') + '</small>';
+      b.dataset.v = v;
+      b.addEventListener('click', function(){ choose(b, v); });
+      box.appendChild(b);
+    });
+  }
+
+  function newQuestion() {
+    answered = false;
+    $('roundLbl').textContent = 'Client ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    makeQuestion();
+    tLeft = grade.secs;
+    clearInterval(timer);
+    timer = setInterval(function () {
+      tLeft -= 0.1;
+      $('timerFill').style.width = Math.max(0, tLeft / grade.secs * 100) + '%';
+      if (tLeft <= 0) timeUp();
+    }, 100);
+    EduSDK.startLesson(q + 1, { design: cur.name });
+  }
+
+  function settle(correct, btn) {
+    clearInterval(timer);
+    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
+      b.disabled = true;
+      if (b.dataset.v === answer) b.classList.add('right');
+    });
+    if (correct) {
+      streak++; nCorrect++;
+      var speedBonus = Math.round(tLeft / grade.secs * 40);
+      var pts = 100 + speedBonus + streak * 10;
+      score += pts;
+      $('scoreVal').textContent = score;
+      sparkle();
+      $('toast').textContent = pick(FAB) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      if (btn) btn.classList.add('wrong');
+      crack();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(SOB) + '  (the ' + cur.name + ' has ' +
+        (cur.lines === 'inf' ? 'endless mirror lines' : cur.lines + ' mirror line' + (cur.lines === 1 ? '' : 's')) + ')';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1700);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 1700);
+    } else setTimeout(newQuestion, 1700);
+  }
+
+  function choose(btn, v) {
+    if (answered) return;
+    answered = true;
+    settle(v === answer, btn);
+  }
+
+  function timeUp() {
+    if (answered) return;
+    answered = true;
+    settle(false, null);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 10 ? '💇🏆' : nCorrect >= 6 ? '💇✂️' : '🪞💥';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' clients styled to perfection. ' +
+      (nCorrect >= 10 ? 'The salon earns a golden scissors award!' :
+       nCorrect >= 6 ? 'A respectable day of monster styling.' :
+       'Every mirror in the salon is cracked. The glazier sends his regards.');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0; cur = null;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  var $ready = document.getElementById('sdknote');
+  $ready.textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'symmetry-salon' });
+})();
+</script>
+</body>
+</html>

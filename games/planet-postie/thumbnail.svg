@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#060a24"/><stop offset=".5" stop-color="#0c1440"/><stop offset="1" stop-color="#030512"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5ad8ff"/><stop offset=".5" stop-color="#c77dff"/><stop offset="1" stop-color="#ffd166"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- stars -->
+  <circle cx="90" cy="70" r="3" fill="#eef0ff"/><circle cx="240" cy="40" r="2" fill="#eef0ff"/>
+  <circle cx="420" cy="90" r="2.5" fill="#eef0ff"/><circle cx="640" cy="50" r="3" fill="#eef0ff"/>
+  <circle cx="860" cy="90" r="2" fill="#eef0ff"/><circle cx="760" cy="150" r="2.5" fill="#eef0ff"/>
+  <!-- sun on the left -->
+  <circle cx="-40" cy="270" r="130" fill="#ffd166" opacity=".9"/>
+  <!-- planet line-up -->
+  <g font-size="44" text-anchor="middle">
+    <text x="170" y="290">🪨</text><text x="250" y="290" font-size="52">🌕</text>
+    <text x="340" y="290" font-size="58">🌍</text><text x="430" y="290" font-size="48">🔴</text>
+    <text x="540" y="290" font-size="76">🟠</text><text x="670" y="290" font-size="72">🪐</text>
+    <text x="780" y="290" font-size="56">🔵</text><text x="870" y="290" font-size="52">💙</text>
+  </g>
+  <text x="340" y="340" font-size="24" font-weight="800" fill="#3ee87a" text-anchor="middle">3rd from the Sun ✓</text>
+  <!-- rocket postie with parcel -->
+  <text x="480" y="150" font-size="90" text-anchor="middle" transform="rotate(20 480 150)">🚀</text>
+  <text x="560" y="180" font-size="52" text-anchor="middle">📦</text>
+  <!-- frozen parcel at neptune -->
+  <text x="870" y="380" font-size="40" text-anchor="middle">🧊</text>
+  <text x="870" y="415" font-size="20" font-weight="800" fill="#9ca8e0" text-anchor="middle">return to sender</text>
+  <text x="480" y="495" fill="url(#ttl)" font-size="64" font-weight="800" text-anchor="middle">Planet Postie</text>
+</svg>

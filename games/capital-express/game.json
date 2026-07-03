@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "capital-express",
+  "title": "Capital Express",
+  "category": "geography",
+  "short_description": "Drive the world's fastest mail train and deliver every parcel to the right capital city — miss and it returns covered in confused stamps.",
+  "description": "All aboard the Capital Express, the world's fastest mail train! Every parcel is addressed to a country's capital city — send Spain's mail to Barcelona and it comes straight back covered in confused stamps and a disappointed goat. Grade bands ramp from famous capitals like Paris and Tokyo, to countries around the world, to the sneaky ones everyone gets wrong (Canberra, not Sydney!) plus reverse rounds where you name the country from its capital. A free online world capitals geography game for kids in grades 2–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap the capital city each parcel should be delivered to.",
+  "tags": [
+    "geography",
+    "capitals",
+    "countries",
+    "world",
+    "strand-capitals",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:capital-express"
+}

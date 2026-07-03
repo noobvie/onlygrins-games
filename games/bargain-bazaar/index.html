@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Bargain Bazaar — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="money" data-seed="bargain-bazaar"></script>
+
+<style>
+  :root{
+    --bg1:#33210c; --bg2:#4a3312; --bg3:#241708;
+    --card:#3d2c11; --line:#a8802e; --text:#fff3df; --muted:#e8ca8a;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81; --gold:#ffd54a;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#33210c;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .stalls{display:flex;align-items:center;gap:4px;justify-content:center;font-size:20px;
+    background:#2b1c08;border:2px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
+  .stalls .step{opacity:.4;} .stalls .step.done{opacity:1;}
+  .item-banner{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:12px;}
+  .item-banner .ic{font-size:56px;}
+  .item-banner .nm{font-size:clamp(18px,3.6vw,26px);font-weight:800;}
+  .q{font-size:clamp(15px,2.8vw,19px);font-weight:800;text-align:center;margin:0 0 12px;color:var(--muted);}
+  .deals{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:640px;margin:0 auto;}
+  .deal{cursor:pointer;border:3px solid #a8802e;font-family:inherit;font-weight:800;
+    padding:16px 12px;border-radius:18px;color:var(--text);background:#54390f;
+    box-shadow:0 5px 0 rgba(0,0,0,.4);text-align:center;}
+  .deal .shop{font-size:36px;}
+  .deal .offer{font-size:clamp(16px,3vw,20px);margin:6px 0;}
+  .deal .price{color:var(--gold);font-size:clamp(18px,3.4vw,24px);}
+  .deal:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.4);}
+  .deal.right{background:var(--green);border-color:var(--green);color:#33210c;}
+  .deal.right .price{color:#204010;}
+  .deal.wrong{background:var(--bad);border-color:var(--bad);color:#33210c;}
+  .deal.wrong .price{color:#4a1015;}
+  .deal:disabled{cursor:default;}
+  .deal .unit{display:block;font-size:13px;font-weight:700;opacity:0;margin-top:4px;}
+  .deal.reveal .unit{opacity:.9;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:17px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#33210c;background:var(--gold);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#54390f;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#c09a4a;}
+  @media (max-width:520px){ .deals{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🛒 Bargain Bazaar</h1>
+      <p class="sub">Welcome to the world's noisiest market! Every stall SWEARS it has the best deal.
+        Compare the prices, discounts and "3-for-2" tricks, and tap the stall that's the true bargain.
+        The shopkeepers can smell a smart shopper.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>cheaper price wins</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>discounts &amp; sale tags</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>best value per item</small></button>
+      </div>
+      <p class="sub">10 shopping duels · streaks earn bonus coins</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Deal 1/10</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="stalls" id="stalls"></div>
+      <div class="item-banner"><span class="ic" id="ic">🍎</span><span class="nm" id="nm">Apples</span></div>
+      <div class="q" id="qtext">Which stall gives you the best deal?</div>
+      <div class="deals" id="deals"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🛒</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Shop again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var GOODS = [
+    { nm:'Apples', ic:'🍎' }, { nm:'Bananas', ic:'🍌' }, { nm:'Cookies', ic:'🍪' },
+    { nm:'Pencils', ic:'✏️' }, { nm:'Socks', ic:'🧦' }, { nm:'Juice boxes', ic:'🧃' },
+    { nm:'Stickers', ic:'⭐' }, { nm:'Marbles', ic:'🔵' }, { nm:'Cupcakes', ic:'🧁' }
+  ];
+  var SHOPS = ['🏪','🏬','🛖','⛺'];
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', kind: 'price'    },
+    { id: 3, label: 'Grade 3',   kind: 'discount' },
+    { id: 4, label: 'Grade 4–5', kind: 'unit'     }
+  ];
+  var ROUNDS = 10;
+
+  var CHEER = ['Smart shopper! The other stalls are fuming. 😤', 'BARGAIN SPOTTED. Your wallet cheers. 👛',
+               'Nobody out-deals you! 🏷️✨', 'The shopkeeper sighs and gives you a free grape. 🍇'];
+  var OOPS  = ['Ooh, tricky pricing — that wasn\'t the best deal. 🏷️', 'The stall did a sneaky sales dance. 💃',
+               'Overpaid! The coin rolls away sadly. 🪙', 'That "SALE!" sign was fibbing a little. 📉'];
+
+  var grade = GRADES[0];
+  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
+  var current = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+  function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.1,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function ka(){ tone(760,.1,'square'); setTimeout(function(){ tone(1140,.2,'sine',1500); },90); }
+  function nope(){ tone(220,.35,'sawtooth',90); }
+
+  // Each deal has a true "effective cost" we compare; label shows the offer text.
+  function makeQuestion() {
+    var g = pick(GOODS), shops = shuffle(SHOPS).slice(0, 2);
+    var deals = [];
+    if (grade.kind === 'price') {
+      var base = rint(4, 12);
+      deals.push({ cost: base,        label: '$' + base,        unit: '' });
+      deals.push({ cost: base + rint(1, 4), label: '', unit: '' });
+      deals[1].label = '$' + deals[1].cost;
+    } else if (grade.kind === 'discount') {
+      // Deal A: full price with % off; Deal B: a flat sale price
+      var full = rint(10, 20);
+      var pct = pick([10, 20, 25, 50]);
+      var aCost = Math.round(full * (100 - pct)) / 100;
+      deals.push({ cost: aCost, label: 'Was $' + full + ', ' + pct + '% OFF', unit: '= $' + aCost.toFixed(2) });
+      var bCost = aCost + pick([-1, 1, 2]) ;
+      if (bCost <= 0) bCost = aCost + 2;
+      deals.push({ cost: bCost, label: 'Flat sale price $' + bCost, unit: '= $' + Number(bCost).toFixed(2) });
+    } else {
+      // unit price: multipacks, compare $ per item
+      var makePack = function () {
+        var n = pick([2, 3, 4, 5, 6]);
+        var price = rint(n, n * 3);
+        return { cost: Math.round((price / n) * 100) / 100, n: n, price: price };
+      };
+      var a = makePack(), b = makePack();
+      while (Math.abs(a.cost - b.cost) < 0.01) b = makePack();
+      deals.push({ cost: a.cost, label: a.n + ' for $' + a.price, unit: '= $' + a.cost.toFixed(2) + ' each' });
+      deals.push({ cost: b.cost, label: b.n + ' for $' + b.price, unit: '= $' + b.cost.toFixed(2) + ' each' });
+    }
+    // ensure the two costs differ; the cheaper is the answer
+    var bestIdx = deals[0].cost <= deals[1].cost ? 0 : 1;
+    deals.forEach(function (d, i) { d.shop = shops[i]; });
+    return { good: g, deals: deals, bestIdx: bestIdx };
+  }
+
+  function drawStalls() {
+    var el = $('stalls'), html = '';
+    for (var i = 0; i < ROUNDS; i++) {
+      if (i === q) html += '<span class="step done">🛍️</span>';
+      else if (i < q) html += '<span class="step done">🪙</span>';
+      else html += '<span class="step">·</span>';
+    }
+    el.innerHTML = html;
+  }
+
+  function newQuestion() {
+    answered = false;
+    current = makeQuestion();
+    $('roundLbl').textContent = 'Deal ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    drawStalls();
+    $('ic').textContent = current.good.ic;
+    $('nm').textContent = current.good.nm;
+    $('qtext').textContent = grade.kind === 'price'
+      ? 'Which stall sells ' + current.good.nm + ' for less?'
+      : (grade.kind === 'discount'
+        ? 'After the discount, which deal is cheaper?'
+        : 'Which pack is the best value per item?');
+    var box = $('deals'); box.innerHTML = '';
+    current.deals.forEach(function (d, i) {
+      var b = document.createElement('button');
+      b.className = 'deal'; b.dataset.i = i;
+      b.innerHTML = '<div class="shop">' + d.shop + '</div><div class="offer">' + d.label +
+        '</div><span class="unit">' + d.unit + '</span>';
+      b.addEventListener('click', function(){ choose(b, i); });
+      box.appendChild(b);
+    });
+    EduSDK.startLesson(q + 1, { kind: grade.kind });
+  }
+
+  function choose(btn, i) {
+    if (answered) return;
+    answered = true;
+    Array.prototype.forEach.call(document.querySelectorAll('.deal'), function(b){
+      b.disabled = true; b.classList.add('reveal');
+      if (Number(b.dataset.i) === current.bestIdx) b.classList.add('right');
+    });
+    var correct = i === current.bestIdx;
+    if (correct) {
+      streak++; nCorrect++;
+      var pts = 100 + streak * 15;
+      score += pts;
+      $('scoreVal').textContent = score;
+      ka();
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      streak = 0;
+      btn.classList.add('wrong');
+      nope();
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' The green stall was the real bargain!';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 2200);
+    if (q === Math.floor(ROUNDS / 2)) {
+      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 2200);
+    } else setTimeout(newQuestion, 2200);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nCorrect >= 8 ? '🛒🏆' : nCorrect >= 5 ? '🛒🪙' : '🏷️😬';
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' best deals found. ' +
+      (nCorrect >= 8 ? 'Master bargain-hunter! The whole bazaar bows to your wallet.' :
+       nCorrect >= 5 ? 'Sharp shopping — a couple of sneaky sale tags got you.' :
+       'The shopkeepers are doing a little victory dance. Study those prices and try again!');
+    EduSDK.submitScore(score, { grade: grade.id, correct: nCorrect })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nCorrect = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newQuestion();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'bargain-bazaar' });
+})();
+</script>
+</body>
+</html>

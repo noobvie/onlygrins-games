@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101c2e"/><stop offset=".5" stop-color="#16263e"/><stop offset="1" stop-color="#0a1220"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5ad8ff"/><stop offset=".5" stop-color="#c77dff"/><stop offset="1" stop-color="#ffb84d"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- grid -->
+  <g>
+    <rect x="120" y="110" width="230" height="230" rx="14" fill="#1d3252" stroke="#2c4a78" stroke-width="3"/>
+    <line x1="120" y1="187" x2="350" y2="187" stroke="#2c4a78" stroke-width="2"/>
+    <line x1="120" y1="264" x2="350" y2="264" stroke="#2c4a78" stroke-width="2"/>
+    <line x1="197" y1="110" x2="197" y2="340" stroke="#2c4a78" stroke-width="2"/>
+    <line x1="274" y1="110" x2="274" y2="340" stroke="#2c4a78" stroke-width="2"/>
+    <text x="150" y="170" font-size="46">🤖</text>
+    <text x="150" y="325" font-size="42">🧱</text>
+    <text x="295" y="325" font-size="46">⚽</text>
+  </g>
+  <!-- program slots -->
+  <g>
+    <rect x="410" y="150" width="60" height="60" rx="10" fill="#5ad8ff"/><text x="425" y="196" font-size="34">➡️</text>
+    <rect x="485" y="150" width="60" height="60" rx="10" fill="#5ad8ff"/><text x="500" y="196" font-size="34">⬇️</text>
+    <rect x="560" y="150" width="60" height="60" rx="10" fill="#5ad8ff"/><text x="575" y="196" font-size="34">➡️</text>
+    <rect x="635" y="150" width="60" height="60" rx="10" fill="#5ad8ff"/><text x="650" y="196" font-size="34">⬇️</text>
+    <rect x="720" y="150" width="120" height="60" rx="10" fill="#3ee87a"/><text x="740" y="192" font-size="28" font-weight="800" fill="#0a1424">▶ RUN</text>
+  </g>
+  <text x="620" y="290" font-size="34" font-weight="800" fill="#a7bfe0" text-anchor="middle">Build the program, press RUN!</text>
+  <text x="480" y="420" fill="url(#ttl)" font-size="66" font-weight="800" text-anchor="middle">Robo Recess</text>
+  <text x="480" y="466" fill="#a7bfe0" font-size="26" font-weight="700" text-anchor="middle">Code Beep the robot to the ball!</text>
+</svg>

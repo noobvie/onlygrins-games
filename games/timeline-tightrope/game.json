@@ -1,0 +1,32 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "timeline-tightrope",
+  "title": "Timeline Tightrope",
+  "category": "history",
+  "short_description": "Tick the Time Cat walks a tightrope across history — tap the event that happened first (or most recently) to keep him from landing in the wrong century.",
+  "description": "Tick the Time Cat is walking a tightrope across all of history, and he can only step in the right order! Look at the event cards — pyramids, Vikings, the Moon landing, the first smartphone — and tap the one that happened first (or most recently). It builds a real sense of chronology and how events line up across thousands of years. Grade bands ramp from events far apart in time, to closer dates with three cards, to four tightly-spaced events for grade 5. Every answer reveals the real date. A free online history and chronology game for kids in grades 2–5, with streak bonuses feeding your score and GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 640,
+  "controls": "Mouse / tap the event card that happened first or most recently.",
+  "tags": [
+    "history",
+    "chronology",
+    "timeline",
+    "ordering",
+    "strand-chronology",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:timeline-tightrope"
+}

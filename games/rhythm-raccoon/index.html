@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Rhythm Raccoon — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+
+<style>
+  :root{
+    --bg1:#111a2e; --bg2:#182541; --bg3:#0a111f;
+    --card:#16233d; --line:#324e7c; --text:#eaf1ff; --muted:#a6bde0;
+    --green:#3ee87a; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffb84d; --pink:#ff8fc0; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--pink),var(--purple),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#0a1424;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .arena{background:#101c33;border:2px solid var(--line);border-radius:16px;padding:20px 16px;
+    text-align:center;margin-bottom:12px;}
+  .raccoon{font-size:clamp(52px,10vw,80px);margin:0;transition:transform .1s;}
+  .raccoon.bop{transform:scale(1.15) rotate(-4deg);}
+  .status{font-size:clamp(16px,3vw,20px);font-weight:800;color:var(--muted);min-height:26px;margin:8px 0 16px;}
+  .status.you{color:var(--pink);}
+  .pads{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:520px;margin:0 auto;}
+  .pad{cursor:pointer;border:none;aspect-ratio:1;border-radius:18px;font-size:34px;
+    box-shadow:0 6px 0 rgba(0,0,0,.4);transition:filter .08s,transform .08s;filter:brightness(.72);}
+  .pad:active{transform:translateY(3px);}
+  .pad.lit{filter:brightness(1.5);transform:scale(1.04);}
+  .pad0{background:var(--pink);} .pad1{background:var(--blue);}
+  .pad2{background:var(--green);} .pad3{background:var(--orange);}
+  .pads.locked .pad{cursor:default;}
+  .toast{min-height:26px;text-align:center;font-weight:800;font-size:18px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;}
+  .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;
+    padding:13px 30px;border-radius:14px;color:#0a1424;background:var(--green);
+    box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);}
+  .btn.ghost{background:#24406b;color:var(--text);}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#5a7cad;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <!-- START -->
+    <div id="start">
+      <h1>🦝 Rhythm Raccoon</h1>
+      <p class="sub">Ringo the raccoon found a set of shiny drums in the bins and started a band!
+        Watch and listen as he taps out a beat, then repeat it back by tapping the same pads in
+        the same order. Each round adds one more beat — how long a rhythm can you remember?</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>slow &amp; steady</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>a bit quicker</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>fast &amp; funky</small></button>
+      </div>
+      <p class="sub">Remember the beat · longer rhythms = more points</p>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Beat 1</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="arena">
+        <div class="raccoon" id="raccoon">🦝</div>
+        <div class="status" id="status">Watch Ringo…</div>
+        <div class="pads" id="pads">
+          <button class="pad pad0" data-p="0">🥁</button>
+          <button class="pad pad1" data-p="1">🎵</button>
+          <button class="pad pad2" data-p="2">🔔</button>
+          <button class="pad pad3" data-p="3">🎸</button>
+        </div>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🦝</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">Play again ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  // beat = ms between notes when Ringo plays; shorter = harder to follow.
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', beat: 720, start: 2 },
+    { id: 3, label: 'Grade 3',   beat: 560, start: 3 },
+    { id: 4, label: 'Grade 4–5', beat: 420, start: 3 }
+  ];
+  var MAX_ROUNDS = 12; // caps the session length
+
+  // Pentatonic-ish notes so any rhythm sounds pleasant.
+  var NOTES = [330, 392, 494, 587]; // E4 G4 B4 D5
+
+  var grade = GRADES[0];
+  var score = 0, round = 0, seq = [], inputIdx = 0, accepting = false, misses = 0;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function ensureAudio(){ if (!actx) { try { actx = new AC(); } catch(e){} } }
+  function play(freq, dur){ try{ ensureAudio(); if(!actx) return;
+    var o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'triangle'; o.frequency.value = freq;
+    g.gain.setValueAtTime(.0001, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.22, actx.currentTime + .02);
+    g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + (dur||.3));
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + (dur||.3) + .02);
+  }catch(e){} }
+  function buzz(){ try{ ensureAudio(); if(!actx) return;
+    var o = actx.createOscillator(), g = actx.createGain();
+    o.type='sawtooth'; o.frequency.setValueAtTime(200,actx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(80,actx.currentTime+.3);
+    g.gain.setValueAtTime(.2,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+.3);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+.32);
+  }catch(e){} }
+
+  function litPad(i, ms) {
+    var pad = $('pads').children[i];
+    pad.classList.add('lit');
+    $('raccoon').classList.add('bop');
+    setTimeout(function(){ pad.classList.remove('lit'); $('raccoon').classList.remove('bop'); }, ms);
+  }
+
+  function playSequence() {
+    accepting = false;
+    $('pads').classList.add('locked');
+    $('status').textContent = 'Watch Ringo…';
+    $('status').className = 'status';
+    var i = 0;
+    var gap = grade.beat;
+    var t = setInterval(function () {
+      if (i >= seq.length) {
+        clearInterval(t);
+        setTimeout(startInput, 350);
+        return;
+      }
+      var note = seq[i];
+      play(NOTES[note], Math.min(.34, gap/1000));
+      litPad(note, Math.min(320, gap - 90));
+      i++;
+    }, gap);
+  }
+
+  function startInput() {
+    accepting = true;
+    inputIdx = 0;
+    $('pads').classList.remove('locked');
+    $('status').textContent = 'Your turn — tap the beat! 🥁';
+    $('status').className = 'status you';
+  }
+
+  function tapPad(i) {
+    if (!accepting) return;
+    play(NOTES[i], .28);
+    litPad(i, 200);
+    if (seq[inputIdx] === i) {
+      inputIdx++;
+      if (inputIdx >= seq.length) {
+        // round complete
+        accepting = false;
+        score += 50 + seq.length * 10;
+        $('scoreVal').textContent = score;
+        $('status').textContent = 'Perfect! 🎉';
+        $('status').className = 'status good';
+        EduSDK.finishLesson(round, { correct: true, length: seq.length });
+        setTimeout(nextRound, 900);
+      }
+    } else {
+      // wrong tap
+      accepting = false;
+      misses++;
+      buzz();
+      $('pads').classList.add('locked');
+      $('card').classList.add('shake');
+      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('status').textContent = 'Oops! That broke the beat. 🙈';
+      $('status').className = 'status bad';
+      EduSDK.finishLesson(round, { correct: false, length: seq.length });
+      if (misses >= 3) { setTimeout(finish, 1300); }
+      else {
+        $('toast').textContent = 'Ringo replays the beat… (' + (3 - misses) + ' ' + (3-misses===1?'life':'lives') + ' left)';
+        $('toast').className = 'toast bad';
+        setTimeout(function () {
+          $('toast').textContent = '';
+          // replay same length, new sequence
+          seq = []; for (var k = 0; k < round + grade.start - 1; k++) seq.push(rint(0,3));
+          playSequence();
+        }, 1500);
+      }
+    }
+  }
+
+  function nextRound() {
+    round++;
+    $('toast').textContent = '';
+    if (round > MAX_ROUNDS) return finish();
+    $('roundLbl').textContent = 'Beat ' + round + ' — ' + (round + grade.start - 1) + ' taps';
+    // grow sequence by one
+    seq.push(rint(0, 3));
+    EduSDK.startLesson(round, { length: seq.length });
+    if (round === Math.floor(MAX_ROUNDS / 2) + 1) {
+      EduSDK.adBreak('interlevel').then(playSequence);
+    } else {
+      setTimeout(playSequence, 500);
+    }
+  }
+
+  function finish() {
+    accepting = false;
+    $('game').classList.add('hidden');
+    $('final').classList.remove('hidden');
+    var best = seq.length;
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = round > 8 ? '🦝🏆' : round > 4 ? '🦝🥁' : '🦝🎵';
+    $('finalLine').textContent = grade.label + ' — longest rhythm remembered: ' + Math.max(0, round + grade.start - 2) + ' beats. ' +
+      (round > 8 ? 'Ringo makes you lead drummer of the Bin Band!' :
+       round > 4 ? 'A seriously groovy memory!' :
+       'Ringo says keep practising — the beat goes on!');
+    EduSDK.submitScore(score, { grade: grade.id, rounds: round })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) {
+          el.innerHTML = res.isPersonalBest
+            ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>'
+            : 'Score saved to the leaderboard.';
+        } else if (res && res.offline) {
+          el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        } else {
+          el.textContent = (res && res.error === 'not_authenticated')
+            ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+        }
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; score = 0; round = 0; seq = []; misses = 0;
+    $('scoreVal').textContent = '0';
+    $('toast').textContent = '';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    ensureAudio();
+    // seed the starting sequence (start-1 taps so round 1 shows `start` taps)
+    for (var k = 0; k < grade.start - 1; k++) seq.push(rint(0, 3));
+    nextRound();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.pad'), function (b) {
+    b.addEventListener('click', function () { tapPad(Number(b.dataset.p)); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'rhythm-raccoon' });
+})();
+</script>
+</body>
+</html>
