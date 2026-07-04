@@ -41,6 +41,18 @@
 
     /** True when running inside the platform (or the dev host). */
     isHosted: function () { return !!(global.parent && global.parent !== global); },
+    /** Fail penalty — the ONE place the OnlyGrins wrong-answer penalty lives.
+     * A wrong answer costs a flat FAIL_PENALTY, but ONLY for Grade 3+ (the
+     * Grade 1-2 band is exempt), and the score never drops below 0. Retune the
+     * whole platform by editing this file. `bandLowGrade` = the lowest grade the
+     * player's chosen band covers (a "Grade 1-2" band -> 1; a "Grade 3" band -> 3).
+     * Returns { score, delta } where delta is the change applied (0 or negative). */
+    FAIL_PENALTY: 20,
+    applyPenalty: function (score, bandLowGrade) {
+      var pen = bandLowGrade >= 3 ? EduSDK.FAIL_PENALTY : 0;
+      var take = Math.min(pen, Math.max(0, score)); // floor at 0
+      return { score: score - take, delta: -take };
+    },
   };
 
   global.EduSDK = EduSDK;

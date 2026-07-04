@@ -280,6 +280,8 @@
       } else setTimeout(newRound, 1600);
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       flies--;
       renderFlies();
       btn.classList.add('wrong');
@@ -292,6 +294,7 @@
       $('card').classList.add('shake');
       $('toast').textContent = pick(SPLASH_LINES) + '  (“' + p[0] + '” means “' + p[1] + '”)';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
       setTimeout(function () {
         $('froggy').classList.remove('splash');
         fx.classList.remove('go');

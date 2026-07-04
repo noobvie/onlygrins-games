@@ -271,12 +271,15 @@
       setTimeout(nextRound, 2000);
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       btn.classList.add('wrong');
       $('customer').classList.add('faint');
       sfxBad();
       $('translation').textContent = '❌ You served: ' + m[1] + ' (' + m[2] + ')';
       $('toast').textContent = pick(FAINT_LINES);
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
       $('card').classList.add('shake');
       setTimeout(function () {
         $('card').classList.remove('shake');

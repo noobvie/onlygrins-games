@@ -257,6 +257,8 @@
       $('toast').className = 'toast good';
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       btn.classList.add('wrong');
       bonk();
       $('card').classList.add('shake');
@@ -264,6 +266,7 @@
       var a = current.unit === '$' ? '$' + current.answer : current.answer + ' weeks';
       $('toast').textContent = pick(OOPS) + ' The answer was ' + a + '.';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
     }
     EduSDK.finishLesson(q + 1, { correct: correct });
     next();

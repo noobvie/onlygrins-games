@@ -38,6 +38,10 @@
   .top .spacer { flex:1; }
   .top .score { font:13px ui-monospace,Consolas,monospace; color:var(--muted); }
   .top .score b { color:var(--grin); }
+  /* transient "−20" that flashes when a wrong answer is penalised */
+  .top .pen { font:700 13px ui-monospace,Consolas,monospace; color:var(--bad); margin-left:8px;
+    opacity:0; transform:translateY(-2px); transition:opacity .15s, transform .15s; }
+  .top .pen.show { opacity:1; transform:translateY(0); }
 
   .progress { display:flex; gap:6px; margin-bottom:22px; }
   .progress span { height:5px; flex:1; border-radius:5px; background:#173425; }
@@ -83,6 +87,7 @@
       <h1>Quiz Template — replace these questions</h1>
       <span class="spacer"></span>
       <span class="score">score <b id="scoreVal">0</b></span>
+      <span class="pen" id="penTag"></span>
     </div>
     <div class="progress" id="progress"></div>
     <div id="stage"></div>
@@ -115,11 +120,26 @@
   ];
   var POINTS_RIGHT = 100;
 
+  // Wrong answers cost a flat −20 (Grade 3+ only, floored at 0) — see PLAN.md
+  // "Fail penalty". `bandLowGrade` is the LOWEST grade the player's chosen band
+  // covers, taken from your grade picker: a "Grade 1–2" band → 1 (exempt), a
+  // "Grade 3" band → 3, a "Grade 4–5" band → 4. This template has no picker, so
+  // it hard-codes 3; replace it with the value your grade picker selects.
+  var bandLowGrade = 3;
+
   // ---- state ----
   var i = 0, score = 0, answered = false;
   var stage = document.getElementById('stage');
   var progressEl = document.getElementById('progress');
   var scoreVal = document.getElementById('scoreVal');
+  var penTag = document.getElementById('penTag');
+
+  // Flash a transient penalty tag (e.g. "−20") next to the score.
+  function flashPenalty(delta) {
+    penTag.textContent = delta + ' pts';
+    penTag.classList.add('show');
+    setTimeout(function () { penTag.classList.remove('show'); }, 900);
+  }
 
   function renderProgress() {
     progressEl.innerHTML = '';
@@ -168,6 +188,12 @@
     btns[item.answer].classList.add('right');
     if (idx !== item.answer) {
       btns[idx].classList.add('wrong');
+      // Wrong → flat −20 penalty. The constant, the 0-floor and the Grade 3+
+      // gate all live in EduSDK.applyPenalty (one place to retune the platform).
+      var pen = EduSDK.applyPenalty(score, bandLowGrade);
+      score = pen.score;
+      scoreVal.textContent = score;
+      if (pen.delta) flashPenalty(pen.delta); // show "−20" only when it applied
     } else {
       score += POINTS_RIGHT;
       scoreVal.textContent = score;

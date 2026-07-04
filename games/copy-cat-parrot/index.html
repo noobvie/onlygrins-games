@@ -229,6 +229,8 @@
     $('status').textContent = '';
     $('toast').textContent = 'Oops — wrong move! Pablo\'s dance was ' + seq.length + ' moves long.';
     $('toast').className = 'toast bad';
+    var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); score = _pen.score; $('scoreVal').textContent = score; // wrong → −20 (Grade 3+), floored at 0
+    if (_pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
     EduSDK.finishLesson(seq.length, { reached: seq.length });
     setTimeout(function(){ finish(false); }, 1400);
   }

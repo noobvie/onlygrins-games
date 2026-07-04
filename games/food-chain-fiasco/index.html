@@ -287,6 +287,8 @@
       pos = 0;
       renderChain(); syncPoolUsed();
       EduSDK.retryLesson(round + 1, { picked: org[1] });
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); score = _pen.score; $('scoreVal').textContent = score; // wrong → −20 (Grade 3+), floored at 0
+      if (_pen.delta) $('fiascoLine').textContent += '  ' + _pen.delta; // show the −20
     }
   }
 

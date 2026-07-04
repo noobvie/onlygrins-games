@@ -237,6 +237,7 @@
     }
     $('toast').textContent = pick(GASP[bucket]) + '  It was ' + answer + ' — you said ' + guess + '.  +' + pts;
     $('toast').className = 'toast ' + (bucket === 'wow' || bucket === 'good' ? 'good' : bucket === 'mid' ? 'mid' : 'bad');
+    if (bucket === 'far') { var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); score = _pen.score; $('scoreVal').textContent = score; if (_pen.delta) $('toast').textContent += '  ' + _pen.delta; } // far guess → −20 (Grade 3+), floored at 0
     EduSDK.finishLesson(q + 1, { guess: guess, answer: answer, errorPct: Math.round(err * 100) });
     q++;
     if (q >= ROUNDS) return setTimeout(finish, 2000);

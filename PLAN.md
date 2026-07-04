@@ -65,6 +65,38 @@ Legacy `__ctlArcade*` globals alias the same calls. **Every educational game we
 ship uses the SDK** so a finished lesson/quiz posts a score → leaderboard → GP
 reward ("learn, earn points") — the GP that a future converter turns into grin.
 
+#### Fail penalty — the wrong-answer rule (applies to every game)
+
+A correct answer is worth ~100+ (plus first-try / streak bonuses). To make wrong
+answers actually cost something, **every wrong answer subtracts a flat 20 points**,
+with these rules:
+
+- **Every wrong attempt** is penalised, not just the first — mashing options keeps
+  costing points. (For arcade/action games, only a **wrong-answer death** costs the
+  20; dying to a wall or the clock does not — that already costs a life.)
+- **Floor at 0** — the score never goes negative.
+- **Show it** — surface the `−20` in the same feedback line as the right/wrong mark.
+- **Grade 1–2 are exempt.** The penalty applies **only to Grade 3+**. Concretely:
+  penalise only when the player's chosen grade band's *lowest* grade is ≥ 3
+  (a "Grade 1–2" band → exempt; a "Grade 3" or "Grade 4–5" band → penalised).
+
+**Do not re-implement this per game.** The constant, the floor, and the grade gate
+live in one place — `EduSDK.applyPenalty(score, bandLowGrade)` in
+`shared/edu-sdk.js` — so the whole platform retunes from a single file (e.g. switch
+the flat 20 to a per-band scale later). At the wrong-answer site call it, assign the
+new score, and show `res.delta` only when it's non-zero:
+
+```js
+var res = EduSDK.applyPenalty(score, bandLowGrade); // bandLowGrade = lowest grade the picked band covers
+score = res.score;                                   // floored at 0, gated to Grade 3+
+scoreEl.textContent = score;
+setMsg('bad', '✗ ' + (res.delta ? res.delta + ' pts' : 'try again')); // res.delta is 0 or negative
+```
+
+`bandLowGrade` comes from the game's own grade picker (§5.1): map the selected band
+to the lowest grade it covers — e.g. a picker offering `Grade 1–2 / Grade 3 / Grade 4–5`
+passes `1 / 3 / 4`. **Every new game must wire this in** (see the starter template).
+
 ### The deploy constraint that decides our architecture
 
 The app uses **git layering** (`onlygrins/deploy/README.md`): vendor Arcade core
@@ -532,6 +564,9 @@ grows across topics and tech. `tools/validate.sh` enforces the mechanical ones.
    the grade filter carries no information.
 5. **One game per concept; grade picked inside the game** (§5.1). Pass
    `extra.grade` (and `extra.mode` if there's a race/solo toggle) to `saveScore`.
+   **Wrong answers cost a flat −20 via `EduSDK.applyPenalty` (Grade 3+ only,
+   floored at 0, shown to the player)** — never re-implement it per game (see
+   "Fail penalty" under §Scoring).
 6. **SEO standard (§5.2):** `noindex` meta in `index.html`, snippet-quality
    descriptions in `game.json`, `thumbnail.png` 960×540 referenced from the
    manifest.

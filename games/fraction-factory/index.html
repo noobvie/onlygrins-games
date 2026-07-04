@@ -257,10 +257,13 @@
       setTimeout(nextRound, 1400);
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       $('robot').textContent = '🤮';
       var hint = got > need ? 'Too much soda!' : 'Not enough soda!';
       $('toast').textContent = pick(BURP_LINES) + '  (' + hint + ')';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
       $('card').classList.add('shake');
       document.querySelector('.machine').classList.add('burping');
       burpSound();

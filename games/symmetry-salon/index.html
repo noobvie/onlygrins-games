@@ -266,6 +266,8 @@
       $('toast').className = 'toast good';
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       if (btn) btn.classList.add('wrong');
       crack();
       $('card').classList.add('shake');
@@ -273,6 +275,7 @@
       $('toast').textContent = pick(SOB) + '  (the ' + cur.name + ' has ' +
         (cur.lines === 'inf' ? 'endless mirror lines' : cur.lines + ' mirror line' + (cur.lines === 1 ? '' : 's')) + ')';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
     }
     EduSDK.finishLesson(q + 1, { correct: correct });
     q++;

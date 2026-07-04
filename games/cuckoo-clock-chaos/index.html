@@ -278,6 +278,8 @@
       $('toast').className = 'toast good';
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       $('cuckoo').textContent = '🐦😱';
       $('gnomes').textContent = '🍄😡 🍄😡 🍄😡';
       cuckooBad();
@@ -285,6 +287,7 @@
       setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
       $('toast').textContent = pick(CHAOS) + '  (it should say ' + fmt(tH, tM) + ')';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
       curH = tH; curM = tM; drawHands();
     }
     EduSDK.finishLesson(q + 1, { correct: correct });

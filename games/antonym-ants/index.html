@@ -209,7 +209,13 @@
         if (c.textContent.replace('🐜','').trim() === cur.answer) c.classList.add('right');
       });
       $('card').classList.add('shake'); setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
-      $('toast').textContent = pick(OOPS) + ' It was "' + cur.answer + '".'; $('toast').className = 'toast bad';
+      // Wrong answer → flat −20 (Grade 3+ only, floored at 0). GRADES[].id is the
+      // band's lowest grade, so it doubles as bandLowGrade. Timeouts (ant reaches
+      // the picnic) are NOT penalised — that's a time-out miss, not a wrong answer.
+      var pen = EduSDK.applyPenalty(score, GRADES[gradeIdx].id);
+      score = pen.score; $('scoreVal').textContent = score;
+      $('toast').textContent = pick(OOPS) + ' It was "' + cur.answer + '".' + (pen.delta ? '  ' + pen.delta : '');
+      $('toast').className = 'toast bad';
     }
     EduSDK.finishLesson(q + 1, { correct: correct });
     next();

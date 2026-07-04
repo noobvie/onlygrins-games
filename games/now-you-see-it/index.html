@@ -217,6 +217,8 @@
       $('toast').className = 'toast good';
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       el.classList.add('wrong');
       nope();
       render(true, true); // reveal the real change
@@ -224,6 +226,7 @@
       setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
       $('toast').textContent = pick(OOPS) + ' The highlighted one changed.';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
     }
     EduSDK.finishLesson(q + 1, { correct: correct });
     next();

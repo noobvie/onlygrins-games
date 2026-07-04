@@ -232,6 +232,8 @@
     locked = true; bad(); streak = 0;
     $('card').classList.add('shake'); setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
     $('toast').textContent = pick(OOPS); $('toast').className = 'toast bad';
+    var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); score = _pen.score; $('scoreVal').textContent = score; // wrong → −20 (Grade 3+), floored at 0
+    if (_pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
     EduSDK.finishLesson(q + 1, { solved: false });
     next();
   }

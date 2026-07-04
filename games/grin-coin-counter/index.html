@@ -278,7 +278,11 @@
       state.round++;
       setTimeout(function () { state.round >= ROUNDS ? endGame() : newRound(); }, 1100);
     } else if (t > state.target) {
-      setMsg('bad', 'Too much by ' + fmt(t - state.target, dec) + ' ツ — basket cleared, try again.');
+      // Over the target is a wrong submission → −20. This game has NO grade picker
+      // (it targets ~Grade 4–5), so bandLowGrade is hardcoded to 4 (Grade 3+). If a
+      // grade picker is added later, pass parseInt(grade.id, 10) instead.
+      var _pen = EduSDK.applyPenalty(state.score, 4); state.score = _pen.score; $('score').textContent = state.score;
+      setMsg('bad', 'Too much by ' + fmt(t - state.target, dec) + ' ツ — basket cleared, try again.' + (_pen.delta ? '  ' + _pen.delta : ''));
       sfxBad();
       state.basket = []; renderBasket();
     } else {

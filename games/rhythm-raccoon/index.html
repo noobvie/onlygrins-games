@@ -225,6 +225,8 @@
       setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
       $('status').textContent = 'Oops! That broke the beat. 🙈';
       $('status').className = 'status bad';
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); score = _pen.score; $('scoreVal').textContent = score; // wrong tap → −20 (Grade 3+), floored at 0
+      if (_pen.delta) $('status').textContent += '  ' + _pen.delta; // show the −20
       EduSDK.finishLesson(round, { correct: false, length: seq.length });
       if (misses >= 3) { setTimeout(finish, 1300); }
       else {

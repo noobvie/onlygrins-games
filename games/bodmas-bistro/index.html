@@ -286,6 +286,8 @@
     } else {
       busy = true;
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       btn.classList.add('wrong');
       var right = nextOpIndex(tokens);
       var btns = document.querySelectorAll('.tok');
@@ -297,6 +299,7 @@
       setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
       $('toast').textContent = pick(BOOM) + '  (the ' + tokens[right] + ' cooks first; the dish makes ' + fullAnswer(tokens) + ')';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
       EduSDK.finishLesson(q + 1, { correct: false });
       nextRound();
     }

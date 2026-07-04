@@ -279,11 +279,14 @@
       next();
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       crash();
       $('card').classList.add('shake');
       setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
       $('toast').textContent = pick(OOPS) + ' Green steps are right — fix the red ones!';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
       setTimeout(function () {
         answered = false;
         bank = shuffle(program.slice()); program = [];

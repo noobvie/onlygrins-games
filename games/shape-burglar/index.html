@@ -271,6 +271,8 @@
       $('toast').className = 'toast good';
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       btn.classList.add('wrong');
       $('burglar').textContent = '🚨🦝🚨';
       alarm();
@@ -278,6 +280,7 @@
       setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
       $('toast').textContent = pick(ALARM) + '  (he wanted ' + current.correct + ')';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
       Array.prototype.forEach.call(document.querySelectorAll('.shapeBtn'), function(b){
         if (b.querySelector('svg').getAttribute('data-shape') === current.correct) b.classList.add('right');
       });

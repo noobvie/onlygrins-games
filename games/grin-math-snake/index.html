@@ -350,6 +350,10 @@ window.addEventListener('keyup', function(e){ keys[e.key]=false; });
 // ===================== game flow =====================
 function loseHeart(reason){
   lives--; sfxBad(); shake = 18; lastEatFlash = {bad:true, t:performance.now()};
+  // Wrong-eat (choke/zero/overshoot) is a wrong answer → −20 for Grade 3+, floored
+  // at 0. A timeout ('time') is NOT a wrong answer, so it's exempt (grade.id is a
+  // band string like '1-2'/'3'; parseInt → 1/3, so 1–2 stays exempt).
+  if (reason !== 'time') { var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); score = _pen.score; if (_pen.delta) banner(_pen.delta + '', '#ff5c7a'); }
   syncHud();
   burst(snake.x, snake.y, '#ff5c7a', 26);
   if(lives<=0){ gameOver(); return; }

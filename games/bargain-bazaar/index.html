@@ -258,12 +258,15 @@
       $('toast').className = 'toast good';
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       btn.classList.add('wrong');
       nope();
       $('card').classList.add('shake');
       setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
       $('toast').textContent = pick(OOPS) + ' The green stall was the real bargain!';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
     }
     EduSDK.finishLesson(q + 1, { correct: correct });
     next();

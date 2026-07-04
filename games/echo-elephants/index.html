@@ -190,6 +190,8 @@
       tile.classList.add('hit'); good(); $('fb').textContent = 'Match! +' + pts; $('fb').className = 'fb good';
     } else if (tapped && !isMatch) {
       streak = 0; tile.classList.add('fa'); bad(); $('fb').textContent = 'No match there.'; $('fb').className = 'fb bad';
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); score = _pen.score; // false alarm → −20 (Grade 3+), floored at 0
+      if (_pen.delta) $('fb').textContent += '  ' + _pen.delta; // show the −20 (scoreVal refreshed just below)
     } else if (!tapped && isMatch) {
       streak = 0; tile.classList.add('miss'); bad(); $('fb').textContent = 'Missed a match!'; $('fb').className = 'fb bad';
     } else {

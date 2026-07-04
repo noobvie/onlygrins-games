@@ -319,10 +319,13 @@
       $('toast').className = 'toast good';
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       womp();
       // partial credit for pairs in correct relative order
       $('toast').textContent = pick(PARTIAL) + ' (' + nRight + '/' + order.length + ' in the right spot)';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
     }
     EduSDK.finishLesson(q + 1, { correct: perfect, right: nRight });
     q++;

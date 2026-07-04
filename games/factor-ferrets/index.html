@@ -216,6 +216,7 @@
     score += pts; $('scoreVal').textContent = score;
     $('toast').textContent = (clean ? pick(CHEER) : (correct >= missed + wrong ? pick(OKISH) : pick(OOPS))) + '  +' + pts;
     $('toast').className = 'toast ' + (clean ? 'good' : 'bad');
+    if (!clean) { var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); score = _pen.score; $('scoreVal').textContent = score; if (_pen.delta) $('toast').textContent += '  ' + _pen.delta; } // imperfect sort → −20 (Grade 3+), floored at 0
     EduSDK.finishLesson(q + 1, { clean: clean, correct: correct });
     next();
   }

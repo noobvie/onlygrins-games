@@ -323,6 +323,8 @@
       var gave = givenC;
       var hint = givenC > needC ? 'too much!' : 'not enough!';
       goatChomps(pick(GOAT_ANGRY) + ' (' + hint + ')');
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); score = _pen.score; $('scoreVal').textContent = score; // wrong → −20 (Grade 3+), floored at 0
+      if (_pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
       given = []; givenC = 0; renderGiven();
       EduSDK.retryLesson(round + 1, { gave: gave, need: needC });
       if (lives <= 0) { clearInterval(patTimer); setTimeout(finish, 900); }

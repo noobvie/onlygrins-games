@@ -276,6 +276,8 @@
       setTimeout(nextRound, 1800);
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       $('robot').textContent = '🤖😑';
       sfxBad();
       var snark = pick(ROBOT_SNARK);
@@ -283,6 +285,7 @@
       speak(got, true);   // ← the joke: he reads the nonsense perfectly seriously
       $('toast').textContent = 'Not quite — un-toss it some more!';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
       $('card').classList.add('shake');
       setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
       EduSDK.retryLesson(round + 1, { attempt: got });

@@ -254,6 +254,8 @@
       $('toast').className = 'toast good';
     } else {
       streak = 0;
+      var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
+      score = _pen.score; $('scoreVal').textContent = score;
       btn.classList.add('wrong');
       nope();
       $('card').classList.add('shake');
@@ -261,6 +263,7 @@
       var right = BUCKETS[current.mode].filter(function (x) { return x.key === current.ans; })[0];
       $('toast').textContent = 'This is a ' + right.nm + ' — ' + right.desc.toLowerCase() + '.';
       $('toast').className = 'toast bad';
+      if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
     }
     EduSDK.finishLesson(q + 1, { correct: correct });
     next();
