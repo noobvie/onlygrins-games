@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#241640"/><stop offset=".5" stop-color="#3a2166"/><stop offset="1" stop-color="#150c28"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#7bf0a8"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- left city -->
+  <g text-anchor="middle">
+    <text x="185" y="155" font-size="60">🏙️</text>
+    <text x="185" y="210" fill="#f1e9ff" font-size="30" font-weight="800">London</text>
+    <text x="185" y="275" fill="#ffd15a" font-size="52" font-weight="800">3:00</text>
+  </g>
+  <text x="330" y="215" font-size="50" fill="#c3ace8" text-anchor="middle">➜</text>
+  <!-- clock -->
+  <g>
+    <circle cx="560" cy="230" r="120" fill="#150c28" stroke="#6a44a8" stroke-width="8"/>
+    <g fill="#c3ace8" font-size="24" font-weight="800" text-anchor="middle">
+      <text x="560" y="135">12</text><text x="655" y="238">3</text><text x="560" y="345">6</text><text x="465" y="238">9</text>
+    </g>
+    <!-- hands to 12:00 -->
+    <line x1="560" y1="230" x2="560" y2="150" stroke="#ffd15a" stroke-width="10" stroke-linecap="round"/>
+    <line x1="560" y1="230" x2="560" y2="165" stroke="#6ec8ff" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="560" cy="230" r="9" fill="#ffd15a"/>
+    <text x="560" y="395" fill="#7bf0a8" font-size="30" font-weight="800" text-anchor="middle">🗼 Tokyo = ?</text>
+  </g>
+  <text x="820" y="150" font-size="60" text-anchor="middle">🌍</text>
+  <text x="480" y="470" fill="url(#ttl)" font-size="66" font-weight="800" text-anchor="middle">Time Zone Tango</text>
+</svg>

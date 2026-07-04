@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101a33"/><stop offset=".5" stop-color="#1c2c52"/><stop offset="1" stop-color="#0a1122"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#7bf0a8"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.4" r="0.6">
+      <stop offset="0" stop-color="#ffe08a" stop-opacity="0.35"/><stop offset="1" stop-color="#ffe08a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <circle cx="150" cy="230" r="150" fill="url(#glow)"/>
+  <text x="150" y="255" font-size="90" text-anchor="middle">🏮</text>
+  <!-- scene card -->
+  <g>
+    <rect x="330" y="120" width="560" height="90" rx="14" fill="#0f1c38" stroke="#3f5a99" stroke-width="3"/>
+    <rect x="330" y="120" width="8" height="90" fill="#ffe08a"/>
+    <text x="615" y="172" fill="#eef3ff" font-size="24" font-weight="700" text-anchor="middle">A newspaper prints a story the</text>
+    <text x="615" y="200" fill="#eef3ff" font-size="24" font-weight="700" text-anchor="middle">mayor dislikes.</text>
+  </g>
+  <g font-weight="800" text-anchor="middle" font-size="22" fill="#eef3ff">
+    <rect x="360" y="240" width="240" height="60" rx="12" fill="#12402c" stroke="#7bf0a8" stroke-width="4"/><text x="480" y="278">Freedom of the press</text>
+    <rect x="620" y="240" width="240" height="60" rx="12" fill="#12203c" stroke="#3f5a99" stroke-width="3"/><text x="740" y="278">Right to vote</text>
+    <rect x="360" y="312" width="240" height="60" rx="12" fill="#12203c" stroke="#3f5a99" stroke-width="3"/><text x="480" y="350">Fair trial</text>
+    <rect x="620" y="312" width="240" height="60" rx="12" fill="#12203c" stroke="#3f5a99" stroke-width="3"/><text x="740" y="350">Assemble</text>
+  </g>
+  <text x="480" y="475" fill="url(#ttl)" font-size="66" font-weight="800" text-anchor="middle">Liberty Lantern</text>
+</svg>

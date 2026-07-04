@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Integer Iguanas — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="integer-iguanas"></script>
+
+<style>
+  :root{
+    --bg1:#0f2f33; --bg2:#164046; --bg3:#0a2024;
+    --card:#123a3f; --line:#2f7f86; --text:#e6fbff; --muted:#a7d8dd;
+    --green:#4fe3b0; --blue:#5ad8ff; --purple:#c77dff; --orange:#ffc15a; --bad:#ff6b81; --neg:#ff9a6b;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#0a2024;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .prompt{font-size:clamp(20px,4vw,30px);font-weight:800;text-align:center;margin:8px 0 6px;}
+  .prompt .expr b{color:var(--orange);}
+  .hint{color:var(--muted);text-align:center;margin:0 0 16px;font-size:14px;}
+  .lineWrap{overflow-x:auto;padding:34px 4px 8px;}
+  .line{display:flex;gap:0;min-width:max-content;margin:0 auto;justify-content:center;}
+  .tick{position:relative;width:clamp(30px,7vw,42px);text-align:center;cursor:pointer;}
+  .tick .bar{height:26px;width:3px;background:#3a6b70;margin:0 auto;border-radius:2px;}
+  .tick.zero .bar{background:var(--orange);width:5px;height:34px;}
+  .tick.neg .num{color:var(--neg);}
+  .tick .num{font-weight:800;font-size:clamp(13px,3vw,17px);margin-top:4px;}
+  .tick:hover .bar{background:var(--blue);}
+  .tick .iggy{position:absolute;top:-30px;left:50%;transform:translateX(-50%);font-size:26px;transition:left .25s;}
+  .tick.start{}
+  .tick.sel .bar{background:var(--blue);}
+  .tick.right .bar{background:var(--green);width:6px;}
+  .tick.wrong .bar{background:var(--bad);width:6px;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:16px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .btnrow{display:flex;justify-content:center;gap:12px;margin-top:6px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:16px;
+    padding:11px 24px;border-radius:12px;color:#0a2024;background:var(--green);box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);} .btn.ghost{background:#1e5158;color:var(--text);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;} .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#6aa8ae;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <div id="start">
+      <h1>🦎 Integer Iguanas</h1>
+      <p class="sub">Iggy the iguana starts on the number line and gets a move. Work out where he lands and
+        tap that spot — remember, subtracting past <b>0</b> lands you in the <b>negative</b> numbers!</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>0–10, one hop</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>crosses zero</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>two hops, ±15</small></button>
+      </div>
+      <p class="sub">8 hops per run · correct landings earn streak bonuses</p>
+    </div>
+
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Hop 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="prompt"><span class="expr" id="expr"></span></div>
+      <p class="hint">Tap where Iggy lands</p>
+      <div class="lineWrap"><div class="line" id="line"></div></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🦎</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="btn" id="againBtn">New hops ▸</button>
+        <button class="btn ghost" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', lo: 0,   hi: 10, steps: 1 },
+    { id: 3, label: 'Grade 3',   lo: -10, hi: 10, steps: 1 },
+    { id: 4, label: 'Grade 4–5', lo: -15, hi: 15, steps: 2 }
+  ];
+  var ROUNDS = 8;
+
+  var CHEER = ['Perfect landing! 🦎🎯','Iggy sticks it! 🌟','Spot on — even below zero! 💚','Number-line ninja iguana! ✨'];
+  var OOPS  = ['Not quite — count the hops again. 🦎','Careful crossing zero! 🤔','Iggy overshot. Try the next one!'];
+
+  var grade = GRADES[0], q = 0, score = 0, streak = 0, nRight = 0;
+  var prob = null, locked = false;
+
+  var $ = function (id){ return document.getElementById(id); };
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f,d,t,slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t||'sine'; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.09,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function hop(){ tone(500,.06,'square',700); }
+  function good(){ tone(523,.1,'sine'); setTimeout(function(){ tone(784,.18,'sine',1046); },110); }
+  function bad(){ tone(200,.3,'sawtooth',90); }
+
+  function makeProblem() {
+    var lo = grade.lo, hi = grade.hi;
+    for (var attempt = 0; attempt < 80; attempt++) {
+      var start = rint(lo, hi), pos = start, moves = [], ok = true;
+      for (var s = 0; s < grade.steps; s++) {
+        var opts = [];
+        for (var d = -8; d <= 8; d++) { if (d === 0) continue; if (pos + d >= lo && pos + d <= hi) opts.push(d); }
+        if (!opts.length) { ok = false; break; }
+        var delta = pick(opts); pos += delta; moves.push(delta);
+      }
+      if (!ok || pos === start) continue;
+      return { start: start, moves: moves, answer: pos };
+    }
+    return { start: 0, moves: [3], answer: 3 };
+  }
+
+  function exprHtml(p) {
+    var s = p.start < 0 ? '(' + p.start + ')' : '' + p.start;
+    var body = p.moves.map(function (d) { return (d >= 0 ? ' + ' : ' − ') + Math.abs(d); }).join('');
+    return 'Iggy at <b>' + s + '</b>, then <b>' + body.trim() + '</b> &nbsp;=&nbsp; ?';
+  }
+
+  function render() {
+    locked = false;
+    prob = makeProblem();
+    $('roundLbl').textContent = 'Hop ' + (q + 1) + '/' + ROUNDS;
+    $('expr').innerHTML = exprHtml(prob);
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    var line = $('line'); line.innerHTML = '';
+    for (var v = grade.lo; v <= grade.hi; v++) {
+      (function (val) {
+        var t = document.createElement('div');
+        t.className = 'tick' + (val === 0 ? ' zero' : '') + (val < 0 ? ' neg' : '') + (val === prob.start ? ' start' : '');
+        t.innerHTML = (val === prob.start ? '<span class="iggy">🦎</span>' : '') +
+          '<div class="bar"></div><div class="num">' + val + '</div>';
+        t.addEventListener('click', function () { choose(val, t); });
+        line.appendChild(t);
+      })(v);
+    }
+    EduSDK.startLesson(q + 1, {});
+  }
+
+  function choose(val, tile) {
+    if (locked) return;
+    locked = true;
+    var ticks = $('line').children;
+    var correct = val === prob.answer;
+    // move iggy to the chosen tile visually
+    for (var i = 0; i < ticks.length; i++) {
+      var tv = grade.lo + i;
+      if (tv === prob.answer) ticks[i].classList.add('right');
+    }
+    if (!correct) tile.classList.add('wrong');
+    if (correct) {
+      hop(); good(); nRight++; streak++;
+      var pts = 100 + streak * 15;
+      score += pts; $('scoreVal').textContent = score;
+      $('toast').textContent = pick(CHEER) + '  +' + pts;
+      $('toast').className = 'toast good';
+    } else {
+      bad(); streak = 0;
+      $('card').classList.add('shake'); setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' The answer was ' + prob.answer + '.';
+      $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct, answer: prob.answer });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1700);
+    if (q === Math.floor(ROUNDS / 2)) setTimeout(function(){ EduSDK.adBreak('interlevel').then(render); }, 1700);
+    else setTimeout(render, 1700);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden'); $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nRight >= 7 ? '🦎🏆' : nRight >= 4 ? '🦎🌟' : '🦎🌵';
+    $('finalLine').textContent = grade.label + ' — ' + nRight + '/' + ROUNDS + ' perfect hops. ' +
+      (nRight >= 7 ? 'Iggy is the king of the number line — negatives and all!' :
+       nRight >= 4 ? 'Great integer sense — a couple of hops overshot.' :
+       'Keep counting the hops, especially past zero. Iggy believes in you!');
+    EduSDK.submitScore(score, { grade: grade.id, right: nRight })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) el.innerHTML = res.isPersonalBest
+          ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>' : 'Score saved to the leaderboard.';
+        else if (res && res.offline) el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        else el.textContent = (res && res.error === 'not_authenticated') ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nRight = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    render();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'integer-iguanas' });
+})();
+</script>
+</body>
+</html>

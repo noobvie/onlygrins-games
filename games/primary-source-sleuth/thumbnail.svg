@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1c1c30"/><stop offset=".5" stop-color="#2c2c50"/><stop offset="1" stop-color="#111120"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#5fe0b0"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="120" y="140" font-size="66" text-anchor="middle">🔎</text>
+  <!-- source card -->
+  <g>
+    <rect x="290" y="90" width="500" height="130" rx="16" fill="#191934" stroke="#4a4a86" stroke-width="3"/>
+    <text x="540" y="150" font-size="46" text-anchor="middle">📔</text>
+    <text x="540" y="200" fill="#eef0ff" font-size="24" font-weight="800" text-anchor="middle">A diary written by someone who was there</text>
+  </g>
+  <!-- two options -->
+  <g font-weight="800" text-anchor="middle">
+    <rect x="200" y="250" width="270" height="110" rx="16" fill="#1a1a34" stroke="#5fe0b0" stroke-width="5"/>
+    <text x="335" y="305" fill="#5fe0b0" font-size="28">🕰️ PRIMARY</text>
+    <text x="335" y="335" fill="#b3b3dc" font-size="15">from the time, first-hand</text>
+    <rect x="500" y="250" width="270" height="110" rx="16" fill="#1a1a34" stroke="#ffab5a" stroke-width="3"/>
+    <text x="635" y="305" fill="#ffab5a" font-size="28">📚 SECONDARY</text>
+    <text x="635" y="335" fill="#b3b3dc" font-size="15">made later, about it</text>
+  </g>
+  <text x="480" y="470" fill="url(#ttl)" font-size="54" font-weight="800" text-anchor="middle">Primary Source Sleuth</text>
+</svg>

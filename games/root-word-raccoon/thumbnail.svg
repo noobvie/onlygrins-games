@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#20262e"/><stop offset=".5" stop-color="#333d49"/><stop offset="1" stop-color="#12161b"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c77dff"/><stop offset=".5" stop-color="#7bf0a8"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="130" y="120" font-size="52" text-anchor="middle">🦝</text>
+  <text x="480" y="120" fill="#eef4fb" font-size="30" font-weight="800" text-anchor="middle">Build: <tspan fill="#ffd15a">able to not be broken</tspan></text>
+  <!-- tiles un + break + able -->
+  <g font-weight="800" text-anchor="middle" font-size="34" fill="#12161b">
+    <rect x="200" y="180" width="120" height="80" rx="14" fill="#c77dff"/><text x="260" y="232">un</text>
+    <text x="340" y="232" fill="#aebccb">+</text>
+    <rect x="370" y="180" width="170" height="80" rx="14" fill="#7bf0a8"/><text x="455" y="232">break</text>
+    <text x="560" y="232" fill="#aebccb">+</text>
+    <rect x="590" y="180" width="150" height="80" rx="14" fill="#6ec8ff"/><text x="665" y="232">able</text>
+  </g>
+  <text x="480" y="335" fill="#aebccb" font-size="30" text-anchor="middle">=</text>
+  <text x="480" y="385" fill="#7bf0a8" font-size="52" font-weight="800" text-anchor="middle">unbreakable</text>
+  <text x="480" y="475" fill="url(#ttl)" font-size="58" font-weight="800" text-anchor="middle">Root Word Raccoon</text>
+</svg>

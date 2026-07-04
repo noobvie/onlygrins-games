@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Root Word Raccoon — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="language" data-seed="root-word-raccoon"></script>
+
+<style>
+  :root{
+    --bg1:#20262e; --bg2:#333d49; --bg3:#12161b;
+    --card:#262e38; --line:#556575; --text:#eef4fb; --muted:#aebccb;
+    --pre:#c77dff; --root:#7bf0a8; --suf:#6ec8ff; --gold:#ffd15a; --bad:#ff6b81; --green:#7bf0a8;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(23px,4.4vw,38px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--pre),var(--root),var(--suf));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#12161b;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--root);} .g2{background:var(--suf);} .g3{background:var(--pre);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--suf);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .clue{text-align:center;font-size:clamp(18px,3.4vw,24px);font-weight:800;margin:6px 0;}
+  .clue b{color:var(--gold);}
+  .slots{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin:12px 0 4px;}
+  .slot{min-width:80px;height:56px;border-radius:12px;border:2px dashed var(--line);display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:clamp(18px,4vw,24px);padding:0 12px;color:var(--muted);}
+  .slot.p{border-color:var(--pre);} .slot.r{border-color:var(--root);} .slot.s{border-color:var(--suf);}
+  .slot.filled{border-style:solid;color:var(--text);}
+  .slot.pf{background:rgba(199,125,255,.18);} .slot.rf{background:rgba(123,240,168,.18);} .slot.sf{background:rgba(110,200,255,.18);}
+  .plus{color:var(--muted);font-size:20px;font-weight:800;}
+  .preview{text-align:center;font-size:clamp(24px,6vw,40px);font-weight:800;color:var(--green);min-height:44px;margin:4px 0 8px;}
+  .banks{max-width:640px;margin:0 auto;}
+  .bankrow{margin:8px 0;}
+  .bankrow .h{font-size:13px;font-weight:800;color:var(--muted);margin-bottom:4px;text-align:center;}
+  .tiles{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+  .tile{cursor:pointer;border:2px solid var(--line);border-radius:12px;padding:10px 16px;font-weight:800;font-size:18px;
+    background:#2f3a46;color:var(--text);box-shadow:0 4px 0 rgba(0,0,0,.35);transition:.1s;}
+  .tile:active{transform:translateY(2px);}
+  .tile.pre.sel{background:var(--pre);color:#12161b;border-color:var(--pre);}
+  .tile.root.sel{background:var(--root);color:#12161b;border-color:var(--root);}
+  .tile.suf.sel{background:var(--suf);color:#12161b;border-color:var(--suf);}
+  .tile.correct{outline:3px solid var(--green);}
+  .runbar{display:flex;gap:10px;justify-content:center;margin-top:12px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:15px;
+    padding:11px 22px;border-radius:12px;color:#12161b;background:var(--green);box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);} .btn:disabled{opacity:.4;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:16px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:56px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;} .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:10px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#7f92a5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <div id="start">
+      <h1>🦝 Root Word Raccoon</h1>
+      <p class="sub">Rocky builds big words from small parts! Read the clue, then snap together a
+        <b style="color:#c77dff">prefix</b>, a <b style="color:#7bf0a8">root</b>, and a
+        <b style="color:#6ec8ff">suffix</b> to make the word. <b>un</b>+<b>break</b>+<b>able</b> = unbreakable!</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>root + suffix</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>prefix + root</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>full builds &amp; roots</small></button>
+      </div>
+      <p class="sub">8 words per run · correct builds earn streak bonuses</p>
+    </div>
+
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Word 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="clue" id="clue"></div>
+      <div class="slots" id="slots"></div>
+      <div class="preview" id="preview"></div>
+      <div class="banks" id="banks"></div>
+      <div class="runbar">
+        <button class="btn" id="checkBtn" disabled>✓ Check</button>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <div id="final" class="hidden final">
+      <div style="font-size:74px" id="finalEmoji">🦝</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="gradeBtn g1" id="againBtn">New words ▸</button>
+        <button class="gradeBtn g2" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var ROUNDS_DATA = [
+    [ // Grade 1-2 : root + suffix
+      { clue:'doing it now: to jump', r:'jump', s:'ing', word:'jumping' },
+      { clue:'more than one dog', r:'dog', s:'s', word:'dogs' },
+      { clue:'did it before: to play', r:'play', s:'ed', word:'played' },
+      { clue:'a person who teaches', r:'teach', s:'er', word:'teacher' },
+      { clue:'full of hope', r:'hope', s:'ful', word:'hopeful' },
+      { clue:'without any fear', r:'fear', s:'less', word:'fearless' }
+    ],
+    [ // Grade 3 : prefix + root
+      { clue:'to play it again', p:'re', r:'play', word:'replay' },
+      { clue:'not happy', p:'un', r:'happy', word:'unhappy' },
+      { clue:'to do it again', p:'re', r:'do', word:'redo' },
+      { clue:'not kind', p:'un', r:'kind', word:'unkind' },
+      { clue:'to NOT agree', p:'dis', r:'agree', word:'disagree' },
+      { clue:'to heat it beforehand', p:'pre', r:'heat', word:'preheat' }
+    ],
+    [ // Grade 4-5 : full builds & Greek/Latin roots
+      { clue:'able to NOT be broken', p:'un', r:'break', s:'able', word:'unbreakable' },
+      { clue:'a device to talk far away', p:'tele', r:'phone', word:'telephone' },
+      { clue:'a cycle with two wheels', p:'bi', r:'cycle', word:'bicycle' },
+      { clue:'able to be enjoyed', r:'enjoy', s:'able', word:'enjoyable' },
+      { clue:'a shape with three angles', p:'tri', r:'angle', word:'triangle' },
+      { clue:'pictures viewed from far (box)', p:'tele', r:'vision', word:'television' }
+    ]
+  ];
+  var POOLS = {
+    p: ['un','re','pre','dis','bi','tri','tele','non','mis','over'],
+    r: ['play','happy','do','kind','agree','heat','break','phone','cycle','enjoy','angle','vision','jump','dog','teach','hope','fear','count'],
+    s: ['s','ing','ed','er','ful','less','able','ly','ness']
+  };
+  var SLOTNAME = { p:'Prefix', r:'Root', s:'Suffix' };
+  var GRADES = [ {id:1,label:'Grade 1–2'}, {id:3,label:'Grade 3'}, {id:4,label:'Grade 4–5'} ];
+  var ROUNDS = 8;
+
+  var CHEER = ['Word built — nice work! 🦝🎉','Snapped together perfectly! 🌟','Root, prefix, suffix — mastered! 💚','Word-building wizard! ✨'];
+  var OOPS  = ['Not quite that word. 🦝','Check the parts again. 🤔','Rocky shakes his head. Try the next!'];
+
+  var gradeIdx = 0, q = 0, score = 0, streak = 0, nRight = 0;
+  var round = null, used = [], chosen = {}, options = {}, locked = false;
+
+  var $ = function (id){ return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f,d,t,slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t||'sine'; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.08,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function snap(){ tone(560,.05,'square',680); }
+  function good(){ tone(523,.1,'sine'); setTimeout(function(){ tone(784,.18,'sine',1046); },110); }
+  function bad(){ tone(200,.3,'sawtooth',90); }
+
+  function render() {
+    locked = false; chosen = {}; options = {};
+    round = pick(ROUNDS_DATA[gradeIdx]);
+    used = ['p','r','s'].filter(function (k) { return round[k]; });
+    used.forEach(function (k) {
+      var correct = round[k];
+      var distract = shuffle(POOLS[k].slice()).filter(function (x) { return x !== correct; }).slice(0, 2);
+      options[k] = shuffle([correct].concat(distract));
+    });
+    $('roundLbl').textContent = 'Word ' + (q + 1) + '/' + ROUNDS;
+    $('clue').innerHTML = 'Build the word for: <b>' + round.clue + '</b>';
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('checkBtn').disabled = true;
+    drawSlots(); drawBanks(); updatePreview();
+    EduSDK.startLesson(q + 1, { word: round.word });
+  }
+
+  function drawSlots() {
+    var s = $('slots'); s.innerHTML = '';
+    used.forEach(function (k, i) {
+      if (i > 0) { var pl = document.createElement('span'); pl.className = 'plus'; pl.textContent = '+'; s.appendChild(pl); }
+      var d = document.createElement('div');
+      d.className = 'slot ' + k + (chosen[k] ? ' filled ' + k + 'f' : '');
+      d.id = 'slot-' + k;
+      d.textContent = chosen[k] || SLOTNAME[k];
+      s.appendChild(d);
+    });
+  }
+
+  function drawBanks() {
+    var b = $('banks'); b.innerHTML = '';
+    used.forEach(function (k) {
+      var row = document.createElement('div'); row.className = 'bankrow';
+      var h = document.createElement('div'); h.className = 'h'; h.textContent = SLOTNAME[k] + ' tiles'; row.appendChild(h);
+      var tiles = document.createElement('div'); tiles.className = 'tiles';
+      options[k].forEach(function (val) {
+        var t = document.createElement('div');
+        t.className = 'tile ' + ({p:'pre',r:'root',s:'suf'})[k];
+        t.textContent = val; t.dataset.k = k; t.dataset.v = val;
+        t.addEventListener('click', function () { choose(k, val); });
+        tiles.appendChild(t);
+      });
+      row.appendChild(tiles); b.appendChild(row);
+    });
+  }
+
+  function choose(k, val) {
+    if (locked) return;
+    chosen[k] = val; snap();
+    // highlight selected tile in that bank
+    Array.prototype.forEach.call($('banks').querySelectorAll('.tile'), function (t) {
+      if (t.dataset.k === k) t.classList.toggle('sel', t.dataset.v === val);
+    });
+    drawSlots(); updatePreview();
+    $('checkBtn').disabled = used.some(function (kk) { return !chosen[kk]; });
+  }
+
+  function updatePreview() {
+    var w = used.map(function (k) { return chosen[k] || ''; }).join('');
+    $('preview').textContent = w || '…';
+  }
+
+  function check() {
+    if (locked) return;
+    var w = used.map(function (k) { return chosen[k] || ''; }).join('');
+    var correct = w === round.word;
+    locked = true; $('checkBtn').disabled = true;
+    if (correct) {
+      good(); nRight++; streak++;
+      var pts = 100 + streak * 15; score += pts; $('scoreVal').textContent = score;
+      $('toast').textContent = pick(CHEER) + '  +' + pts; $('toast').className = 'toast good';
+    } else {
+      bad(); streak = 0;
+      // highlight the correct tiles
+      Array.prototype.forEach.call($('banks').querySelectorAll('.tile'), function (t) {
+        if (t.dataset.v === round[t.dataset.k]) t.classList.add('correct');
+      });
+      $('preview').textContent = round.word;
+      $('card').classList.add('shake'); setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' The word was "' + round.word + '".'; $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1800);
+    if (q === Math.floor(ROUNDS / 2)) setTimeout(function(){ EduSDK.adBreak('interlevel').then(render); }, 1800);
+    else setTimeout(render, 1800);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden'); $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nRight >= 7 ? '🦝🏆' : nRight >= 4 ? '🦝📚' : '🦝🧩';
+    $('finalLine').textContent = GRADES[gradeIdx].label + ' — ' + nRight + '/' + ROUNDS + ' words built right. ' +
+      (nRight >= 7 ? 'Master word-builder — prefixes and suffixes bow to you!' :
+       nRight >= 4 ? 'Great building — a few parts didn\'t snap.' :
+       'Keep noticing word-parts — un-, re-, -ing, -ful — they\'re everywhere!');
+    EduSDK.submitScore(score, { grade: GRADES[gradeIdx].id, right: nRight })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) el.innerHTML = res.isPersonalBest
+          ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>' : 'Score saved to the leaderboard.';
+        else if (res && res.offline) el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        else el.textContent = (res && res.error === 'not_authenticated') ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(idx) {
+    gradeIdx = idx; q = 0; score = 0; streak = 0; nRight = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    render();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('#start .gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(Number(b.dataset.grade)); });
+  });
+  $('checkBtn').addEventListener('click', check);
+  $('againBtn').addEventListener('click', function () { startGame(gradeIdx); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'root-word-raccoon' });
+})();
+</script>
+</body>
+</html>

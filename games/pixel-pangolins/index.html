@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Pixel Pangolins — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="logic" data-seed="pixel-pangolins"></script>
+
+<style>
+  :root{
+    --bg1:#2e2a14; --bg2:#454020; --bg3:#1a1709;
+    --card:#33301a; --line:#8a7a3a; --text:#fff8e6; --muted:#d8c99a;
+    --green:#a8e05a; --blue:#6ec8ff; --purple:#c77dff; --gold:#ffd15a; --bad:#ff6b81; --fill:#ffb84d;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--gold),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#1a1709;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .gridWrap{display:flex;justify-content:center;overflow-x:auto;padding-bottom:6px;}
+  .grid{display:grid;gap:2px;}
+  .cc{display:flex;align-items:flex-end;justify-content:center;font-size:12px;font-weight:800;color:var(--gold);
+    line-height:1.05;padding-bottom:2px;flex-direction:column;}
+  .rc{display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:13px;font-weight:800;color:var(--gold);padding-right:4px;}
+  .cell{width:clamp(30px,7vw,44px);height:clamp(30px,7vw,44px);background:#4a4522;border:1px solid #6a5f2e;border-radius:5px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:16px;color:#8a7a3a;}
+  .cell.fill{background:var(--fill);border-color:#c88a2a;}
+  .cell.mark::after{content:'✕';color:#a08a4a;font-weight:800;}
+  .cell.reveal{background:var(--green);border-color:#6a9a2a;}
+  .modebar{display:flex;gap:10px;justify-content:center;margin:12px 0 4px;flex-wrap:wrap;}
+  .mbtn{cursor:pointer;border:2px solid var(--line);font-family:inherit;font-weight:800;font-size:14px;
+    padding:9px 14px;border-radius:12px;color:var(--text);background:#4a4522;box-shadow:0 4px 0 rgba(0,0,0,.35);}
+  .mbtn:active{transform:translateY(2px);} .mbtn.on{background:var(--fill);color:#1a1709;border-color:#c88a2a;}
+  .runbar{display:flex;gap:10px;justify-content:center;margin-top:6px;flex-wrap:wrap;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:15px;
+    padding:10px 18px;border-radius:12px;color:#1a1709;background:var(--green);box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);} .btn.ghost{background:#4a4522;color:var(--text);} .btn:disabled{opacity:.4;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:16px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:56px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;} .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:10px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#a89a5a;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <div id="start">
+      <h1>🦔 Pixel Pangolins</h1>
+      <p class="sub">The number clues tell you how many squares to fill in each row and column. Puzzle it out
+        and a hidden pixel picture appears! Use <b>Fill</b> for squares you're sure of, and <b>Mark ✕</b> for
+        blanks — then <b>Check</b>.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>gentle 5×5</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>6×6 pictures</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>tricky 7×7</small></button>
+      </div>
+      <p class="sub">6 pictures per run · solving without peeking earns streak bonuses</p>
+    </div>
+
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Picture 1/6</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="gridWrap"><div class="grid" id="grid"></div></div>
+      <div class="modebar">
+        <button class="mbtn on" id="fillMode">🎨 Fill</button>
+        <button class="mbtn" id="markMode">✕ Mark blank</button>
+      </div>
+      <div class="runbar">
+        <button class="btn" id="checkBtn">✓ Check</button>
+        <button class="btn ghost" id="clearBtn">🗑 Clear</button>
+        <button class="btn ghost" id="revealBtn">👀 Reveal</button>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <div id="final" class="hidden final">
+      <div style="font-size:74px" id="finalEmoji">🦔</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="gradeBtn g1" id="againBtn">New pictures ▸</button>
+        <button class="gradeBtn g2" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var PUZZLES = [
+    [ // 5x5
+      ['.#.#.','#####','#####','.###.','..#..'],           // heart
+      ['..#..','..#..','#####','..#..','..#..'],           // plus
+      ['..#..','.###.','#####','..#..','..#..'],           // arrow
+      ['..#..','.###.','#####','.###.','..#..'],           // diamond
+      ['.###.','#...#','#...#','#...#','.###.']            // ring
+    ],
+    [ // 6x6
+      ['..##..','.####.','######','.#..#.','.#..#.','.####.'], // house
+      ['.#..#.','######','######','######','.####.','..##..'], // heart
+      ['######','..##..','..##..','..##..','..##..','..##..'], // T
+      ['..##..','.####.','######','######','..##..','..##..']  // tree
+    ],
+    [ // 7x7
+      ['...#...','...#...','#######','.#####.','..###..','.##.##.','##...##'], // star
+      ['.##.##.','#######','#######','#######','.#####.','..###..','...#...'], // heart
+      ['...#...','..###..','.#####.','#######','.#####.','..###..','...#...']  // diamond
+    ]
+  ];
+  var GRADES = [ {id:1,label:'Grade 1–2'}, {id:3,label:'Grade 3'}, {id:4,label:'Grade 4–5'} ];
+  var ROUNDS = 6;
+
+  var CHEER = ['Picture revealed — beautiful logic! 🦔🎉','Solved without a peek! 🌟','Every clue nailed! 💚','Pixel perfect! ✨'];
+  var OOPS  = ['Not solved yet — check the clues again. 🔍','Some squares are off — keep reasoning! 🤔'];
+
+  var gradeIdx = 0, q = 0, score = 0, streak = 0, nSolved = 0;
+  var sol = null, N = 5, state = [], mode = 1, locked = false, peeked = false;
+
+  var $ = function (id){ return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f,d,t,slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t||'sine'; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.07,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function tap(){ tone(520,.04,'square'); }
+  function good(){ tone(523,.1,'sine'); setTimeout(function(){ tone(784,.18,'sine',1046); },110); }
+  function bad(){ tone(200,.28,'sawtooth',90); }
+
+  function runsOf(arr) { // arr of 0/1
+    var runs = [], c = 0;
+    arr.forEach(function (v) { if (v) c++; else if (c) { runs.push(c); c = 0; } });
+    if (c) runs.push(c);
+    return runs.length ? runs : [0];
+  }
+
+  function render() {
+    locked = false; peeked = false; mode = 1;
+    setModeUI();
+    var grid = pick(PUZZLES[gradeIdx]);
+    N = grid.length;
+    sol = grid.map(function (row) { return row.split('').map(function (ch) { return ch === '#' ? 1 : 0; }); });
+    state = sol.map(function (row) { return row.map(function () { return 0; }); });
+    $('roundLbl').textContent = 'Picture ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+
+    var rowClues = sol.map(function (row) { return runsOf(row); });
+    var colClues = [];
+    for (var c = 0; c < N; c++) { var col = []; for (var r = 0; r < N; r++) col.push(sol[r][c]); colClues.push(runsOf(col)); }
+
+    var g = $('grid'); g.innerHTML = '';
+    g.style.gridTemplateColumns = 'auto repeat(' + N + ',1fr)';
+    // corner
+    g.appendChild(el('cc', ''));
+    // column clue headers
+    for (var cc = 0; cc < N; cc++) g.appendChild(el('cc', colClues[cc].join('<br>')));
+    // rows
+    for (var r = 0; r < N; r++) {
+      g.appendChild(el('rc', rowClues[r].join(' ')));
+      for (var cx = 0; cx < N; cx++) {
+        (function (rr, ccx) {
+          var cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.addEventListener('click', function () { clickCell(rr, ccx, cell); });
+          g.appendChild(cell);
+        })(r, cx);
+      }
+    }
+    EduSDK.startLesson(q + 1, { size: N });
+  }
+
+  function el(cls, html) { var d = document.createElement('div'); d.className = cls; d.innerHTML = html; return d; }
+
+  function cellDiv(r, c) {
+    // grid children: index 0 corner, 1..N col headers, then rows of (1 rc + N cells)
+    var perRow = N + 1;
+    var base = (N + 1) + r * perRow + 1; // start of this row's cells
+    return $('grid').children[base + c];
+  }
+
+  function clickCell(r, c, cell) {
+    if (locked) return;
+    var target = mode; // 1 fill, 2 mark
+    state[r][c] = state[r][c] === target ? 0 : target;
+    cell.className = 'cell' + (state[r][c] === 1 ? ' fill' : state[r][c] === 2 ? ' mark' : '');
+    tap();
+  }
+
+  function check() {
+    if (locked) return;
+    var okAll = true;
+    for (var r = 0; r < N && okAll; r++) for (var c = 0; c < N; c++)
+      if ((state[r][c] === 1 ? 1 : 0) !== sol[r][c]) { okAll = false; break; }
+    if (okAll) return solved();
+    bad();
+    $('card').classList.add('shake'); setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+    $('toast').textContent = pick(OOPS); $('toast').className = 'toast bad';
+  }
+
+  function revealPic() {
+    for (var r = 0; r < N; r++) for (var c = 0; c < N; c++)
+      if (sol[r][c]) cellDiv(r, c).classList.add('reveal');
+  }
+
+  function solved() {
+    locked = true; good(); nSolved++;
+    revealPic();
+    var pts;
+    if (!peeked) { streak++; pts = 100 + streak * 15; }
+    else { streak = 0; pts = 40; }
+    score += pts; $('scoreVal').textContent = score;
+    $('toast').textContent = (peeked ? 'Solved (with a peek).' : pick(CHEER)) + '  +' + pts;
+    $('toast').className = 'toast good';
+    EduSDK.finishLesson(q + 1, { solved: true, peeked: peeked });
+    next();
+  }
+
+  function reveal() {
+    if (locked) return;
+    peeked = true; streak = 0;
+    // fill state to solution and show
+    for (var r = 0; r < N; r++) for (var c = 0; c < N; c++) state[r][c] = sol[r][c] ? 1 : 0;
+    solved();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1800);
+    if (q === Math.floor(ROUNDS / 2)) setTimeout(function(){ EduSDK.adBreak('interlevel').then(render); }, 1800);
+    else setTimeout(render, 1800);
+  }
+
+  function setModeUI() {
+    $('fillMode').classList.toggle('on', mode === 1);
+    $('markMode').classList.toggle('on', mode === 2);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden'); $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nSolved >= 6 ? '🦔🏆' : nSolved >= 3 ? '🦔🎨' : '🦔🧩';
+    $('finalLine').textContent = GRADES[gradeIdx].label + ' — ' + nSolved + '/' + ROUNDS + ' pictures revealed. ' +
+      (nSolved >= 6 ? 'Master of clues — a true nonogram ninja!' :
+       nSolved >= 3 ? 'Nice deducing — the pictures are coming to life.' :
+       'Take it row by row, mark the blanks — you\'ll crack them!');
+    EduSDK.submitScore(score, { grade: GRADES[gradeIdx].id, solved: nSolved })
+      .then(function (res) {
+        var el2 = $('saveMsg');
+        if (res && res.success) el2.innerHTML = res.isPersonalBest
+          ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>' : 'Score saved to the leaderboard.';
+        else if (res && res.offline) el2.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        else el2.textContent = (res && res.error === 'not_authenticated') ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(idx) {
+    gradeIdx = idx; q = 0; score = 0; streak = 0; nSolved = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    render();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('#start .gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(Number(b.dataset.grade)); });
+  });
+  $('fillMode').addEventListener('click', function(){ mode = 1; setModeUI(); });
+  $('markMode').addEventListener('click', function(){ mode = 2; setModeUI(); });
+  $('checkBtn').addEventListener('click', check);
+  $('clearBtn').addEventListener('click', function () {
+    if (locked) return;
+    for (var r = 0; r < N; r++) for (var c = 0; c < N; c++) { state[r][c] = 0; cellDiv(r, c).className = 'cell'; }
+  });
+  $('revealBtn').addEventListener('click', reveal);
+  $('againBtn').addEventListener('click', function () { startGame(gradeIdx); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'pixel-pangolins' });
+})();
+</script>
+</body>
+</html>

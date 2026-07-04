@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b2140"/><stop offset=".5" stop-color="#123a63"/><stop offset="1" stop-color="#071427"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#4fe3b0"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="480" y="86" fill="#e9f4ff" font-size="34" font-weight="800" text-anchor="middle">Plot the island at <tspan fill="#ffd15a">(3, 2)</tspan></text>
+  <!-- 6x5 grid -->
+  <g>
+    <rect x="330" y="115" width="300" height="250" rx="12" fill="#071427" stroke="#2f6aa8" stroke-width="4"/>
+    <g fill="#12456f">
+      <!-- 5 cols x 4 rows sample cells -->
+      <rect x="342" y="127" width="52" height="52" rx="7"/><rect x="400" y="127" width="52" height="52" rx="7"/>
+      <rect x="458" y="127" width="52" height="52" rx="7"/><rect x="516" y="127" width="52" height="52" rx="7"/>
+      <rect x="574" y="127" width="44" height="52" rx="7"/>
+      <rect x="342" y="185" width="52" height="52" rx="7"/><rect x="400" y="185" width="52" height="52" rx="7"/>
+      <rect x="458" y="185" width="52" height="52" rx="7"/><rect x="574" y="185" width="44" height="52" rx="7"/>
+      <rect x="342" y="243" width="52" height="52" rx="7"/><rect x="400" y="243" width="52" height="52" rx="7"/>
+      <rect x="458" y="243" width="52" height="52" rx="7"/><rect x="516" y="243" width="52" height="52" rx="7"/><rect x="574" y="243" width="44" height="52" rx="7"/>
+      <rect x="342" y="301" width="52" height="52" rx="7"/><rect x="400" y="301" width="52" height="52" rx="7"/>
+      <rect x="458" y="301" width="52" height="52" rx="7"/><rect x="516" y="301" width="52" height="52" rx="7"/><rect x="574" y="301" width="44" height="52" rx="7"/>
+    </g>
+    <!-- target cell (3,2) highlighted -->
+    <rect x="516" y="185" width="52" height="52" rx="7" fill="#1f6e4a" stroke="#4fe3b0" stroke-width="4"/>
+    <text x="542" y="222" font-size="30" text-anchor="middle">🏝️</text>
+    <text x="368" y="404" fill="#a8cae8" font-size="20" font-weight="800" text-anchor="middle">1</text>
+    <text x="426" y="404" fill="#a8cae8" font-size="20" font-weight="800" text-anchor="middle">2</text>
+    <text x="484" y="404" fill="#ffd15a" font-size="20" font-weight="800" text-anchor="middle">3</text>
+    <text x="542" y="404" fill="#a8cae8" font-size="20" font-weight="800" text-anchor="middle">4</text>
+    <text x="595" y="404" fill="#a8cae8" font-size="20" font-weight="800" text-anchor="middle">5</text>
+  </g>
+  <text x="150" y="250" font-size="64" text-anchor="middle">🧭</text>
+  <text x="810" y="250" font-size="56" text-anchor="middle">⛵</text>
+  <text x="480" y="470" fill="url(#ttl)" font-size="64" font-weight="800" text-anchor="middle">Coordinate Compass</text>
+</svg>

@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Receipt Rascals — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="money" data-seed="receipt-rascals"></script>
+
+<style>
+  :root{
+    --bg1:#123322; --bg2:#1c4e32; --bg3:#0a2015;
+    --card:#143a26; --line:#3f8a5a; --text:#eafff0; --muted:#a9dcbc;
+    --green:#6fe89a; --blue:#6ec8ff; --purple:#c77dff; --gold:#ffd15a; --bad:#ff6b81; --paper:#f4efdd;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--gold),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#0a2015;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .receipt{background:var(--paper);color:#2a2a2a;max-width:340px;margin:8px auto 14px;border-radius:8px;padding:16px 20px;
+    font-family:ui-monospace,Consolas,monospace;box-shadow:0 8px 20px rgba(0,0,0,.4);}
+  .receipt h3{margin:0 0 8px;text-align:center;font-family:"Baloo 2",sans-serif;letter-spacing:1px;}
+  .receipt .line{display:flex;justify-content:space-between;padding:2px 0;}
+  .receipt .rule{border-top:2px dashed #999;margin:8px 0;}
+  .receipt .sub2{font-weight:800;} .receipt .tax{color:#227a44;} .receipt .tip{color:#9a6a10;}
+  .receipt .tot{display:flex;justify-content:space-between;font-weight:800;font-size:20px;margin-top:4px;}
+  .receipt .tot .qq{color:#c0392b;}
+  .q{text-align:center;color:var(--muted);font-weight:800;margin-bottom:10px;}
+  .opts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:480px;margin:0 auto;}
+  .opt{cursor:pointer;border:2px solid var(--line);background:#0f3221;border-radius:14px;padding:16px;text-align:center;
+    font-weight:800;font-size:clamp(20px,4vw,26px);box-shadow:0 5px 0 rgba(0,0,0,.35);transition:.1s;}
+  .opt:active{transform:translateY(2px);}
+  .opt.right{border-color:var(--green);background:#12522f;} .opt.wrong{border-color:var(--bad);background:#4a1e28;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:16px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:56px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;} .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:10px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#6fae86;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <div id="start">
+      <h1>🧾 Receipt Rascals</h1>
+      <p class="sub">The rascals are padding the bills! Work out the <b>real total</b> — add the sales tax
+        (and sometimes a tip) to the subtotal — and tap it before they sneak an overcharge past you.</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>10% tax, tidy sums</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>bigger tax rates</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>tax + tip combos</small></button>
+      </div>
+      <p class="sub">8 receipts per run · correct totals earn streak bonuses</p>
+    </div>
+
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Receipt 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="receipt" id="receipt"></div>
+      <div class="q">What's the honest total?</div>
+      <div class="opts" id="opts"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <div id="final" class="hidden final">
+      <div style="font-size:74px" id="finalEmoji">🧾</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="gradeBtn g1" id="againBtn">New receipts ▸</button>
+        <button class="gradeBtn g2" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var ITEMS = ['🍔 Burger','🍟 Fries','🥤 Drink','🍕 Pizza','🍩 Donut','🧁 Cupcake','🍎 Apple','🥪 Sandwich','🍪 Cookie','🌮 Taco'];
+  var GRADES = [
+    { id:1, label:'Grade 1–2', subs:[10,20,30,40,50], taxes:[10], tips:[0] },
+    { id:3, label:'Grade 3',   subs:[10,20,30,40,50,60], taxes:[10,20], tips:[0] },
+    { id:4, label:'Grade 4–5', subs:[20,40,60], taxes:[10,20], tips:[10,15,20] }
+  ];
+  var ROUNDS = 8;
+
+  var CHEER = ['Honest total — rascals foiled! 🧾🎉','Maths never lies! 🌟','Overcharge blocked! 💚','Receipt detective! ✨'];
+  var OOPS  = ['The rascals got you! 🦝','Check the tax again. 🤔','Not the honest total — next receipt!'];
+
+  var grade = GRADES[0], q = 0, score = 0, streak = 0, nRight = 0;
+  var cur = null, locked = false;
+
+  var $ = function (id){ return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+  function money(n){ return '$' + (Math.round(n * 100) / 100).toFixed(2); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f,d,t,slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t||'sine'; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.08,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function good(){ tone(523,.1,'sine'); setTimeout(function(){ tone(784,.18,'sine',1046); },110); }
+  function bad(){ tone(200,.3,'sawtooth',90); }
+
+  // split subtotal into 2-3 item lines summing to it
+  function splitItems(sub) {
+    var names = shuffle(ITEMS.slice());
+    var n = sub >= 40 ? 3 : 2, lines = [], left = sub;
+    for (var i = 0; i < n - 1; i++) {
+      var p = Math.max(1, Math.min(left - (n - 1 - i), Math.floor(Math.random() * (left - (n - 1 - i)) ) + 1));
+      lines.push([names[i], p]); left -= p;
+    }
+    lines.push([names[n - 1], left]);
+    return lines;
+  }
+
+  function buildRound() {
+    var sub = pick(grade.subs), taxP = pick(grade.taxes), tipP = pick(grade.tips);
+    var tax = sub * taxP / 100, tip = sub * tipP / 100, total = sub + tax + tip;
+    var opts = {};
+    opts[total.toFixed(2)] = true;                 // correct
+    opts[(sub).toFixed(2)] = true;                 // forgot tax+tip
+    opts[(sub + tax).toFixed(2)] = true;           // forgot the tip (or a plausible)
+    opts[(sub + tax * 2 + tip).toFixed(2)] = true; // double tax = the rascal overcharge
+    opts[(total + Math.max(1, sub * 0.1)).toFixed(2)] = true; // padded
+    var list = Object.keys(opts).filter(function (v) { return v !== total.toFixed(2); });
+    var chosen = shuffle(list).slice(0, 3).concat([total.toFixed(2)]);
+    cur = { sub: sub, taxP: taxP, tipP: tipP, tax: tax, tip: tip, total: total,
+            items: splitItems(sub), opts: shuffle(chosen) };
+  }
+
+  function render() {
+    locked = false;
+    buildRound();
+    $('roundLbl').textContent = 'Receipt ' + (q + 1) + '/' + ROUNDS;
+    var r = ['<h3>🦝 Rascal Diner</h3>'];
+    cur.items.forEach(function (it) { r.push('<div class="line"><span>' + it[0] + '</span><span>' + money(it[1]) + '</span></div>'); });
+    r.push('<div class="rule"></div>');
+    r.push('<div class="line sub2"><span>Subtotal</span><span>' + money(cur.sub) + '</span></div>');
+    r.push('<div class="line tax"><span>Tax ' + cur.taxP + '%</span><span>+ ' + money(cur.tax) + '</span></div>');
+    if (cur.tipP) r.push('<div class="line tip"><span>Tip ' + cur.tipP + '%</span><span>+ ' + money(cur.tip) + '</span></div>');
+    r.push('<div class="rule"></div>');
+    r.push('<div class="tot"><span>TOTAL</span><span class="qq">?</span></div>');
+    $('receipt').innerHTML = r.join('');
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    var o = $('opts'); o.innerHTML = '';
+    cur.opts.forEach(function (v) {
+      var b = document.createElement('div');
+      b.className = 'opt'; b.textContent = '$' + v;
+      b.addEventListener('click', function () { choose(v, b); });
+      o.appendChild(b);
+    });
+    EduSDK.startLesson(q + 1, {});
+  }
+
+  function choose(v, el) {
+    if (locked) return;
+    locked = true;
+    var correct = v === cur.total.toFixed(2);
+    if (correct) {
+      el.classList.add('right'); good(); nRight++; streak++;
+      var pts = 100 + streak * 15; score += pts; $('scoreVal').textContent = score;
+      $('toast').textContent = CHEER[Math.floor(Math.random()*CHEER.length)] + '  +' + pts; $('toast').className = 'toast good';
+    } else {
+      el.classList.add('wrong'); bad(); streak = 0;
+      Array.prototype.forEach.call($('opts').children, function (x) { if (x.textContent === '$' + cur.total.toFixed(2)) x.classList.add('right'); });
+      $('card').classList.add('shake'); setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = OOPS[Math.floor(Math.random()*OOPS.length)] + ' It was ' + money(cur.total) + '.'; $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1800);
+    if (q === Math.floor(ROUNDS / 2)) setTimeout(function(){ EduSDK.adBreak('interlevel').then(render); }, 1800);
+    else setTimeout(render, 1800);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden'); $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nRight >= 7 ? '🧾🏆' : nRight >= 4 ? '🧾💰' : '🧾🦝';
+    $('finalLine').textContent = grade.label + ' — ' + nRight + '/' + ROUNDS + ' honest totals. ' +
+      (nRight >= 7 ? 'Master of money maths — no rascal can fool you!' :
+       nRight >= 4 ? 'Good calculating — a couple of overcharges got through.' :
+       'Keep practising tax and tips — check every bill!');
+    EduSDK.submitScore(score, { grade: grade.id, right: nRight })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) el.innerHTML = res.isPersonalBest
+          ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>' : 'Score saved to the leaderboard.';
+        else if (res && res.offline) el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        else el.textContent = (res && res.error === 'not_authenticated') ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nRight = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    render();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('#start .gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'receipt-rascals' });
+})();
+</script>
+</body>
+</html>

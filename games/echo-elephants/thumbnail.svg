@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#20303f"/><stop offset=".5" stop-color="#324a5e"/><stop offset="1" stop-color="#12202b"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#7bf0a8"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="480" y="80" fill="#ffd15a" font-size="28" font-weight="800" text-anchor="middle">Tap MATCH when it repeats <tspan fill="#6ec8ff">1 step ago</tspan></text>
+  <!-- stream trail -->
+  <g text-anchor="middle">
+    <rect x="130" y="150" width="110" height="110" rx="18" fill="#16242f" stroke="#4a6f8a" stroke-width="3" opacity="0.5"/><text x="185" y="228" font-size="56" opacity="0.5">🌟</text>
+    <rect x="270" y="150" width="110" height="110" rx="18" fill="#16242f" stroke="#4a6f8a" stroke-width="3" opacity="0.7"/><text x="325" y="228" font-size="56" opacity="0.7">🍎</text>
+    <rect x="420" y="130" width="150" height="150" rx="22" fill="#12402c" stroke="#7bf0a8" stroke-width="5"/><text x="495" y="235" font-size="80">🍎</text>
+    <text x="495" y="305" fill="#7bf0a8" font-size="22" font-weight="800">MATCH!</text>
+    <rect x="620" y="150" width="110" height="110" rx="18" fill="#16242f" stroke="#4a6f8a" stroke-width="3" opacity="0.3"/><text x="675" y="228" font-size="50" opacity="0.3">❔</text>
+  </g>
+  <text x="820" y="230" font-size="66" text-anchor="middle">🐘</text>
+  <!-- match button -->
+  <rect x="380" y="330" width="200" height="66" rx="18" fill="#ffd15a"/>
+  <text x="480" y="375" fill="#12202b" font-size="28" font-weight="800" text-anchor="middle">🐘 MATCH!</text>
+  <text x="480" y="475" fill="url(#ttl)" font-size="64" font-weight="800" text-anchor="middle">Echo Elephants</text>
+</svg>

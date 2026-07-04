@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f2f33"/><stop offset=".5" stop-color="#164046"/><stop offset="1" stop-color="#0a2024"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffc15a"/><stop offset=".5" stop-color="#4fe3b0"/><stop offset="1" stop-color="#5ad8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="480" y="120" fill="#e6fbff" font-size="36" font-weight="800" text-anchor="middle">Iggy at <tspan fill="#ffc15a">2</tspan>, then <tspan fill="#ffc15a">− 5</tspan> = ?</text>
+  <!-- number line -->
+  <line x1="120" y1="300" x2="840" y2="300" stroke="#3a6b70" stroke-width="4"/>
+  <g font-size="26" font-weight="800" text-anchor="middle">
+    <!-- ticks -5..5 -->
+    <g stroke="#3a6b70" stroke-width="3">
+      <line x1="150" y1="285" x2="150" y2="315"/><line x1="215" y1="285" x2="215" y2="315"/>
+      <line x1="280" y1="285" x2="280" y2="315"/><line x1="345" y1="285" x2="345" y2="315"/>
+      <line x1="410" y1="285" x2="410" y2="315"/>
+    </g>
+    <line x1="480" y1="278" x2="480" y2="322" stroke="#ffc15a" stroke-width="6"/>
+    <g stroke="#3a6b70" stroke-width="3">
+      <line x1="550" y1="285" x2="550" y2="315"/><line x1="615" y1="285" x2="615" y2="315"/>
+      <line x1="680" y1="285" x2="680" y2="315"/><line x1="745" y1="285" x2="745" y2="315"/>
+      <line x1="810" y1="285" x2="810" y2="315"/>
+    </g>
+    <text x="150" y="352" fill="#ff9a6b">-5</text><text x="215" y="352" fill="#ff9a6b">-4</text>
+    <text x="280" y="352" fill="#ff9a6b">-3</text><text x="345" y="352" fill="#ff9a6b">-2</text>
+    <text x="410" y="352" fill="#ff9a6b">-1</text><text x="480" y="352" fill="#ffc15a">0</text>
+    <text x="550" y="352" fill="#a7d8dd">1</text><text x="615" y="352" fill="#a7d8dd">2</text>
+    <text x="680" y="352" fill="#a7d8dd">3</text><text x="745" y="352" fill="#a7d8dd">4</text>
+    <text x="810" y="352" fill="#a7d8dd">5</text>
+  </g>
+  <!-- hop arc from 2 to -3 -->
+  <path d="M615 285 Q447 170 280 285" fill="none" stroke="#4fe3b0" stroke-width="5" stroke-dasharray="10 8"/>
+  <text x="615" y="262" font-size="34" text-anchor="middle">🦎</text>
+  <text x="280" y="262" font-size="34" text-anchor="middle">🎯</text>
+  <text x="480" y="470" fill="url(#ttl)" font-size="70" font-weight="800" text-anchor="middle">Integer Iguanas</text>
+</svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#33241a"/><stop offset=".5" stop-color="#4e3826"/><stop offset="1" stop-color="#1e140c"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#8fe15a"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- carriage -->
+  <text x="150" y="150" font-size="60">🚂</text>
+  <g>
+    <rect x="250" y="110" width="480" height="130" rx="16" fill="#2a1c10" stroke="#ffd15a" stroke-width="4"/>
+    <text x="490" y="175" font-size="50" text-anchor="middle">🔺</text>
+    <text x="490" y="220" fill="#fff2e2" font-size="26" font-weight="800" text-anchor="middle">The Great Pyramids</text>
+  </g>
+  <text x="490" y="270" fill="#26170d" font-size="22" letter-spacing="10" text-anchor="middle">◉ ◉ ◉ ◉</text>
+  <!-- options -->
+  <g font-weight="800" text-anchor="middle" font-size="24" fill="#fff2e2">
+    <rect x="230" y="290" width="230" height="66" rx="14" fill="#2f4a1c" stroke="#8fe15a" stroke-width="4"/><text x="345" y="332">Egypt</text>
+    <rect x="500" y="290" width="230" height="66" rx="14" fill="#2f2114" stroke="#9a6f3f" stroke-width="3"/><text x="615" y="332">Rome</text>
+    <rect x="230" y="366" width="230" height="66" rx="14" fill="#2f2114" stroke="#9a6f3f" stroke-width="3"/><text x="345" y="408">China</text>
+    <rect x="500" y="366" width="230" height="66" rx="14" fill="#2f2114" stroke="#9a6f3f" stroke-width="3"/><text x="615" y="408">Greece</text>
+  </g>
+  <text x="480" y="495" fill="url(#ttl)" font-size="66" font-weight="800" text-anchor="middle">Empire Express</text>
+</svg>

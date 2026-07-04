@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Venn Vultures — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="logic" data-seed="venn-vultures"></script>
+
+<style>
+  :root{
+    --bg1:#1a1630; --bg2:#2b2450; --bg3:#0f0c1f;
+    --card:#221c40; --line:#5a4a9a; --text:#f0ecff; --muted:#bcb0e8;
+    --green:#7bf0a8; --aCol:#6ec8ff; --bCol:#ff9ec7; --gold:#ffd15a; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--aCol),var(--bCol),var(--gold));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#0f0c1f;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--aCol);} .g3{background:var(--bCol);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--aCol);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .item{text-align:center;margin:6px 0 10px;}
+  .item .thing{font-size:clamp(40px,10vw,64px);line-height:1;}
+  .item .lbl{font-size:clamp(18px,3.4vw,24px);font-weight:800;}
+  .item .lbl b{color:var(--gold);}
+  .venn{position:relative;height:clamp(150px,34vw,210px);margin:6px auto 12px;max-width:520px;}
+  .circle{position:absolute;top:50%;transform:translateY(-50%);width:56%;height:96%;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;opacity:.85;}
+  .circle.a{left:0;background:rgba(110,200,255,.28);border:3px solid var(--aCol);justify-content:flex-start;padding-left:8%;}
+  .circle.b{right:0;background:rgba(255,158,199,.28);border:3px solid var(--bCol);justify-content:flex-end;padding-right:8%;}
+  .zones{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:520px;margin:0 auto;}
+  .zone{cursor:pointer;border:2px solid var(--line);background:#1b1636;border-radius:14px;padding:12px;
+    text-align:center;font-weight:800;box-shadow:0 5px 0 rgba(0,0,0,.35);transition:.1s;}
+  .zone:active{transform:translateY(2px);} .zone small{display:block;font-weight:700;color:var(--muted);font-size:12px;}
+  .zone.za{border-color:var(--aCol);} .zone.zb{border-color:var(--bCol);}
+  .zone.zboth{border-color:#c77dff;} .zone.zneither{border-color:#7a86a0;}
+  .zone.right{background:#1f4a34;} .zone.wrong{background:#4a1e28;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:16px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;} .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#9a86d8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <div id="start">
+      <h1>🦅 Venn Vultures</h1>
+      <p class="sub">Sort each treasure into the Venn diagram! Read the two labels, then choose:
+        <b>only left</b>, <b>only right</b>, <b>both</b> (the overlap), or <b>neither</b> (outside).</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>colours &amp; shapes</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>living-things groups</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>number properties</small></button>
+      </div>
+      <p class="sub">8 items per run · correct placements earn streak bonuses</p>
+    </div>
+
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Item 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="item">
+        <div class="thing" id="thing"></div>
+        <div class="lbl">Where does it go?</div>
+      </div>
+      <div class="venn">
+        <div class="circle a" id="circA">A</div>
+        <div class="circle b" id="circB">B</div>
+      </div>
+      <div class="zones" id="zones"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🦅</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="gradeBtn g1" id="againBtn">New items ▸</button>
+        <button class="gradeBtn g2" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // item worlds: each has labels a,b and either a fixed item list or numeric tests.
+  var WORLDS = [
+    [ // Grade 1-2 : colour & shape
+      { a:'Red', b:'Round', items:[['🍎',1,1],['🍓',1,0],['🌹',1,0],['🍒',1,1],['🌕',0,1],['⚽',0,1],['🫐',0,1],['🍋',0,0],['🥕',0,0],['🟥',1,0]] },
+      { a:'Yellow', b:'Fruit', items:[['🍌',1,1],['🍋',1,1],['⭐',1,0],['🌻',1,0],['🧀',1,0],['🍎',0,1],['🍇',0,1],['🫐',0,1],['🪨',0,0],['🐟',0,0]] },
+      { a:'Green', b:'Food', items:[['🥦',1,1],['🥑',1,1],['🍏',1,1],['🐸',1,0],['🌲',1,0],['🍕',0,1],['🍔',0,1],['🍎',0,1],['💧',0,0],['🎈',0,0]] }
+    ],
+    [ // Grade 3 : categories
+      { a:'Animal', b:'Can fly', items:[['🦅',1,1],['🦋',1,1],['🦜',1,1],['🐕',1,0],['🐟',1,0],['🐈',1,0],['✈️',0,1],['🚁',0,1],['🎈',0,1],['🚗',0,0],['🪨',0,0]] },
+      { a:'Lives in water', b:'Mammal', items:[['🐬',1,1],['🐳',1,1],['🦭',1,1],['🐟',1,0],['🦈',1,0],['🐙',1,0],['🐕',0,1],['🐈',0,1],['🦇',0,1],['🌳',0,0],['🪨',0,0]] },
+      { a:'Insect', b:'Has wings', items:[['🐝',1,1],['🦋',1,1],['🐞',1,1],['🐜',1,0],['🕷️',0,0],['🐍',0,0],['🦅',0,1],['🦇',0,1],['🐟',0,0]] }
+    ],
+    'NUMERIC'
+  ];
+  var NUM_WORLDS = [
+    { a:'Even', b:'Greater than 10', at:function(n){return n%2===0;}, bt:function(n){return n>10;} },
+    { a:'Multiple of 3', b:'Odd', at:function(n){return n%3===0;}, bt:function(n){return n%2===1;} },
+    { a:'Greater than 10', b:'Multiple of 5', at:function(n){return n>10;}, bt:function(n){return n%5===0;} }
+  ];
+  var GRADES = [ {id:1,label:'Grade 1–2'}, {id:3,label:'Grade 3'}, {id:4,label:'Grade 4–5'} ];
+  var ROUNDS = 8;
+
+  var CHEER = ['Sorted! The vultures approve. 🦅🎉','Perfect placement! 🌟','Logic on point! 💚','Set master! ✨'];
+  var OOPS  = ['Not that region! 🦅','Think AND vs OR again. 🤔','Check both labels — try the next!'];
+
+  var gradeIdx = 0, q = 0, score = 0, streak = 0, nRight = 0;
+  var world = null, cur = null, locked = false;
+
+  var $ = function (id){ return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f,d,t,slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t||'sine'; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.08,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function good(){ tone(523,.1,'sine'); setTimeout(function(){ tone(784,.18,'sine',1046); },110); }
+  function bad(){ tone(200,.3,'sawtooth',90); }
+
+  function regionOf(a, b){ return a && b ? 'both' : a ? 'A' : b ? 'B' : 'none'; }
+
+  function buildRound() {
+    if (WORLDS[gradeIdx] === 'NUMERIC') {
+      world = pick(NUM_WORLDS);
+      var n = rint(1, 20);
+      cur = { label: '' + n, a: world.at(n), b: world.bt(n) };
+    } else {
+      world = pick(WORLDS[gradeIdx]);
+      var it = pick(world.items);
+      cur = { label: it[0], a: !!it[1], b: !!it[2] };
+    }
+  }
+
+  function render() {
+    locked = false;
+    buildRound();
+    $('roundLbl').textContent = 'Item ' + (q + 1) + '/' + ROUNDS;
+    $('thing').textContent = cur.label;
+    $('circA').textContent = world.a; $('circB').textContent = world.b;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    var zones = [
+      { key:'A',    cls:'za',      t:'Only ' + world.a, s:'left hoop' },
+      { key:'both', cls:'zboth',   t:'Both', s:world.a + ' AND ' + world.b },
+      { key:'B',    cls:'zb',      t:'Only ' + world.b, s:'right hoop' },
+      { key:'none', cls:'zneither',t:'Neither', s:'outside' }
+    ];
+    var z = $('zones'); z.innerHTML = '';
+    zones.forEach(function (zn) {
+      var d = document.createElement('div');
+      d.className = 'zone ' + zn.cls;
+      d.dataset.key = zn.key;
+      d.innerHTML = zn.t + '<small>' + zn.s + '</small>';
+      d.addEventListener('click', function () { choose(zn.key, d); });
+      z.appendChild(d);
+    });
+    EduSDK.startLesson(q + 1, {});
+  }
+
+  function choose(key, el) {
+    if (locked) return;
+    locked = true;
+    var correctKey = regionOf(cur.a, cur.b);
+    var correct = key === correctKey;
+    if (correct) {
+      el.classList.add('right'); good(); nRight++; streak++;
+      var pts = 100 + streak * 15; score += pts; $('scoreVal').textContent = score;
+      $('toast').textContent = pick(CHEER) + '  +' + pts; $('toast').className = 'toast good';
+    } else {
+      el.classList.add('wrong'); bad(); streak = 0;
+      Array.prototype.forEach.call($('zones').children, function (c) {
+        if (c.dataset.key === correctKey) c.classList.add('right');
+      });
+      $('card').classList.add('shake'); setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS); $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1600);
+    if (q === Math.floor(ROUNDS / 2)) setTimeout(function(){ EduSDK.adBreak('interlevel').then(render); }, 1600);
+    else setTimeout(render, 1600);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden'); $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nRight >= 7 ? '🦅🏆' : nRight >= 4 ? '🦅⭕' : '🦅🪺';
+    $('finalLine').textContent = GRADES[gradeIdx].label + ' — ' + nRight + '/' + ROUNDS + ' sorted right. ' +
+      (nRight >= 7 ? 'Master sorter — every set in its place!' :
+       nRight >= 4 ? 'Good logic — a few landed in the wrong hoop.' :
+       'Remember: the overlap is for things in BOTH groups. Try again!');
+    EduSDK.submitScore(score, { grade: GRADES[gradeIdx].id, right: nRight })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) el.innerHTML = res.isPersonalBest
+          ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>' : 'Score saved to the leaderboard.';
+        else if (res && res.offline) el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        else el.textContent = (res && res.error === 'not_authenticated') ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(idx) {
+    gradeIdx = idx; q = 0; score = 0; streak = 0; nRight = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    render();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('#start .gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(Number(b.dataset.grade)); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(gradeIdx); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'venn-vultures' });
+})();
+</script>
+</body>
+</html>

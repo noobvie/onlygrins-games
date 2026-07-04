@@ -1,0 +1,33 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "time-zone-tango",
+  "title": "Time Zone Tango",
+  "category": "geography",
+  "short_description": "It's 3 o'clock in London — so what time is it for your friend in Tokyo? Spin the clock to the right hour as you hop time zones around the globe.",
+  "description": "Friends are scattered across the world and they all want to call. You're told the time in one city, then you spin a clock to work out the time in another — adding hours when a city is ahead, subtracting when it's behind, and wrapping around the clock face when you pass twelve. It teaches time zones, adding and subtracting hours, and the idea that the Earth's spin makes it a different time in different places. Grade bands ramp from small 'hours ahead/behind' hints, to bigger jumps that wrap past twelve, to reading raw UTC offsets and finding the difference yourself. Quick, correct clock-setting and streaks earn bonus points. A free online time zones and telling-time geography game for kids in grades 1–5, feeding your score and GP on OnlyGrins.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "width": 960,
+  "height": 600,
+  "thumbnail": "thumbnail.png",
+  "controls": "Mouse / tap the arrows to spin the clock, then Set it.",
+  "tags": [
+    "geography",
+    "time-zones",
+    "telling-time",
+    "add-subtract-hours",
+    "world-cities",
+    "grade-1",
+    "grade-2",
+    "grade-3",
+    "grade-4",
+    "grade-5",
+    "kids",
+    "funny"
+  ],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:time-zone-tango"
+}

@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Antonym Ants — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="language" data-seed="antonym-ants"></script>
+
+<style>
+  :root{
+    --bg1:#1e3320; --bg2:#2e4a2c; --bg3:#0f1e10;
+    --card:#1f3a22; --line:#4f8a4a; --text:#f0ffe8; --muted:#b8d8a8;
+    --green:#9be86a; --blue:#6ec8ff; --purple:#c77dff; --gold:#ffd15a; --bad:#ff6b81; --leaf:#3a6a30;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--gold),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#0f1e10;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .march{height:34px;position:relative;margin:4px 0 6px;overflow:hidden;}
+  .antline{position:absolute;top:0;left:0;font-size:24px;transition:left 3.4s linear;}
+  .basket{position:absolute;right:0;top:0;font-size:26px;}
+  .task{text-align:center;font-size:clamp(19px,3.6vw,26px);font-weight:800;margin:8px 0 4px;}
+  .task .kind{color:var(--gold);} .task .word{color:var(--green);font-size:1.15em;}
+  .opts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:560px;margin:14px auto 0;}
+  .opt{cursor:pointer;border:2px solid var(--line);background:var(--leaf);border-radius:14px;
+    padding:16px;text-align:center;font-weight:800;font-size:clamp(17px,3.4vw,22px);box-shadow:0 5px 0 rgba(0,0,0,.35);transition:.1s;}
+  .opt:active{transform:translateY(2px);} .opt .ant{font-size:16px;opacity:.7;margin-right:4px;}
+  .opt.right{border-color:var(--green);background:#2f6a24;}
+  .opt.wrong{border-color:var(--bad);background:#4a1e28;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:16px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;} .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#7fae66;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <div id="start">
+      <h1>🐜 Antonym Ants</h1>
+      <p class="sub">Word-ants are marching to the picnic! Feed each one the right word before it arrives —
+        sometimes the <b>opposite</b> of the target word, sometimes the <b>same</b> meaning. Grow your word power!</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>easy opposites</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>opposites &amp; synonyms</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>richer vocabulary</small></button>
+      </div>
+      <p class="sub">8 ants per run · quick, correct answers earn streak bonuses</p>
+    </div>
+
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Ant 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="march"><span class="antline" id="antline">🐜</span><span class="basket">🧺</span></div>
+      <div class="task" id="task"></div>
+      <div class="opts" id="opts"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🐜</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="gradeBtn g1" id="againBtn">New ants ▸</button>
+        <button class="gradeBtn g2" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // entries: [word, answer, type]  type: 'opp' opposite, 'syn' same-meaning
+  var BANDS = [
+    { // Grade 1-2 : easy opposites
+      pairs: [
+        ['hot','cold','opp'],['big','small','opp'],['up','down','opp'],['happy','sad','opp'],
+        ['fast','slow','opp'],['day','night','opp'],['open','closed','opp'],['wet','dry','opp'],
+        ['high','low','opp'],['full','empty','opp'],['hard','soft','opp'],['old','new','opp'],
+        ['loud','quiet','opp'],['light','dark','opp']
+      ],
+      noise: ['apple','table','green','river','happy','jump','chair','rabbit','music','pencil','cloud','sock']
+    },
+    { // Grade 3 : opposites + synonyms
+      pairs: [
+        ['push','pull','opp'],['buy','sell','opp'],['brave','scared','opp'],['early','late','opp'],
+        ['rich','poor','opp'],['smooth','rough','opp'],['win','lose','opp'],['first','last','opp'],
+        ['happy','glad','syn'],['big','large','syn'],['small','tiny','syn'],['fast','quick','syn'],
+        ['angry','mad','syn'],['jump','leap','syn'],['shout','yell','syn'],['begin','start','syn']
+      ],
+      noise: ['garden','yellow','window','river','bottle','ladder','planet','biscuit','engine','forest','marble','kitten']
+    },
+    { // Grade 4-5 : richer vocabulary
+      pairs: [
+        ['ancient','modern','opp'],['generous','selfish','opp'],['expand','shrink','opp'],['arrive','depart','opp'],
+        ['increase','decrease','opp'],['victory','defeat','opp'],['temporary','permanent','opp'],['artificial','natural','opp'],
+        ['enormous','gigantic','syn'],['difficult','hard','syn'],['courageous','brave','syn'],['rapid','swift','syn'],
+        ['delicious','tasty','syn'],['gloomy','sad','syn'],['furious','angry','syn'],['tidy','neat','syn']
+      ],
+      noise: ['triangle','harbour','volcano','pyramid','lantern','compass','glacier','festival','satchel','meadow','anchor','trophy']
+    }
+  ];
+  var GRADES = [ {id:1,label:'Grade 1–2'}, {id:3,label:'Grade 3'}, {id:4,label:'Grade 4–5'} ];
+  var ROUNDS = 8;
+
+  var CHEER = ['Yum — right word! 🐜🎉','The ant is delighted! 🌟','Vocabulary victory! 💚','Word wizard! ✨'];
+  var OOPS  = ['That word didn\'t fit! 🐜','Wrong meaning — look again. 🤔','The ant spat it out. Try the next!'];
+
+  var gradeIdx = 0, q = 0, score = 0, streak = 0, nRight = 0;
+  var cur = null, locked = false, marchTimer = null;
+
+  var $ = function (id){ return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f,d,t,slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t||'sine'; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.08,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function good(){ tone(523,.1,'sine'); setTimeout(function(){ tone(784,.18,'sine',1046); },110); }
+  function bad(){ tone(200,.3,'sawtooth',90); }
+
+  function buildRound() {
+    var band = BANDS[gradeIdx];
+    var p = pick(band.pairs);
+    var correct = p[1];
+    var distractors = shuffle(band.noise.slice()).filter(function (w) { return w !== correct && w !== p[0]; }).slice(0, 3);
+    var opts = shuffle([correct].concat(distractors));
+    cur = { word: p[0], answer: correct, type: p[2], opts: opts };
+  }
+
+  function render() {
+    locked = false;
+    buildRound();
+    $('roundLbl').textContent = 'Ant ' + (q + 1) + '/' + ROUNDS;
+    $('task').innerHTML = 'Find the <span class="kind">' + (cur.type === 'opp' ? 'OPPOSITE' : 'SAME') +
+      '</span> of <span class="word">' + cur.word + '</span>';
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    var o = $('opts'); o.innerHTML = '';
+    cur.opts.forEach(function (w) {
+      var b = document.createElement('div');
+      b.className = 'opt';
+      b.innerHTML = '<span class="ant">🐜</span>' + w;
+      b.addEventListener('click', function () { choose(w, b); });
+      o.appendChild(b);
+    });
+    // ant marches; if it reaches basket first, count as miss
+    var ant = $('antline'); ant.style.transition = 'none'; ant.style.left = '0px';
+    void ant.offsetWidth;
+    ant.style.transition = 'left 4s linear';
+    ant.style.left = 'calc(100% - 34px)';
+    clearTimeout(marchTimer);
+    marchTimer = setTimeout(function () { if (!locked) timeout(); }, 4000);
+    EduSDK.startLesson(q + 1, {});
+  }
+
+  function stopAnt() { var ant = $('antline'); var x = getComputedStyle(ant).left; ant.style.transition = 'none'; ant.style.left = x; clearTimeout(marchTimer); }
+
+  function choose(w, el) {
+    if (locked) return;
+    locked = true; stopAnt();
+    var correct = w === cur.answer;
+    if (correct) {
+      el.classList.add('right'); good(); nRight++; streak++;
+      var pts = 100 + streak * 15; score += pts; $('scoreVal').textContent = score;
+      $('toast').textContent = pick(CHEER) + '  +' + pts; $('toast').className = 'toast good';
+    } else {
+      el.classList.add('wrong'); bad(); streak = 0;
+      Array.prototype.forEach.call($('opts').children, function (c) {
+        if (c.textContent.replace('🐜','').trim() === cur.answer) c.classList.add('right');
+      });
+      $('card').classList.add('shake'); setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' It was "' + cur.answer + '".'; $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function timeout() {
+    locked = true; bad(); streak = 0;
+    Array.prototype.forEach.call($('opts').children, function (c) {
+      if (c.textContent.replace('🐜','').trim() === cur.answer) c.classList.add('right');
+    });
+    $('toast').textContent = 'The ant reached the picnic! It was "' + cur.answer + '".'; $('toast').className = 'toast bad';
+    EduSDK.finishLesson(q + 1, { correct: false, timeout: true });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1700);
+    if (q === Math.floor(ROUNDS / 2)) setTimeout(function(){ EduSDK.adBreak('interlevel').then(render); }, 1700);
+    else setTimeout(render, 1700);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden'); $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nRight >= 7 ? '🐜🏆' : nRight >= 4 ? '🐜🧺' : '🐜🍃';
+    $('finalLine').textContent = GRADES[gradeIdx].label + ' — ' + nRight + '/' + ROUNDS + ' ants fed right. ' +
+      (nRight >= 7 ? 'Master of words — synonyms and antonyms all sorted!' :
+       nRight >= 4 ? 'Growing vocabulary — a few ants went hungry.' :
+       'Keep reading — opposites and same-meaning words will click!');
+    EduSDK.submitScore(score, { grade: GRADES[gradeIdx].id, right: nRight })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) el.innerHTML = res.isPersonalBest
+          ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>' : 'Score saved to the leaderboard.';
+        else if (res && res.offline) el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        else el.textContent = (res && res.error === 'not_authenticated') ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(idx) {
+    gradeIdx = idx; q = 0; score = 0; streak = 0; nRight = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    render();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('#start .gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(Number(b.dataset.grade)); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(gradeIdx); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'antonym-ants' });
+})();
+</script>
+</body>
+</html>

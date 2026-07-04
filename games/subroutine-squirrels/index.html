@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Subroutine Squirrels — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="coding" data-seed="subroutine-squirrels"></script>
+
+<style>
+  :root{
+    --bg1:#3a2712; --bg2:#5a3d1c; --bg3:#241708;
+    --card:#402c14; --line:#9a6a2f; --text:#fff2e0; --muted:#e0c199;
+    --green:#8fe15a; --blue:#6ec8ff; --purple:#c77dff; --orange:#ffb84d; --bad:#ff6b81; --func:#c77dff;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(23px,4.4vw,38px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--orange),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#241708;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .play{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;}
+  .board{display:grid;gap:4px;background:#241708;padding:8px;border-radius:14px;border:2px solid var(--line);align-self:flex-start;}
+  .tile{width:clamp(36px,9vw,54px);height:clamp(36px,9vw,54px);border-radius:10px;background:#5a3d1c;
+    display:flex;align-items:center;justify-content:center;font-size:clamp(20px,5.5vw,30px);}
+  .tile.wall{background:#180f04;} .tile.goal{background:#3a4a1e;}
+  .panel{flex:1;min-width:280px;max-width:440px;}
+  .lbl{font-weight:800;margin:6px 0 4px;font-size:14px;}
+  .lbl.f{color:var(--func);} .lbl.m{color:var(--orange);}
+  .prog{min-height:44px;background:#241708;border:2px dashed var(--line);border-radius:12px;
+    padding:6px 8px;display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:6px;}
+  .prog.f{border-color:var(--func);} .prog .slot{font-size:22px;background:#5a3d1c;border-radius:8px;padding:2px 7px;}
+  .prog .slot.call{background:#5a2a7a;color:#f0e0ff;font-size:15px;font-weight:800;padding:5px 8px;}
+  .prog .slot.active{outline:3px solid var(--orange);}
+  .prog .empty{color:var(--muted);font-weight:700;font-size:13px;}
+  .palette{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+  .cmd{cursor:pointer;border:2px solid var(--line);font-family:inherit;font-weight:800;font-size:19px;
+    padding:6px 11px;border-radius:10px;color:var(--text);background:#5a3d1c;box-shadow:0 3px 0 rgba(0,0,0,.4);}
+  .cmd:active{transform:translateY(2px);} .cmd.call{background:#5a2a7a;border-color:var(--func);font-size:14px;}
+  .cmd.ghost{background:#3a2712;}
+  .runbar{display:flex;gap:10px;flex-wrap:wrap;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:15px;
+    padding:10px 18px;border-radius:12px;color:#241708;background:var(--green);box-shadow:0 5px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(3px);} .btn.ghost{background:#5a3d1c;color:var(--text);} .btn:disabled{opacity:.4;}
+  .toast{min-height:22px;text-align:center;font-weight:800;font-size:15px;margin-top:10px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:56px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;} .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:10px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#b78a4f;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <div id="start">
+      <h1>🐿️ Subroutine Squirrels</h1>
+      <p class="sub">Sandy's path repeats the same little trick over and over. Teach it once inside
+        <b style="color:#c77dff">function f()</b>, then drop <b style="color:#c77dff">CALL f()</b> blocks in your
+        Main program instead of retyping the moves. Fewer blocks = big bonus points!</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>short trick, 2 calls</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>tricks with turns</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>function + extra moves</small></button>
+      </div>
+      <p class="sub">8 stashes per run · tidy programs earn brevity bonuses</p>
+    </div>
+
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Stash 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="play">
+        <div class="board" id="board"></div>
+        <div class="panel">
+          <div class="lbl f">🐿️ function f()  <span style="font-weight:700;color:#e0c199;font-size:12px">— the reusable trick</span></div>
+          <div class="prog f" id="funcProg"></div>
+          <div class="palette" id="funcPal"></div>
+          <div class="lbl m">▶ Main program</div>
+          <div class="prog m" id="mainProg"></div>
+          <div class="palette" id="mainPal"></div>
+          <div class="runbar">
+            <button class="btn" id="runBtn">▶ Run</button>
+            <button class="btn ghost" id="clearBtn">🗑 Clear all</button>
+          </div>
+          <div class="toast" id="toast"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="final" class="hidden final">
+      <div style="font-size:74px" id="finalEmoji">🐿️</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="gradeBtn g1" id="againBtn">New stashes ▸</button>
+        <button class="gradeBtn g2" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var DIRS = { '⬆️':[0,-1], '➡️':[1,0], '⬇️':[0,1], '⬅️':[-1,0] };
+  var GRADES = [
+    { id:1, label:'Grade 1–2', size:5, motif:2, calls:2, main:0 },
+    { id:3, label:'Grade 3',   size:6, motif:3, calls:3, main:0 },
+    { id:4, label:'Grade 4–5', size:7, motif:3, calls:3, main:2 }
+  ];
+  var ROUNDS = 8;
+
+  var CHEER = ['Sandy reaches the stash! 🐿️🌰','Function called perfectly! 💜','Reuse for the win! ✨','Tidy code, happy squirrel! 🎉'];
+  var OOPS  = ['Sandy bonked a tree! 🌳😵','Off the map — into the woods! 🍂','So close! Fix f() or your calls. 🐛','That program missed the stash. Debug it!'];
+
+  var grade = GRADES[0], q = 0, score = 0, streak = 0, nSolved = 0, running = false;
+  var maze = null, func = [], main = [];
+
+  var $ = function (id){ return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f,d,t,slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t||'sine'; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.09,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function step(){ tone(600,.06,'square'); }
+  function win(){ tone(523,.12,'sine'); setTimeout(function(){ tone(784,.2,'sine',1046); },120); }
+  function bump(){ tone(180,.35,'sawtooth',80); }
+
+  // Build a map whose intended path = motif repeated `calls` times (+ optional extra main moves).
+  function makeMaze() {
+    var n = grade.size;
+    for (var attempt = 0; attempt < 120; attempt++) {
+      var start = [0, n - 1], pos = start.slice(), seen = {}; seen[pos] = true;
+      var motif = [];
+      for (var m = 0; m < grade.motif; m++) motif.push(pick(Object.keys(DIRS)));
+      var ok = true;
+      function applyMove(k) {
+        var d = DIRS[k]; var nx = pos[0] + d[0], ny = pos[1] + d[1];
+        if (nx < 0 || nx >= n || ny < 0 || ny >= n || seen[nx + ',' + ny]) return false;
+        pos = [nx, ny]; seen[pos] = true; return true;
+      }
+      for (var c = 0; c < grade.calls && ok; c++)
+        for (var s = 0; s < motif.length && ok; s++) ok = applyMove(motif[s]);
+      // extra trailing main moves (grade 3)
+      var extra = [];
+      for (var e = 0; e < grade.main && ok; e++) {
+        var choices = Object.keys(DIRS).filter(function (k) {
+          var d = DIRS[k]; var nx = pos[0]+d[0], ny = pos[1]+d[1];
+          return nx>=0&&nx<n&&ny>=0&&ny<n&&!seen[nx+','+ny];
+        });
+        if (!choices.length) { ok = false; break; }
+        var mv = pick(choices); extra.push(mv); applyMove(mv);
+      }
+      if (!ok || (pos[0] === start[0] && pos[1] === start[1])) continue;
+      return { n: n, start: start, goal: pos };
+    }
+    return { n: grade.size, start: [0, grade.size - 1], goal: [grade.size - 1, 0] };
+  }
+
+  function drawBoard(sq) {
+    var n = maze.n, b = $('board');
+    b.style.gridTemplateColumns = 'repeat(' + n + ',1fr)';
+    b.innerHTML = '';
+    for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) {
+      var t = document.createElement('div'); t.className = 'tile';
+      var isGoal = x === maze.goal[0] && y === maze.goal[1];
+      if (isGoal) t.className += ' goal';
+      var here = sq && sq[0] === x && sq[1] === y;
+      t.textContent = here ? '🐿️' : (isGoal ? '🌰' : '');
+      b.appendChild(t);
+    }
+  }
+
+  function renderProg(el, arr, isFunc) {
+    if (!arr.length) { el.innerHTML = '<span class="empty">' + (isFunc ? 'Add the trick…' : 'Add moves & CALL f()…') + '</span>'; return; }
+    el.innerHTML = arr.map(function (c) {
+      return c === 'CALL' ? '<span class="slot call">CALL f()</span>' : '<span class="slot">' + c + '</span>';
+    }).join('');
+  }
+
+  function buildPalettes() {
+    var fp = $('funcPal'); fp.innerHTML = '';
+    var mp = $('mainPal'); mp.innerHTML = '';
+    Object.keys(DIRS).forEach(function (k) {
+      var bf = document.createElement('button'); bf.className = 'cmd'; bf.textContent = k;
+      bf.addEventListener('click', function(){ if(!running){ func.push(k); step(); renderProg($('funcProg'), func, true); } });
+      fp.appendChild(bf);
+      var bm = document.createElement('button'); bm.className = 'cmd'; bm.textContent = k;
+      bm.addEventListener('click', function(){ if(!running){ main.push(k); step(); renderProg($('mainProg'), main, false); } });
+      mp.appendChild(bm);
+    });
+    var uf = document.createElement('button'); uf.className = 'cmd ghost'; uf.textContent = '⌫';
+    uf.addEventListener('click', function(){ if(!running){ func.pop(); renderProg($('funcProg'), func, true); } });
+    fp.appendChild(uf);
+    var call = document.createElement('button'); call.className = 'cmd call'; call.textContent = 'CALL f()';
+    call.addEventListener('click', function(){ if(!running){ main.push('CALL'); step(); renderProg($('mainProg'), main, false); } });
+    mp.appendChild(call);
+    var um = document.createElement('button'); um.className = 'cmd ghost'; um.textContent = '⌫';
+    um.addEventListener('click', function(){ if(!running){ main.pop(); renderProg($('mainProg'), main, false); } });
+    mp.appendChild(um);
+  }
+
+  function flatten() {
+    var out = [];
+    main.forEach(function (c) {
+      if (c === 'CALL') func.forEach(function (k) { out.push(k); });
+      else out.push(c);
+    });
+    return out;
+  }
+
+  function newMaze() {
+    running = false; func = []; main = [];
+    maze = makeMaze();
+    $('roundLbl').textContent = 'Stash ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    $('runBtn').disabled = false;
+    buildPalettes();
+    renderProg($('funcProg'), func, true);
+    renderProg($('mainProg'), main, false);
+    drawBoard(maze.start);
+    EduSDK.startLesson(q + 1, { size: maze.n });
+  }
+
+  function run() {
+    if (running) return;
+    var steps = flatten();
+    if (!steps.length) { $('toast').textContent = 'Add some moves first!'; $('toast').className = 'toast bad'; return; }
+    running = true; $('runBtn').disabled = true;
+    var pos = maze.start.slice(), i = 0;
+    drawBoard(pos);
+    var timer = setInterval(function () {
+      if (i >= steps.length) { clearInterval(timer); finishRun(pos); return; }
+      var d = DIRS[steps[i]]; var nx = pos[0] + d[0], ny = pos[1] + d[1];
+      if (nx < 0 || nx >= maze.n || ny < 0 || ny >= maze.n) { bump(); clearInterval(timer); finishRun(pos, true); return; }
+      pos = [nx, ny]; step(); drawBoard(pos); i++;
+    }, 300);
+  }
+
+  function finishRun(pos, crashed) {
+    var reached = !crashed && pos[0] === maze.goal[0] && pos[1] === maze.goal[1];
+    if (reached) {
+      nSolved++; streak++;
+      var blocks = main.length + func.length;
+      var brevity = Math.max(0, (grade.motif + grade.calls + 4) - blocks) * 12;
+      var usedCall = main.indexOf('CALL') !== -1 ? 30 : 0;
+      var pts = 100 + streak * 15 + brevity + usedCall;
+      score += pts; $('scoreVal').textContent = score; win();
+      $('toast').textContent = pick(CHEER) + '  +' + pts + (usedCall ? ' (function bonus!)' : '');
+      $('toast').className = 'toast good';
+      EduSDK.finishLesson(q + 1, { solved: true, blocks: blocks });
+      nextMaze();
+    } else {
+      streak = 0;
+      $('card').classList.add('shake'); setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' Edit and Run again.'; $('toast').className = 'toast bad';
+      running = false; $('runBtn').disabled = false; drawBoard(maze.start);
+    }
+  }
+
+  function nextMaze() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1600);
+    if (q === Math.floor(ROUNDS / 2)) setTimeout(function(){ EduSDK.adBreak('interlevel').then(newMaze); }, 1600);
+    else setTimeout(newMaze, 1600);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden'); $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nSolved >= 7 ? '🐿️🏆' : nSolved >= 4 ? '🐿️🌰' : '🐿️🌳';
+    $('finalLine').textContent = grade.label + ' — ' + nSolved + '/' + ROUNDS + ' stashes reached. ' +
+      (nSolved >= 7 ? 'Master of functions! Sandy has never eaten so well.' :
+       nSolved >= 4 ? 'Solid coding — define once, call often!' :
+       'Remember: teach f() the repeating trick, then CALL it. Try again!');
+    EduSDK.submitScore(score, { grade: grade.id, solved: nSolved })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) el.innerHTML = res.isPersonalBest
+          ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>' : 'Score saved to the leaderboard.';
+        else if (res && res.offline) el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        else el.textContent = (res && res.error === 'not_authenticated') ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    grade = g; q = 0; score = 0; streak = 0; nSolved = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    newMaze();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('#start .gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('runBtn').addEventListener('click', run);
+  $('clearBtn').addEventListener('click', function () { if (!running) { func = []; main = []; renderProg($('funcProg'), func, true); renderProg($('mainProg'), main, false); } });
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'subroutine-squirrels' });
+})();
+</script>
+</body>
+</html>

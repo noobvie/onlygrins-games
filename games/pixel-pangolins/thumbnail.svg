@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2e2a14"/><stop offset=".5" stop-color="#454020"/><stop offset="1" stop-color="#1a1709"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#a8e05a"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="480" y="80" fill="#ffd15a" font-size="30" font-weight="800" text-anchor="middle">Fill by the clues → reveal the picture!</text>
+  <!-- 5x5 nonogram with heart filled -->
+  <g>
+    <!-- clues top -->
+    <g fill="#ffd15a" font-size="22" font-weight="800" text-anchor="middle">
+      <text x="428" y="150">1</text><text x="482" y="150">4</text><text x="536" y="150">2</text><text x="590" y="150">4</text><text x="644" y="150">1</text>
+    </g>
+    <!-- clues left -->
+    <g fill="#ffd15a" font-size="22" font-weight="800" text-anchor="end">
+      <text x="360" y="195">1 1</text><text x="360" y="249">5</text><text x="360" y="303">5</text><text x="360" y="357">3</text><text x="360" y="411">1</text>
+    </g>
+    <!-- grid 5x5 starting x=401 y=168 cell 54 -->
+    <g>
+      <!-- draw heart pattern: rows -->
+      <!-- helper: fill cells -->
+      <!-- r0: .#.#. -->
+      <rect x="455" y="168" width="50" height="50" rx="6" fill="#ffb84d"/><rect x="563" y="168" width="50" height="50" rx="6" fill="#ffb84d"/>
+      <!-- r1: ##### -->
+      <rect x="401" y="222" width="50" height="50" rx="6" fill="#ffb84d"/><rect x="455" y="222" width="50" height="50" rx="6" fill="#ffb84d"/><rect x="509" y="222" width="50" height="50" rx="6" fill="#ffb84d"/><rect x="563" y="222" width="50" height="50" rx="6" fill="#ffb84d"/><rect x="617" y="222" width="50" height="50" rx="6" fill="#ffb84d"/>
+      <!-- r2: ##### -->
+      <rect x="401" y="276" width="50" height="50" rx="6" fill="#ffb84d"/><rect x="455" y="276" width="50" height="50" rx="6" fill="#ffb84d"/><rect x="509" y="276" width="50" height="50" rx="6" fill="#ffb84d"/><rect x="563" y="276" width="50" height="50" rx="6" fill="#ffb84d"/><rect x="617" y="276" width="50" height="50" rx="6" fill="#ffb84d"/>
+      <!-- r3: .###. -->
+      <rect x="455" y="330" width="50" height="50" rx="6" fill="#ffb84d"/><rect x="509" y="330" width="50" height="50" rx="6" fill="#ffb84d"/><rect x="563" y="330" width="50" height="50" rx="6" fill="#ffb84d"/>
+      <!-- r4: ..#.. -->
+      <rect x="509" y="384" width="50" height="50" rx="6" fill="#ffb84d"/>
+      <!-- grid outline cells (all) -->
+      <g fill="none" stroke="#6a5f2e" stroke-width="2">
+        <rect x="401" y="168" width="270" height="270" rx="8" stroke="#8a7a3a" stroke-width="3"/>
+      </g>
+    </g>
+  </g>
+  <text x="480" y="490" fill="url(#ttl)" font-size="60" font-weight="800" text-anchor="middle">Pixel Pangolins</text>
+</svg>

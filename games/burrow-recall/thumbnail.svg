@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22381f"/><stop offset=".5" stop-color="#345029"/><stop offset="1" stop-color="#141f10"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#9be86a"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+    <radialGradient id="mound" cx="0.5" cy="0" r="1">
+      <stop offset="0" stop-color="#a9764a"/><stop offset="1" stop-color="#5f3d22"/>
+    </radialGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="120" y="130" font-size="60" text-anchor="middle">🐰</text>
+  <text x="560" y="120" fill="#ffd15a" font-size="30" font-weight="800" text-anchor="middle">Which burrow hides the 🥕?</text>
+  <!-- mounds -->
+  <g>
+    <ellipse cx="280" cy="330" rx="90" ry="60" fill="url(#mound)"/><ellipse cx="280" cy="345" rx="34" ry="16" fill="#2a1a0e"/>
+    <ellipse cx="480" cy="330" rx="90" ry="60" fill="url(#mound)"/><ellipse cx="480" cy="345" rx="34" ry="16" fill="#2a1a0e"/>
+    <text x="480" y="255" font-size="46" text-anchor="middle">🥕</text>
+    <ellipse cx="680" cy="330" rx="90" ry="60" fill="url(#mound)"/><ellipse cx="680" cy="345" rx="34" ry="16" fill="#2a1a0e"/>
+  </g>
+  <!-- swap arrows -->
+  <path d="M340 300 Q380 250 420 300" fill="none" stroke="#9be86a" stroke-width="5" stroke-dasharray="8 6"/>
+  <path d="M540 300 Q580 250 620 300" fill="none" stroke="#6ec8ff" stroke-width="5" stroke-dasharray="8 6"/>
+  <text x="480" y="475" fill="url(#ttl)" font-size="66" font-weight="800" text-anchor="middle">Burrow Recall</text>
+</svg>

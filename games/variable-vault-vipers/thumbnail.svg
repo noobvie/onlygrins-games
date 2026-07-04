@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#16241c"/><stop offset=".5" stop-color="#1e3a2c"/><stop offset="1" stop-color="#0c1510"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#7bf0a8"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="480" y="95" font-size="46" text-anchor="middle">🐍</text>
+  <!-- x box -->
+  <g text-anchor="middle">
+    <rect x="150" y="150" width="180" height="150" rx="18" fill="#2b3a44" stroke="#7bf0a8" stroke-width="5"/>
+    <text x="240" y="195" fill="#a9d9bb" font-size="24" font-weight="800">x</text>
+    <text x="240" y="270" fill="#7bf0a8" font-size="72" font-weight="800">14</text>
+    <text x="415" y="240" fill="#a9d9bb" font-size="44">➜</text>
+    <!-- target -->
+    <rect x="500" y="150" width="180" height="150" rx="18" fill="#2b3a44" stroke="#c77dff" stroke-width="5" stroke-dasharray="10 6"/>
+    <text x="590" y="195" fill="#a9d9bb" font-size="24" font-weight="800">target</text>
+    <text x="590" y="270" fill="#c77dff" font-size="72" font-weight="800">20</text>
+    <!-- M box -->
+    <rect x="730" y="175" width="120" height="100" rx="14" fill="#2b3a44" stroke="#6ec8ff" stroke-width="4"/>
+    <text x="790" y="210" fill="#a9d9bb" font-size="20" font-weight="800">M</text>
+    <text x="790" y="258" fill="#6ec8ff" font-size="44" font-weight="800">7</text>
+  </g>
+  <!-- op pills -->
+  <g font-weight="800" text-anchor="middle" fill="#0c1510" font-size="24">
+    <rect x="250" y="350" width="90" height="54" rx="14" fill="#7bf0a8"/><text x="295" y="386">+3</text>
+    <rect x="360" y="350" width="90" height="54" rx="14" fill="#7bf0a8"/><text x="405" y="386">−2</text>
+    <rect x="470" y="350" width="90" height="54" rx="14" fill="#7bf0a8"/><text x="515" y="386">×2</text>
+    <rect x="580" y="350" width="130" height="54" rx="14" fill="#6ec8ff"/><text x="645" y="386" font-size="18">STORE→M</text>
+  </g>
+  <text x="480" y="475" fill="url(#ttl)" font-size="54" font-weight="800" text-anchor="middle">Variable Vault Vipers</text>
+</svg>

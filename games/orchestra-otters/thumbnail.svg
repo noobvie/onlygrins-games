@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a1640"/><stop offset=".5" stop-color="#3f2166"/><stop offset="1" stop-color="#160b28"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#7bf0a8"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="480" y="150" font-size="80" text-anchor="middle">🦦</text>
+  <text x="360" y="130" font-size="40">🎵</text><text x="620" y="120" font-size="34">🎶</text>
+  <text x="480" y="215" fill="#cbb0e8" font-size="26" font-weight="800" text-anchor="middle">Which instrument family do you hear?</text>
+  <!-- family options -->
+  <g font-weight="800" text-anchor="middle" fill="#f4ecff" font-size="22">
+    <rect x="140" y="250" width="150" height="120" rx="16" fill="#26143f" stroke="#6a44a8" stroke-width="3"/><text x="215" y="315" font-size="44">🪈</text><text x="215" y="352">Woodwind</text>
+    <rect x="310" y="250" width="150" height="120" rx="16" fill="#1f4a34" stroke="#7bf0a8" stroke-width="5"/><text x="385" y="315" font-size="44">🎺</text><text x="385" y="352">Brass</text>
+    <rect x="480" y="250" width="150" height="120" rx="16" fill="#26143f" stroke="#6a44a8" stroke-width="3"/><text x="555" y="315" font-size="44">🎻</text><text x="555" y="352">Strings</text>
+    <rect x="650" y="250" width="150" height="120" rx="16" fill="#26143f" stroke="#6a44a8" stroke-width="3"/><text x="725" y="315" font-size="44">🥁</text><text x="725" y="352">Percussion</text>
+  </g>
+  <text x="480" y="480" fill="url(#ttl)" font-size="62" font-weight="800" text-anchor="middle">Orchestra Otters</text>
+</svg>

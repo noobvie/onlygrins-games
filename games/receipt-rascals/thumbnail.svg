@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#123322"/><stop offset=".5" stop-color="#1c4e32"/><stop offset="1" stop-color="#0a2015"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#6fe89a"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="120" y="150" font-size="56" text-anchor="middle">🦝</text>
+  <!-- receipt -->
+  <g font-family="ui-monospace,Consolas,monospace">
+    <rect x="290" y="70" width="300" height="300" rx="10" fill="#f4efdd"/>
+    <text x="440" y="110" fill="#2a2a2a" font-size="24" font-weight="800" text-anchor="middle" font-family="'Baloo 2',sans-serif">🦝 Rascal Diner</text>
+    <line x1="315" y1="125" x2="565" y2="125" stroke="#999" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="315" y="160" fill="#2a2a2a" font-size="20">🍔 Burger</text><text x="565" y="160" fill="#2a2a2a" font-size="20" text-anchor="end">$18.00</text>
+    <text x="315" y="190" fill="#2a2a2a" font-size="20">🍟 Fries</text><text x="565" y="190" fill="#2a2a2a" font-size="20" text-anchor="end">$12.00</text>
+    <line x1="315" y1="208" x2="565" y2="208" stroke="#999" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="315" y="240" fill="#2a2a2a" font-size="20" font-weight="800">Subtotal</text><text x="565" y="240" fill="#2a2a2a" font-size="20" font-weight="800" text-anchor="end">$30.00</text>
+    <text x="315" y="270" fill="#227a44" font-size="20">Tax 10%</text><text x="565" y="270" fill="#227a44" font-size="20" text-anchor="end">+ $3.00</text>
+    <line x1="315" y1="288" x2="565" y2="288" stroke="#999" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="315" y="325" fill="#2a2a2a" font-size="26" font-weight="800">TOTAL</text><text x="565" y="325" fill="#c0392b" font-size="30" font-weight="800" text-anchor="end">?</text>
+  </g>
+  <!-- options -->
+  <g font-weight="800" text-anchor="middle" fill="#eafff0" font-size="26">
+    <rect x="640" y="120" width="150" height="60" rx="12" fill="#12522f" stroke="#6fe89a" stroke-width="4"/><text x="715" y="160">$33.00</text>
+    <rect x="800" y="120" width="130" height="60" rx="12" fill="#0f3221" stroke="#3f8a5a" stroke-width="3"/><text x="865" y="160">$30.00</text>
+    <rect x="640" y="200" width="150" height="60" rx="12" fill="#0f3221" stroke="#3f8a5a" stroke-width="3"/><text x="715" y="240">$36.00</text>
+    <rect x="800" y="200" width="130" height="60" rx="12" fill="#0f3221" stroke="#3f8a5a" stroke-width="3"/><text x="865" y="240">$43.00</text>
+  </g>
+  <text x="480" y="475" fill="url(#ttl)" font-size="64" font-weight="800" text-anchor="middle">Receipt Rascals</text>
+</svg>

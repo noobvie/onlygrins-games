@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#12331f"/><stop offset=".5" stop-color="#1c4a2c"/><stop offset="1" stop-color="#0b2013"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#7bf0a8"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="480" y="95" fill="#eafff0" font-size="32" font-weight="800" text-anchor="middle">Surface: <tspan fill="#ffd15a">🧊 Ice</tspan> · push − friction = ?</text>
+  <!-- track -->
+  <g>
+    <rect x="90" y="200" width="780" height="120" rx="16" fill="#0d2916" stroke="#3f7a52" stroke-width="4"/>
+    <g fill="#1a4029">
+      <rect x="104" y="214" width="86" height="92" rx="8"/><rect x="198" y="214" width="86" height="92" rx="8"/>
+      <rect x="292" y="214" width="86" height="92" rx="8"/><rect x="386" y="214" width="86" height="92" rx="8"/>
+      <rect x="480" y="214" width="86" height="92" rx="8"/><rect x="668" y="214" width="86" height="92" rx="8"/>
+      <rect x="762" y="214" width="86" height="92" rx="8"/>
+    </g>
+    <rect x="574" y="214" width="86" height="92" rx="8" fill="#3a5a1e" stroke="#ffd15a" stroke-width="4"/>
+    <text x="617" y="288" font-size="46" text-anchor="middle">🚩</text>
+    <text x="147" y="292" font-size="50" text-anchor="middle">🐼</text>
+    <path d="M175 260 H540" stroke="#7bf0a8" stroke-width="6" stroke-dasharray="12 9" marker-end="url(#a)"/>
+  </g>
+  <!-- push buttons -->
+  <g font-weight="800" text-anchor="middle" fill="#0b2013" font-size="22">
+    <rect x="250" y="360" width="140" height="56" rx="14" fill="#7bf0a8"/><text x="320" y="396">Soft 🐾</text>
+    <rect x="410" y="360" width="150" height="56" rx="14" fill="#6ec8ff"/><text x="485" y="396">Medium 👟</text>
+    <rect x="580" y="360" width="140" height="56" rx="14" fill="#c77dff"/><text x="650" y="396">Hard 💥</text>
+  </g>
+  <text x="480" y="490" fill="url(#ttl)" font-size="66" font-weight="800" text-anchor="middle">Push-Pull Pandas</text>
+</svg>

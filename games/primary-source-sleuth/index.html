@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Primary Source Sleuth — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="history" data-seed="primary-source-sleuth"></script>
+
+<style>
+  :root{
+    --bg1:#1c1c30; --bg2:#2c2c50; --bg3:#111120;
+    --card:#20203c; --line:#4a4a86; --text:#eef0ff; --muted:#b3b3dc;
+    --green:#7bf0a8; --blue:#6ec8ff; --purple:#c77dff; --gold:#ffd15a; --bad:#ff6b81;
+    --prim:#5fe0b0; --sec:#ffab5a;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(22px,4.3vw,38px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--gold),var(--prim),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#111120;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .source{background:#191934;border:2px solid var(--line);border-radius:16px;padding:20px;margin:10px 0 14px;text-align:center;}
+  .source .emo{font-size:52px;} .source .desc{font-size:clamp(18px,3.6vw,25px);font-weight:800;margin-top:6px;}
+  .q{text-align:center;color:var(--muted);font-weight:800;margin-bottom:12px;}
+  .opts{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:560px;margin:0 auto;}
+  .opt{cursor:pointer;border:3px solid var(--line);border-radius:16px;padding:18px 12px;text-align:center;
+    font-weight:800;font-size:clamp(17px,3.4vw,22px);box-shadow:0 6px 0 rgba(0,0,0,.35);transition:.1s;background:#1a1a34;}
+  .opt:active{transform:translateY(2px);}
+  .opt.prim{border-color:var(--prim);} .opt.sec{border-color:var(--sec);}
+  .opt small{display:block;font-weight:700;font-size:12px;color:var(--muted);margin-top:2px;}
+  .opt.right{box-shadow:0 0 0 3px var(--green) inset,0 6px 0 rgba(0,0,0,.35);}
+  .opt.wrong{box-shadow:0 0 0 3px var(--bad) inset,0 6px 0 rgba(0,0,0,.35);}
+  .why{max-width:560px;margin:14px auto 0;background:#191934;border-left:4px solid var(--gold);border-radius:8px;
+    padding:12px 14px;color:var(--muted);font-size:14px;display:none;}
+  .why.show{display:block;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:16px;margin-top:12px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;} .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#8383c0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <div id="start">
+      <h1>🔎 Primary Source Sleuth</h1>
+      <p class="sub">Historians are detectives! For each clue decide: is it a <b style="color:#5fe0b0">PRIMARY</b>
+        source (made at the time, first-hand) or a <b style="color:#ffab5a">SECONDARY</b> source (made later,
+        about it)?</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>obvious clues</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>letters &amp; books</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>tricky edge cases</small></button>
+      </div>
+      <p class="sub">8 cases per run · correct verdicts earn streak bonuses</p>
+    </div>
+
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Case 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="source">
+        <div class="emo" id="emo"></div>
+        <div class="desc" id="desc"></div>
+      </div>
+      <div class="q">Primary or secondary source?</div>
+      <div class="opts">
+        <div class="opt prim" id="optPrim">🕰️ PRIMARY<small>from the time, first-hand</small></div>
+        <div class="opt sec" id="optSec">📚 SECONDARY<small>made later, about it</small></div>
+      </div>
+      <div class="why" id="why"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🔎</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="gradeBtn g1" id="againBtn">New cases ▸</button>
+        <button class="gradeBtn g2" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // [emoji, description, isPrimary, why]
+  var BANDS = [
+    [
+      ['📔','A diary written by someone who was there',true,'A diary from the time is first-hand — a primary source.'],
+      ['📖','A school textbook about the past',false,'A textbook is written later to explain history — secondary.'],
+      ['📸','An old photograph taken at the event',true,'A photo snapped at the time captures it first-hand — primary.'],
+      ['🎬','A modern movie about knights',false,'A film made today, retelling the past — secondary.'],
+      ['🖼️','A painting made during the event',true,'Painted at the time by a witness — primary.'],
+      ['🗿','A statue carved by the ancient people',true,'An object made by the people themselves — primary.']
+    ],
+    [
+      ['✉️','A letter a soldier wrote home from the war',true,'A first-hand letter from the time — primary.'],
+      ['📚','An encyclopedia article about the war',false,'Written later, summarising events — secondary.'],
+      ['🪙','A coin used in ancient Rome',true,'A real object from the time — primary.'],
+      ['👤','A biography written this year',false,'Written long after, about someone\'s life — secondary.'],
+      ['🎙️','A recording of a leader\'s actual speech',true,'The real speech, captured then — primary.'],
+      ['📺','A documentary explaining the events',false,'Made later to teach us about it — secondary.']
+    ],
+    [
+      ['🎤','An interview with someone who lived through it',true,'A witness telling their own story — primary.'],
+      ['📰','A newspaper printed the day the event happened',true,'Reported at the time — primary.'],
+      ['🎧','A history podcast discussing the event',false,'Made later, analysing it — secondary.'],
+      ['🏷️','A museum label explaining an artifact',false,'Written by curators later — secondary (the artifact itself is primary).'],
+      ['📝','An autobiography — someone writing their own life',true,'First-hand account by the person — primary.'],
+      ['📜','A scroll written by an eyewitness scribe',true,'Recorded by someone who was there — primary.']
+    ]
+  ];
+  var GRADES = [ {id:1,label:'Grade 1–2'}, {id:3,label:'Grade 3'}, {id:4,label:'Grade 4–5'} ];
+  var ROUNDS = 8;
+
+  var CHEER = ['Case cracked! 🔎🎉','Sharp detective work! 🌟','Evidence sorted! 💚','Master sleuth! ✨'];
+  var OOPS  = ['Look again, detective. 🔎','Where did it come from? 🤔','Not quite — next case!'];
+
+  var gradeIdx = 0, q = 0, score = 0, streak = 0, nRight = 0;
+  var cur = null, locked = false;
+
+  var $ = function (id){ return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f,d,t,slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
+    o.type=t||'sine'; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    g.gain.setValueAtTime(.08,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function good(){ tone(523,.1,'sine'); setTimeout(function(){ tone(784,.18,'sine',1046); },110); }
+  function bad(){ tone(200,.3,'sawtooth',90); }
+
+  var bagIdx = [], bagPos = 0;
+  function nextCase() {
+    if (bagPos >= bagIdx.length) { bagIdx = shuffle(BANDS[gradeIdx].map(function(_,i){ return i; })); bagPos = 0; }
+    return BANDS[gradeIdx][bagIdx[bagPos++]];
+  }
+
+  function render() {
+    locked = false;
+    var c = nextCase();
+    cur = { emo: c[0], desc: c[1], primary: c[2], why: c[3] };
+    $('roundLbl').textContent = 'Case ' + (q + 1) + '/' + ROUNDS;
+    $('emo').textContent = cur.emo; $('desc').textContent = cur.desc;
+    $('why').classList.remove('show'); $('why').textContent = cur.why;
+    $('optPrim').className = 'opt prim'; $('optSec').className = 'opt sec';
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    EduSDK.startLesson(q + 1, {});
+  }
+
+  function choose(saidPrimary) {
+    if (locked) return;
+    locked = true;
+    var correct = saidPrimary === cur.primary;
+    var chosen = saidPrimary ? $('optPrim') : $('optSec');
+    var answerEl = cur.primary ? $('optPrim') : $('optSec');
+    if (correct) {
+      chosen.classList.add('right'); good(); nRight++; streak++;
+      var pts = 100 + streak * 15; score += pts; $('scoreVal').textContent = score;
+      $('toast').textContent = pick(CHEER) + '  +' + pts; $('toast').className = 'toast good';
+    } else {
+      chosen.classList.add('wrong'); answerEl.classList.add('right'); bad(); streak = 0;
+      $('card').classList.add('shake'); setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS); $('toast').className = 'toast bad';
+    }
+    $('why').classList.add('show');
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 2100);
+    if (q === Math.floor(ROUNDS / 2)) setTimeout(function(){ EduSDK.adBreak('interlevel').then(render); }, 2100);
+    else setTimeout(render, 2100);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden'); $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nRight >= 7 ? '🔎🏆' : nRight >= 4 ? '🔎📜' : '🔎🧩';
+    $('finalLine').textContent = GRADES[gradeIdx].label + ' — ' + nRight + '/' + ROUNDS + ' cases cracked. ' +
+      (nRight >= 7 ? 'Master sleuth — you evaluate evidence like a real historian!' :
+       nRight >= 4 ? 'Good detective work — a few sources fooled you.' :
+       'Keep asking: was this made AT the time, or later? Try again!');
+    EduSDK.submitScore(score, { grade: GRADES[gradeIdx].id, right: nRight })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) el.innerHTML = res.isPersonalBest
+          ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>' : 'Score saved to the leaderboard.';
+        else if (res && res.offline) el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        else el.textContent = (res && res.error === 'not_authenticated') ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(idx) {
+    gradeIdx = idx; q = 0; score = 0; streak = 0; nRight = 0; bagIdx = []; bagPos = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    render();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('#start .gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(Number(b.dataset.grade)); });
+  });
+  $('optPrim').addEventListener('click', function(){ choose(true); });
+  $('optSec').addEventListener('click', function(){ choose(false); });
+  $('againBtn').addEventListener('click', function () { startGame(gradeIdx); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'primary-source-sleuth' });
+})();
+</script>
+</body>
+</html>

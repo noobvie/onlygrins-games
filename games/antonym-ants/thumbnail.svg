@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e3320"/><stop offset=".5" stop-color="#2e4a2c"/><stop offset="1" stop-color="#0f1e10"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset=".5" stop-color="#9be86a"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- marching ants -->
+  <g font-size="30">
+    <text x="120" y="100">🐜</text><text x="200" y="100">🐜</text><text x="280" y="100">🐜</text>
+    <text x="820" y="102" font-size="36">🧺</text>
+  </g>
+  <text x="480" y="185" fill="#f0ffe8" font-size="34" font-weight="800" text-anchor="middle">Find the <tspan fill="#ffd15a">OPPOSITE</tspan> of <tspan fill="#9be86a">hot</tspan></text>
+  <!-- options -->
+  <g font-weight="800" text-anchor="middle" font-size="28">
+    <rect x="160" y="240" width="280" height="80" rx="16" fill="#2f6a24" stroke="#9be86a" stroke-width="5"/>
+    <text x="300" y="292" fill="#f0ffe8">🐜 cold</text>
+    <rect x="520" y="240" width="280" height="80" rx="16" fill="#3a6a30" stroke="#4f8a4a" stroke-width="4"/>
+    <text x="660" y="292" fill="#f0ffe8">🐜 river</text>
+    <rect x="160" y="335" width="280" height="80" rx="16" fill="#3a6a30" stroke="#4f8a4a" stroke-width="4"/>
+    <text x="300" y="387" fill="#f0ffe8">🐜 table</text>
+    <rect x="520" y="335" width="280" height="80" rx="16" fill="#3a6a30" stroke="#4f8a4a" stroke-width="4"/>
+    <text x="660" y="387" fill="#f0ffe8">🐜 apple</text>
+  </g>
+  <text x="480" y="490" fill="url(#ttl)" font-size="66" font-weight="800" text-anchor="middle">Antonym Ants</text>
+</svg>

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a2712"/><stop offset=".5" stop-color="#5a3d1c"/><stop offset="1" stop-color="#241708"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb84d"/><stop offset=".5" stop-color="#8fe15a"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <!-- board -->
+  <g>
+    <rect x="70" y="90" width="320" height="320" rx="16" fill="#241708" stroke="#9a6a2f" stroke-width="4"/>
+    <g fill="#5a3d1c">
+      <rect x="84" y="104" width="70" height="70" rx="8"/><rect x="164" y="104" width="70" height="70" rx="8"/>
+      <rect x="244" y="104" width="70" height="70" rx="8"/><rect x="84" y="184" width="70" height="70" rx="8"/>
+      <rect x="164" y="184" width="70" height="70" rx="8"/><rect x="244" y="184" width="70" height="70" rx="8"/>
+      <rect x="84" y="264" width="70" height="70" rx="8"/><rect x="164" y="264" width="70" height="70" rx="8"/>
+      <rect x="84" y="344" width="70" height="70" rx="8"/><rect x="244" y="344" width="70" height="70" rx="8"/>
+    </g>
+    <rect x="244" y="264" width="70" height="70" rx="8" fill="#3a4a1e"/>
+    <text x="279" y="315" font-size="42" text-anchor="middle">🌰</text>
+    <text x="119" y="393" font-size="46" text-anchor="middle">🐿️</text>
+    <path d="M119 360 V310 H200 V230 H280 V300" fill="none" stroke="#8fe15a" stroke-width="5" stroke-dasharray="9 7"/>
+  </g>
+  <!-- program blocks -->
+  <g font-weight="800">
+    <text x="440" y="130" fill="#c77dff" font-size="26">function f()</text>
+    <rect x="440" y="145" width="240" height="56" rx="12" fill="#402c14" stroke="#c77dff" stroke-width="3"/>
+    <text x="470" y="185" font-size="34">➡️</text><text x="530" y="185" font-size="34">⬆️</text>
+    <text x="440" y="255" fill="#ffb84d" font-size="26">Main</text>
+    <rect x="440" y="270" width="440" height="56" rx="12" fill="#402c14" stroke="#9a6a2f" stroke-width="3"/>
+    <rect x="452" y="280" width="130" height="36" rx="8" fill="#5a2a7a"/><text x="517" y="305" fill="#f0e0ff" font-size="18" text-anchor="middle">CALL f()</text>
+    <rect x="592" y="280" width="130" height="36" rx="8" fill="#5a2a7a"/><text x="657" y="305" fill="#f0e0ff" font-size="18" text-anchor="middle">CALL f()</text>
+    <rect x="732" y="280" width="130" height="36" rx="8" fill="#5a2a7a"/><text x="797" y="305" fill="#f0e0ff" font-size="18" text-anchor="middle">CALL f()</text>
+  </g>
+  <text x="660" y="380" fill="#8fe15a" font-size="34" font-weight="800" text-anchor="middle">▶ RUN</text>
+  <text x="480" y="475" fill="url(#ttl)" font-size="58" font-weight="800" text-anchor="middle">Subroutine Squirrels</text>
+</svg>

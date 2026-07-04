@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Orchestra Otters — OnlyGrins</title>
+
+<!-- Music game: NO bgm.js — the gameplay IS the audio (synthesized instrument tones). -->
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+
+<style>
+  :root{
+    --bg1:#2a1640; --bg2:#3f2166; --bg3:#160b28;
+    --card:#301a4d; --line:#6a44a8; --text:#f4ecff; --muted:#cbb0e8;
+    --green:#7bf0a8; --blue:#6ec8ff; --purple:#c77dff; --gold:#ffd15a; --bad:#ff6b81;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    color:var(--text);font:16px/1.45 "Baloo 2","Comic Sans MS",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:16px;
+    user-select:none;-webkit-user-select:none;}
+  .wrap{width:min(960px,100%);}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:20px 26px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{margin:0 0 4px;font-size:clamp(24px,4.5vw,40px);font-weight:800;text-align:center;
+    background:linear-gradient(90deg,var(--gold),var(--green),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);text-align:center;margin:0 0 16px;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;
+    padding:14px 20px;border-radius:16px;color:#160b28;box-shadow:0 6px 0 rgba(0,0,0,.35);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  .g1{background:var(--green);} .g2{background:var(--blue);} .g3{background:var(--purple);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
+  .top .round{color:var(--blue);} .top .spacer{flex:1;}
+  .top .score{color:var(--green);font-size:20px;}
+  .listen{text-align:center;margin:14px 0;}
+  .playBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:22px;
+    padding:20px 40px;border-radius:20px;color:#160b28;background:var(--gold);box-shadow:0 6px 0 rgba(0,0,0,.4);}
+  .playBtn:active{transform:translateY(3px);}
+  .playBtn.playing{background:var(--blue);}
+  .otter{font-size:56px;margin:6px 0;transition:.15s;} .otter.bounce{transform:translateY(-8px);}
+  .q{text-align:center;color:var(--muted);font-weight:800;margin:6px 0 10px;}
+  .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;max-width:620px;margin:0 auto;}
+  .opt{cursor:pointer;border:2px solid var(--line);background:#26143f;border-radius:16px;padding:16px 10px;text-align:center;
+    font-weight:800;box-shadow:0 5px 0 rgba(0,0,0,.35);transition:.1s;}
+  .opt:active{transform:translateY(2px);} .opt .emo{font-size:34px;display:block;} .opt small{color:var(--muted);font-weight:700;font-size:11px;}
+  .opt.right{border-color:var(--green);background:#1f4a34;} .opt.wrong{border-color:var(--bad);background:#4a1e28;}
+  .toast{min-height:24px;text-align:center;font-weight:800;font-size:16px;margin-top:14px;}
+  .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
+  .shake{animation:shake .45s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+  .final{text-align:center;padding:12px 0;}
+  .final .big{font-size:58px;font-weight:800;color:var(--green);margin:8px 0;}
+  .final p{color:var(--muted);margin:6px 0;} .final .pb{color:var(--green);font-weight:800;}
+  .actions{display:flex;justify-content:center;gap:12px;}
+  .hidden{display:none!important;}
+  .sdknote{margin-top:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#9a7ac8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+
+    <div id="start">
+      <h1>🦦 Orchestra Otters</h1>
+      <p class="sub">Use your ears! Each otter plays a sound — decide which <b>instrument family</b> it belongs
+        to: airy woodwind, buzzy brass, singing strings, ringing keys or thumping percussion. Listen for the
+        <b>colour</b> of the sound. 🔊 Turn your sound on!</p>
+      <div class="grades">
+        <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>3 families</small></button>
+        <button class="gradeBtn g2" data-grade="1">Grade 3<small>4 families</small></button>
+        <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>all 5 families</small></button>
+      </div>
+      <p class="sub">8 sounds per run · sharp ears earn streak bonuses</p>
+    </div>
+
+    <div id="game" class="hidden">
+      <div class="top">
+        <span class="round" id="roundLbl">Sound 1/8</span>
+        <span class="spacer"></span>
+        <span class="score">⭐ <span id="scoreVal">0</span></span>
+      </div>
+      <div class="listen">
+        <div class="otter" id="otter">🦦</div>
+        <button class="playBtn" id="playBtn">🔁 Play sound</button>
+      </div>
+      <div class="q">Which instrument family is it?</div>
+      <div class="opts" id="opts"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <div id="final" class="hidden final">
+      <div style="font-size:76px" id="finalEmoji">🦦</div>
+      <p id="finalLine"></p>
+      <div class="big" id="finalScore">0</div>
+      <p id="saveMsg">Saving your score…</p>
+      <div class="actions">
+        <button class="gradeBtn g1" id="againBtn">New sounds ▸</button>
+        <button class="gradeBtn g2" id="changeBtn">Change grade</button>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var FAMILIES = {
+    woodwind:   { label:'Woodwind', emo:'🪈', hint:'airy &amp; smooth' },
+    brass:      { label:'Brass',    emo:'🎺', hint:'bold &amp; buzzy' },
+    strings:    { label:'Strings',  emo:'🎻', hint:'singing sweep' },
+    keys:       { label:'Keys',     emo:'🎹', hint:'bright ring' },
+    percussion: { label:'Percussion', emo:'🥁', hint:'thump &amp; hit' }
+  };
+  var GRADES = [
+    { id:1, label:'Grade 1–2', fams:['percussion','woodwind','brass'] },
+    { id:3, label:'Grade 3',   fams:['woodwind','brass','strings','percussion'] },
+    { id:4, label:'Grade 4–5', fams:['woodwind','brass','strings','keys','percussion'] }
+  ];
+  var ROUNDS = 8;
+  var NOTES = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25]; // C D E G A C
+
+  var CHEER = ['Great ears! 🦦🎶','Spot on — you heard it! 🌟','Timbre master! 💚','The otters are impressed! ✨'];
+  var OOPS  = ['Listen again — different colour. 🦦','Not that family. 🤔','Tricky tone! Next one…'];
+
+  var grade = GRADES[0], q = 0, score = 0, streak = 0, nRight = 0;
+  var target = '', locked = false;
+
+  var $ = function (id){ return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null, noiseBuf = null;
+  function ensureCtx() { if (!actx) { actx = new AC(); makeNoise(); } if (actx.state === 'suspended') actx.resume(); }
+  function makeNoise() {
+    noiseBuf = actx.createBuffer(1, actx.sampleRate * 0.4, actx.sampleRate);
+    var d = noiseBuf.getChannelData(0);
+    for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  function env(g, t, a, peak, dur) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  }
+  function vibrato(osc, t, rate, depth, dur) {
+    var lfo = actx.createOscillator(), lg = actx.createGain();
+    lfo.frequency.value = rate; lg.gain.value = depth;
+    lfo.connect(lg); lg.connect(osc.frequency); lfo.start(t); lfo.stop(t + dur);
+  }
+  function playFamily(fam) {
+    ensureCtx();
+    var t = actx.currentTime + 0.02, f = pick(NOTES), out = actx.createGain();
+    out.gain.value = 0.5; out.connect(actx.destination);
+    if (fam === 'percussion') {
+      var src = actx.createBufferSource(); src.buffer = noiseBuf;
+      var bp = actx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1400; bp.Q.value = 0.8;
+      var ng = actx.createGain(); env(ng, t, 0.005, 0.9, 0.28);
+      src.connect(bp); bp.connect(ng); ng.connect(out); src.start(t); src.stop(t + 0.3);
+      var thump = actx.createOscillator(), tg = actx.createGain();
+      thump.type = 'sine'; thump.frequency.setValueAtTime(150, t); thump.frequency.exponentialRampToValueAtTime(60, t + 0.15);
+      env(tg, t, 0.005, 0.8, 0.2); thump.connect(tg); tg.connect(out); thump.start(t); thump.stop(t + 0.25);
+      return;
+    }
+    var osc = actx.createOscillator(), g = actx.createGain(), filt = actx.createBiquadFilter();
+    filt.type = 'lowpass'; osc.frequency.value = f;
+    if (fam === 'woodwind') { osc.type = 'sine'; filt.frequency.value = 3000; env(g, t, 0.06, 0.7, 1.0); vibrato(osc, t, 5, 3, 1.0); }
+    else if (fam === 'brass') { osc.type = 'sawtooth'; filt.frequency.value = 2200; env(g, t, 0.04, 0.55, 1.0); vibrato(osc, t, 6, 6, 1.0); }
+    else if (fam === 'strings') { osc.type = 'sawtooth'; filt.frequency.value = 1600; env(g, t, 0.18, 0.5, 1.4); vibrato(osc, t, 5.5, 5, 1.4); }
+    else if (fam === 'keys') { osc.type = 'triangle'; filt.frequency.value = 3500; env(g, t, 0.005, 0.7, 1.2);
+      var ring = actx.createOscillator(), rg = actx.createGain(); ring.type = 'sine'; ring.frequency.value = f * 2;
+      env(rg, t, 0.005, 0.25, 0.8); ring.connect(rg); rg.connect(out); ring.start(t); ring.stop(t + 0.9); }
+    osc.connect(filt); filt.connect(g); g.connect(out);
+    osc.start(t); osc.stop(t + (fam === 'strings' ? 1.5 : 1.2));
+  }
+
+  function playCurrent() {
+    var o = $('otter'); o.classList.add('bounce'); setTimeout(function(){ o.classList.remove('bounce'); }, 200);
+    $('playBtn').classList.add('playing'); setTimeout(function(){ $('playBtn').classList.remove('playing'); }, 400);
+    playFamily(target);
+  }
+
+  function render() {
+    locked = false;
+    target = pick(grade.fams);
+    $('roundLbl').textContent = 'Sound ' + (q + 1) + '/' + ROUNDS;
+    $('toast').textContent = ''; $('toast').className = 'toast';
+    var o = $('opts'); o.innerHTML = '';
+    shuffle(grade.fams.slice()).forEach(function (key) {
+      var fam = FAMILIES[key];
+      var b = document.createElement('div');
+      b.className = 'opt'; b.dataset.key = key;
+      b.innerHTML = '<span class="emo">' + fam.emo + '</span>' + fam.label + '<br><small>' + fam.hint + '</small>';
+      b.addEventListener('click', function () { choose(key, b); });
+      o.appendChild(b);
+    });
+    EduSDK.startLesson(q + 1, {});
+    setTimeout(playCurrent, 350);
+  }
+
+  function choose(key, el) {
+    if (locked) return;
+    locked = true;
+    var correct = key === target;
+    if (correct) {
+      el.classList.add('right'); nRight++; streak++;
+      var pts = 100 + streak * 15; score += pts; $('scoreVal').textContent = score;
+      $('toast').textContent = pick(CHEER) + '  +' + pts; $('toast').className = 'toast good';
+    } else {
+      el.classList.add('wrong'); streak = 0;
+      Array.prototype.forEach.call($('opts').children, function (c) { if (c.dataset.key === target) c.classList.add('right'); });
+      $('card').classList.add('shake'); setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(OOPS) + ' It was ' + FAMILIES[target].label + '.'; $('toast').className = 'toast bad';
+    }
+    EduSDK.finishLesson(q + 1, { correct: correct });
+    next();
+  }
+
+  function next() {
+    q++;
+    if (q >= ROUNDS) return setTimeout(finish, 1700);
+    if (q === Math.floor(ROUNDS / 2)) setTimeout(function(){ EduSDK.adBreak('interlevel').then(render); }, 1700);
+    else setTimeout(render, 1700);
+  }
+
+  function finish() {
+    $('game').classList.add('hidden'); $('final').classList.remove('hidden');
+    $('finalScore').textContent = score;
+    $('finalEmoji').textContent = nRight >= 7 ? '🦦🏆' : nRight >= 4 ? '🦦🎶' : '🦦🎵';
+    $('finalLine').textContent = grade.label + ' — ' + nRight + '/' + ROUNDS + ' sounds named. ' +
+      (nRight >= 7 ? 'Golden ears — a true conductor of otters!' :
+       nRight >= 4 ? 'Good listening — a few tones fooled you.' :
+       'Keep listening for the colour of each sound — your ears will sharpen!');
+    EduSDK.submitScore(score, { grade: grade.id, right: nRight })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) el.innerHTML = res.isPersonalBest
+          ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>' : 'Score saved to the leaderboard.';
+        else if (res && res.offline) el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        else el.textContent = (res && res.error === 'not_authenticated') ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  function startGame(g) {
+    ensureCtx();
+    grade = g; q = 0; score = 0; streak = 0; nRight = 0;
+    $('scoreVal').textContent = '0';
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('game').classList.remove('hidden');
+    render();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('#start .gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(GRADES[Number(b.dataset.grade)]); });
+  });
+  $('playBtn').addEventListener('click', playCurrent);
+  $('againBtn').addEventListener('click', function () { startGame(grade); });
+  $('changeBtn').addEventListener('click', function () {
+    $('final').classList.add('hidden'); $('start').classList.remove('hidden');
+  });
+
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'orchestra-otters' });
+})();
+</script>
+</body>
+</html>

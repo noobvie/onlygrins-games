@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#123a35"/><stop offset=".5" stop-color="#1c5a4a"/><stop offset="1" stop-color="#0b241f"/>
+    </linearGradient>
+    <linearGradient id="ttl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff9ec7"/><stop offset=".5" stop-color="#7bf0b0"/><stop offset="1" stop-color="#6ec8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="22" fill="url(#bg)"/>
+  <text x="480" y="92" fill="#eafff6" font-size="34" font-weight="800" text-anchor="middle">Put <tspan fill="#ffd15a">a Butterfly</tspan> in order</text>
+  <!-- 4 ordered slots -->
+  <g text-anchor="middle">
+    <g>
+      <rect x="120" y="150" width="150" height="180" rx="16" fill="#12463a" stroke="#7bf0b0" stroke-width="4"/>
+      <text x="145" y="180" fill="#a9e0cf" font-size="20" font-weight="800" text-anchor="start">1</text>
+      <text x="195" y="245" font-size="56">🥚</text><text x="195" y="300" fill="#a9e0cf" font-size="20" font-weight="800">Egg</text>
+    </g>
+    <g>
+      <rect x="290" y="150" width="150" height="180" rx="16" fill="#12463a" stroke="#7bf0b0" stroke-width="4"/>
+      <text x="315" y="180" fill="#a9e0cf" font-size="20" font-weight="800" text-anchor="start">2</text>
+      <text x="365" y="245" font-size="56">🐛</text><text x="365" y="300" fill="#a9e0cf" font-size="17" font-weight="800">Caterpillar</text>
+    </g>
+    <g>
+      <rect x="460" y="150" width="150" height="180" rx="16" fill="#12463a" stroke="#7bf0b0" stroke-width="4"/>
+      <text x="485" y="180" fill="#a9e0cf" font-size="20" font-weight="800" text-anchor="start">3</text>
+      <circle cx="535" cy="225" r="30" fill="#7bf0b0"/><text x="535" y="300" fill="#a9e0cf" font-size="18" font-weight="800">Chrysalis</text>
+    </g>
+    <g>
+      <rect x="630" y="150" width="150" height="180" rx="16" fill="#12463a" stroke="#7bf0b0" stroke-width="4"/>
+      <text x="655" y="180" fill="#a9e0cf" font-size="20" font-weight="800" text-anchor="start">4</text>
+      <text x="705" y="245" font-size="56">🦋</text><text x="705" y="300" fill="#a9e0cf" font-size="18" font-weight="800">Butterfly</text>
+    </g>
+    <text x="850" y="245" font-size="44">🌸</text>
+  </g>
+  <text x="480" y="470" fill="url(#ttl)" font-size="56" font-weight="800" text-anchor="middle">Metamorphosis Meadow</text>
+</svg>
