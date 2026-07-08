@@ -5,18 +5,33 @@ for the **OnlyGrins** arcade. Each game posts its score through the Arcade SDK
 → leaderboard → **GP (Grin Points)**. Architecture, SDK, and manifest details:
 [PLAN.md](PLAN.md).
 
+## First-time server setup (once)
+
+The deploy script lives *in this repo*, so the very first time you must pull
+the repo onto the server yourself:
+
+```bash
+# on the VPS, as the deploy user:
+git clone git@github.com:noobvie/onlygrins-games.git /home/arcade-games
+bash /home/arcade-games/deploy/deploy-games.sh
+```
+
+That's the only manual clone you'll ever do — from then on the script pulls
+the latest commits itself on every run.
+
 ## The whole process
 
 Ship = three arrows: **git pull → sync files → tell the admin panel**.
 On the server, one command does all three:
 
 ```bash
-bash deploy/deploy-games.sh
+bash /home/arcade-games/deploy/deploy-games.sh
 ```
 
 What it does, in order:
 
-1. **git pull** this repo (clones on first run)
+1. **git pull** this repo into `/home/arcade-games` (the clone you made in
+   first-time setup)
 2. validates every `game.json`
 3. **rsync** each `games/<slug>/` → `storage/app/public/uploads/games/html5/<slug>/`
 4. **`php artisan games:sync`** — reads each `game.json` and upserts the
