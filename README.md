@@ -7,17 +7,32 @@ for the **OnlyGrins** arcade. Each game posts its score through the Arcade SDK
 
 ## First-time server setup (once)
 
-The deploy script lives *in this repo*, so the very first time you must pull
-the repo onto the server yourself:
+Two things must exist on the server before the first deploy:
+
+**1. The `games:sync` command in the app.** Check with
+`cd /home/arcade && php artisan list games` — if it errors with
+*"no commands defined in the games namespace"*, copy the command file over
+and clear caches:
 
 ```bash
-# on the VPS, as the deploy user:
+# from Windows (WSL):
+scp /mnt/d/Git_noob/Onlygrins/app/Console/Commands/GamesSyncCommand.php \
+    root@<vps>:/home/arcade/app/Console/Commands/
+
+# on the VPS:
+cd /home/arcade && php artisan optimize:clear && php artisan list games
+```
+
+**2. This repo cloned onto the server** (the deploy script lives in it):
+
+```bash
 git clone https://github.com/noobvie/onlygrins-games.git /home/arcade-games
 bash /home/arcade-games/deploy/deploy-games.sh
 ```
 
 That's the only manual clone you'll ever do — from then on the script pulls
-the latest commits itself on every run.
+the latest commits itself on every run. (Use the HTTPS URL — the repo is
+public, so no SSH keys are needed.)
 
 ## The whole process
 
@@ -74,7 +89,31 @@ path. New game, changed game, changed metadata: edit → push → deploy.
 | Test on the real platform before going public | `STAGING=1 bash deploy/deploy-games.sh` → deploys everything hidden, prints `/play/<slug>` URLs you can open as admin |
 | Hide a game | set `"is_active": false` in its `game.json` → push → deploy |
 | Remove a game | delete `games/<slug>/` → push → `PRUNE=1 bash deploy/deploy-games.sh` (row is deactivated, never deleted — scores survive) |
-| Manually upload one game without the pipeline | `bash tools/pack-game.sh <slug>` → in admin: Add game → HTML5 → upload `dist/<slug>.zip` |
+| Test/iterate on ONE game by hand | see [Testing one game by upload](#testing-one-game-by-upload--fix--re-upload) below |
+
+## Testing one game by upload → fix → re-upload
+
+To iterate on a **single game** against the real platform without touching
+the pipeline or redeploying everything:
+
+1. **Pack it:** `bash tools/pack-game.sh <slug>` → `dist/<slug>.zip`
+   (`index.html` at the zip root, as the platform requires; `game.json` and
+   thumbnails are excluded).
+2. **Upload it:** admin → Games → Add game → type **HTML5** → upload the zip,
+   fill in title/category, upload the thumbnail via the form's image field —
+   and leave it **inactive**.
+3. **Test it:** open `/play/<slug>` while logged in as an admin — real SDK,
+   real scoring/leaderboard; the public gets a 404 until it's active.
+4. **Fix & repeat:** edit the game locally → re-run `pack-game.sh` → in
+   admin, edit that game and re-upload the new zip. Hard-refresh the browser
+   if you still see old assets (HTTP cache).
+5. **When done:** either mark it active (it stays a manually-managed game),
+   **or**, if it should be managed by the pipeline like the rest:
+   **delete the manual entry in the admin first**, then ship it through the
+   normal deploy. Manual uploads have no `edu:` import_id, so `games:sync`
+   can't adopt them — deploying without deleting would create a duplicate.
+
+## Configuration
 
 `deploy-games.sh` is configured by env vars (shown with defaults):
 `GAMES_REPO=https://github.com/noobvie/onlygrins-games.git`,
@@ -85,9 +124,8 @@ path. New game, changed game, changed metadata: edit → push → deploy.
 
 - **Windows (dev):** a browser; Node.js + Git Bash for
   `dev-serve.sh` / `validate.sh` (dependency-free, no `npm install`).
-- **Server (one-time):** `git`, `rsync`, `php`, and the OnlyGrins app with the
-  `games:sync` command deployed (`app/Console/Commands/GamesSyncCommand.php` —
-  already in the app repo; see PLAN.md §6).
+- **Server (one-time):** `git`, `rsync`, `php`, and the `games:sync` command
+  in the app (see [First-time server setup](#first-time-server-setup-once)).
 
 ## Notes
 
