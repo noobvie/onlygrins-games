@@ -12,7 +12,7 @@ the repo onto the server yourself:
 
 ```bash
 # on the VPS, as the deploy user:
-git clone git@github.com:noobvie/onlygrins-games.git /home/arcade-games
+git clone https://github.com/noobvie/onlygrins-games.git /home/arcade-games
 bash /home/arcade-games/deploy/deploy-games.sh
 ```
 
@@ -77,7 +77,7 @@ path. New game, changed game, changed metadata: edit → push → deploy.
 | Manually upload one game without the pipeline | `bash tools/pack-game.sh <slug>` → in admin: Add game → HTML5 → upload `dist/<slug>.zip` |
 
 `deploy-games.sh` is configured by env vars (shown with defaults):
-`GAMES_REPO=git@github.com:noobvie/onlygrins-games.git`,
+`GAMES_REPO=https://github.com/noobvie/onlygrins-games.git`,
 `GAMES_SRC=/home/arcade-games`, `APP_DIR=/home/arcade`,
 `GAMES_BRANCH=master`, `WEB_USER=www-data`.
 

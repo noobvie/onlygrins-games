@@ -9,7 +9,7 @@
 # the app's `git reset --hard` vendor-overlay deploys.
 #
 # Usage (env overrides shown with defaults):
-#   GAMES_REPO=git@github.com:noobvie/onlygrins-games.git \
+#   GAMES_REPO=https://github.com/noobvie/onlygrins-games.git \
 #   GAMES_SRC=/home/arcade-games \
 #   APP_DIR=/home/arcade \
 #   bash deploy/deploy-games.sh                 # full deploy (live)
@@ -26,7 +26,7 @@
 #
 set -euo pipefail
 
-GAMES_REPO="${GAMES_REPO:-git@github.com:noobvie/onlygrins-games.git}"
+GAMES_REPO="${GAMES_REPO:-https://github.com/noobvie/onlygrins-games.git}"
 GAMES_SRC="${GAMES_SRC:-/home/arcade-games}"
 APP_DIR="${APP_DIR:-/home/arcade}"
 BRANCH="${GAMES_BRANCH:-master}"
