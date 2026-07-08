@@ -75,7 +75,7 @@ for dir in "$GAMES_SRC"/games/*/; do
 done
 
 # 4) upsert the catalog rows ------------------------------------------------
-log "Upserting catalog (php artisan games:sync)${STAGING:+ [staging: hidden]}"
+log "Upserting catalog (php artisan games:sync)${INACTIVE_FLAG:+ [staging: hidden]}"
 SYNC_OPTS=(--path="$GAMES_SRC/games")
 [ -n "$PRUNE_FLAG" ] && SYNC_OPTS+=("$PRUNE_FLAG")
 [ -n "$INACTIVE_FLAG" ] && SYNC_OPTS+=("$INACTIVE_FLAG")
@@ -110,4 +110,7 @@ if [ "$STAGING" = "1" ]; then
   echo "  When happy: set is_active:true (or just run the LIVE deploy without STAGING) to publish."
 fi
 
-log "Done${DRY_RUN:+ (dry-run)}${STAGING:+ (staging)}."
+DONE_SUFFIX=""
+[ "$DRY_RUN" = "1" ] && DONE_SUFFIX+=" (dry-run)"
+[ "$STAGING" = "1" ] && DONE_SUFFIX+=" (staging)"
+log "Done${DONE_SUFFIX}."
