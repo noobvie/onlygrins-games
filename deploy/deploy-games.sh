@@ -29,7 +29,7 @@ set -euo pipefail
 GAMES_REPO="${GAMES_REPO:-git@github.com:noobvie/onlygrins-games.git}"
 GAMES_SRC="${GAMES_SRC:-/home/arcade-games}"
 APP_DIR="${APP_DIR:-/home/arcade}"
-BRANCH="${GAMES_BRANCH:-main}"
+BRANCH="${GAMES_BRANCH:-master}"
 WEB_USER="${WEB_USER:-www-data}"
 HTML5_DIR="${HTML5_DIR:-$APP_DIR/storage/app/public/uploads/games/html5}"
 
