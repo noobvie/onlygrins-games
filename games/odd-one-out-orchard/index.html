@@ -38,21 +38,26 @@
   .top{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-weight:800;}
   .top .round{color:var(--blue);} .top .spacer{flex:1;}
   .top .score{color:var(--green);font-size:20px;}
-  .arena{background:#102a0b;border:2px solid var(--line);border-radius:16px;padding:16px;
-    text-align:center;margin-bottom:12px;}
-  .task{font-size:clamp(16px,3vw,21px);font-weight:800;color:var(--muted);margin-bottom:14px;}
-  .timerbar{height:10px;border-radius:6px;background:#0a1d07;overflow:hidden;margin-top:14px;}
-  .timerbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--orange),var(--bad));}
-  .answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:600px;margin:0 auto;}
-  .ans{cursor:pointer;border:none;font-family:inherit;font-weight:800;
-    padding:16px 8px;border-radius:16px;color:#0c2208;background:#e8f5d8;
-    box-shadow:0 5px 0 rgba(0,0,0,.35);}
-  .ans .big{display:block;font-size:44px;line-height:1.1;}
-  .ans .txt{display:block;font-size:20px;padding:8px 0;}
-  .ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
-  .ans.right{background:var(--green);} .ans.wrong{background:var(--bad);}
-  .ans:disabled{cursor:default;}
-  .toast{min-height:44px;text-align:center;font-weight:800;font-size:17px;margin-top:12px;}
+  .task{text-align:center;font-size:clamp(15px,2.8vw,20px);font-weight:800;color:var(--muted);margin:2px 0 8px;}
+  .task b{color:var(--orange);}
+
+  .cfield{position:relative;height:320px;border:2px solid var(--line);border-radius:16px;overflow:hidden;
+    touch-action:none;cursor:grab;
+    background:linear-gradient(180deg,#1a4212,#0c2208 88%),
+      repeating-linear-gradient(90deg,transparent 0 24.7%,rgba(0,0,0,.16) 24.7% 25%);}
+  .cfield:active{cursor:grabbing;}
+  .catchline{position:absolute;left:0;right:0;bottom:66px;height:0;border-top:2px dashed rgba(255,255,255,.18);}
+  .citem{position:absolute;top:0;left:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    width:22%;min-height:52px;border-radius:14px;background:#e8f5d8;color:#0c2208;font-weight:800;
+    box-shadow:0 4px 0 rgba(0,0,0,.3);will-change:transform;padding:6px 4px;}
+  .citem .big{font-size:38px;line-height:1;} .citem .txt{font-size:clamp(14px,2.6vw,18px);text-align:center;}
+  .citem.belong{background:#cfe8b8;} .citem.odd{background:#ffe3a8;}
+  .citem.caughtRight{background:var(--green);} .citem.caughtWrong{background:var(--bad);color:#fff;}
+  .citem.missOdd{outline:3px solid var(--green);outline-offset:2px;}
+  .cbasket{position:absolute;bottom:6px;left:0;font-size:52px;will-change:transform;pointer-events:none;
+    filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));transform:translateX(-50%);}
+  .hint{text-align:center;color:var(--muted);font-size:13px;font-weight:700;margin-top:8px;}
+  .toast{min-height:40px;text-align:center;font-weight:800;font-size:17px;margin-top:8px;}
   .toast.good{color:var(--green);} .toast.bad{color:var(--bad);}
   .shake{animation:shake .45s ease;}
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
@@ -78,29 +83,30 @@
     <!-- START -->
     <div id="start">
       <h1>🍎 Odd One Out Orchard</h1>
-      <p class="sub">Something strange is growing in Granny Smith's orchard! In every basket,
-        one thing simply does not belong — a shark among the pets, a donut among the socks.
-        Spot the impostor and boot it out before Granny notices!</p>
+      <p class="sub">Fruit is tumbling down in Granny Smith's orchard! In every drop, one thing simply
+        does not belong — a shark among the pets, a donut among the socks. <b>Slide your basket</b>
+        under the impostor and catch it — but don't grab the things that <i>do</i> belong!</p>
       <div class="grades">
         <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>easy to spot</small></button>
         <button class="gradeBtn g2" data-grade="1">Grade 3<small>think it through</small></button>
         <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>sneaky impostors</small></button>
       </div>
-      <p class="sub">12 baskets · fast spotting = bonus points</p>
+      <p class="sub">12 drops · grab it high &amp; early for a speed bonus</p>
     </div>
 
     <!-- GAME -->
     <div id="game" class="hidden">
       <div class="top">
-        <span class="round" id="roundLbl">Basket 1/12</span>
+        <span class="round" id="roundLbl">Drop 1/12</span>
         <span class="spacer"></span>
         <span class="score">⭐ <span id="scoreVal">0</span></span>
       </div>
-      <div class="arena">
-        <div class="task">🧺 Which one does <b>NOT</b> belong?</div>
-        <div class="answers" id="answers"></div>
-        <div class="timerbar"><i id="timerFill"></i></div>
+      <div class="task">🧺 Catch the one that does <b>NOT</b> belong!</div>
+      <div class="cfield" id="field">
+        <div class="catchline"></div>
+        <div class="cbasket" id="basket">🧺</div>
       </div>
+      <div class="hint">Drag the basket · ← → or A / D to move · Space or tap the basket to grab now</div>
       <div class="toast" id="toast"></div>
     </div>
 
@@ -157,26 +163,33 @@
     { band:2, items:[{t:'16'},{t:'25'},{t:'36'},{t:'42'}], odd:3, why:'42 is not a square number — 16=4², 25=5², 36=6².' }
   ];
 
-  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1).
+  // Grade bands — one game, difficulty picked inside (PLAN.md §5.1). fall = seconds
+  // the fruit takes to reach the catch line on drop 1; it speeds up each round.
   var GRADES = [
-    { id: 1, label: 'Grade 1–2', secs: 12, bands: [0] },
-    { id: 3, label: 'Grade 3',   secs: 12, bands: [0,1] },
-    { id: 4, label: 'Grade 4–5', secs: 10, bands: [1,2] }
+    { id: 1, label: 'Grade 1–2', fall: 6.5, bands: [0] },
+    { id: 3, label: 'Grade 3',   fall: 5.5, bands: [0,1] },
+    { id: 4, label: 'Grade 4–5', fall: 4.5, bands: [1,2] }
   ];
   var ROUNDS = 12;
+  var LANES = 4;
 
-  var CHEER = ['Impostor spotted! Out of the basket! 🧺', 'Granny Smith applauds! 👏',
+  var CHEER = ['Impostor caught! Out of the orchard! 🧺', 'Granny Smith applauds! 👏',
                'Nothing sneaks past you! 🕵️', 'The orchard is safe again! 🍎'];
   var OOPS  = ['That one DID belong! The impostor giggles. 😏', 'Granny Smith raises an eyebrow. 🤨',
-               'The real impostor is doing a tiny victory dance. 💃', 'Oops — wrong suspect!'];
+               'Wrong fruit in the basket!', 'Oops — that one belonged!'];
+  var MISS  = ['The impostor slipped past your basket! 😮', 'Too slow — it rolled away! 🍎💨'];
 
   var grade = GRADES[0];
-  var q = 0, score = 0, streak = 0, nCorrect = 0, answered = false;
-  var current = null, timer = null, tLeft = 0, deck = [];
+  var q = 0, score = 0, streak = 0, nCorrect = 0;
+  var current = null, deck = [];
+  var items = [], oddLane = 0, basketX = 0, judged = false;
+  var rafId = null, startT = 0, dur = 0, dragging = false;
+  var fieldW = 0, fieldH = 0, laneW = 0, landY = 0;
 
   var $ = function (id) { return document.getElementById(id); };
-  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
   function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
 
   var AC = window.AudioContext || window.webkitAudioContext, actx = null;
   function tone(f, d, t, slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),g=actx.createGain();
@@ -188,91 +201,133 @@
 
   function poolFor(g) { return BASKETS.filter(function (b) { return g.bands.indexOf(b.band) !== -1; }); }
 
-  function makeQuestion() {
+  function measure() {
+    var f = $('field');
+    fieldW = f.clientWidth; fieldH = f.clientHeight;
+    laneW = fieldW / LANES;
+    landY = fieldH - 66 - 52; // catch line (bottom:66) minus item height
+  }
+
+  function laneCenter(i){ return (i + 0.5) * laneW; }
+  function basketLane(){ return clamp(Math.floor(basketX / laneW), 0, LANES - 1); }
+
+  function placeBasket(){ $('basket').style.transform = 'translateX(' + basketX + 'px)'; }
+
+  function makeDrop() {
     if (!deck.length) deck = shuffle(poolFor(grade));
     current = deck.pop();
-    // shuffle item order, track where the odd one lands
-    var order = shuffle(current.items.map(function (_, idx) { return idx; }));
-    var box = $('answers');
-    box.innerHTML = '';
-    order.forEach(function (origIdx) {
-      var it = current.items[origIdx];
-      var b = document.createElement('button');
-      b.className = 'ans';
-      b.innerHTML = it.e ? '<span class="big">' + it.e + '</span>' : '<span class="txt">' + it.t + '</span>';
-      b.dataset.odd = (origIdx === current.odd) ? '1' : '0';
-      b.addEventListener('click', function(){ choose(b); });
-      box.appendChild(b);
+    var f = $('field');
+    // clear previous fruit
+    items.forEach(function (it){ if (it.el.parentNode) it.el.parentNode.removeChild(it.el); });
+    items = [];
+    measure();
+    var order = shuffle([0,1,2,3]);           // which content sits in which lane
+    order.forEach(function (contentIdx, lane) {
+      var c = current.items[contentIdx];
+      var el = document.createElement('div');
+      var isOdd = (contentIdx === current.odd);
+      el.className = 'citem ' + (isOdd ? 'odd' : 'belong');
+      el.innerHTML = c.e ? '<span class="big">' + c.e + '</span>' : '<span class="txt">' + c.t + '</span>';
+      el.style.width = (laneW - 14) + 'px';
+      el.style.left = (laneCenter(lane) - (laneW - 14) / 2) + 'px';
+      el.style.transform = 'translateY(-64px)';
+      f.appendChild(el);
+      items.push({ el: el, lane: lane, odd: isOdd });
+      if (isOdd) oddLane = lane;
     });
   }
 
-  function newQuestion() {
-    answered = false;
-    $('roundLbl').textContent = 'Basket ' + (q + 1) + '/' + ROUNDS;
+  function newDrop() {
+    judged = false;
+    $('roundLbl').textContent = 'Drop ' + (q + 1) + '/' + ROUNDS;
     $('toast').textContent = ''; $('toast').className = 'toast';
-    makeQuestion();
-    tLeft = grade.secs;
-    clearInterval(timer);
-    timer = setInterval(function () {
-      tLeft -= 0.1;
-      $('timerFill').style.width = Math.max(0, tLeft / grade.secs * 100) + '%';
-      if (tLeft <= 0) timeUp();
-    }, 100);
+    makeDrop();
+    basketX = laneCenter(basketLane()); placeBasket();
+    dur = Math.max(2.6, grade.fall - q * 0.28);
+    startT = performance.now();
+    rafId = requestAnimationFrame(loop);
     EduSDK.startLesson(q + 1, {});
   }
 
-  function settle(correct, btn) {
-    clearInterval(timer);
-    Array.prototype.forEach.call(document.querySelectorAll('.ans'), function(b){
-      b.disabled = true;
-      if (b.dataset.odd === '1') b.classList.add('right');
-    });
+  function loop(now) {
+    var p = clamp((now - startT) / (dur * 1000), 0, 1);
+    var y = -64 + (landY + 64) * p;
+    for (var i = 0; i < items.length; i++) items[i].el.style.transform = 'translateY(' + y + 'px)';
+    if (p >= 1) return judge(false);         // landed on its own → judge basket's lane
+    rafId = requestAnimationFrame(loop);
+  }
+
+  // snatched=true when the player grabbed early (Space / tap basket); gives a speed bonus.
+  function judge(snatched) {
+    if (judged) return;
+    judged = true;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    var lane = basketLane();
+    var caught = null;
+    for (var i = 0; i < items.length; i++) if (items[i].lane === lane) caught = items[i];
+    var p = clamp((performance.now() - startT) / (dur * 1000), 0, 1);
+    var correct = !!(caught && caught.odd);
+
     if (correct) {
       streak++; nCorrect++;
-      var pts = 100 + Math.round(tLeft / grade.secs * 40) + streak * 10;
-      score += pts;
-      $('scoreVal').textContent = score;
+      caught.el.classList.remove('odd'); caught.el.classList.add('caughtRight');
+      var speed = snatched ? Math.round((1 - p) * 50) : 0;
+      var pts = 100 + speed + streak * 10;
+      score += pts; $('scoreVal').textContent = score;
       cheer();
-      $('toast').textContent = pick(CHEER) + ' ' + current.why + '  +' + pts;
+      $('toast').textContent = pick(CHEER) + ' ' + current.why + '  +' + pts + (speed >= 20 ? ' ⚡' : '');
       $('toast').className = 'toast good';
     } else {
       streak = 0;
+      // Highlight where the impostor actually was.
+      for (var j = 0; j < items.length; j++) if (items[j].odd) items[j].el.classList.add('missOdd');
+      var wrongBasket = caught && !caught.odd;
+      if (wrongBasket) caught.el.classList.add('caughtWrong');
       var _pen = EduSDK.applyPenalty(score, parseInt(grade.id, 10)); // wrong → −20 (Grade 3+), floored at 0
       score = _pen.score; $('scoreVal').textContent = score;
-      if (btn) btn.classList.add('wrong');
       womp();
-      $('card').classList.add('shake');
-      setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
-      $('toast').textContent = pick(OOPS) + ' ' + current.why;
+      $('card').classList.add('shake'); setTimeout(function(){ $('card').classList.remove('shake'); }, 500);
+      $('toast').textContent = pick(wrongBasket ? OOPS : MISS) + ' ' + current.why;
       $('toast').className = 'toast bad';
       if (_pen && _pen.delta) $('toast').textContent += '  ' + _pen.delta; // show the −20
     }
     EduSDK.finishLesson(q + 1, { correct: correct });
     q++;
     if (q >= ROUNDS) return setTimeout(finish, 2000);
-    if (q === Math.floor(ROUNDS / 2)) {
-      setTimeout(function(){ EduSDK.adBreak('interlevel').then(newQuestion); }, 2000);
-    } else setTimeout(newQuestion, 2000);
+    if (q === Math.floor(ROUNDS / 2)) setTimeout(function(){ EduSDK.adBreak('interlevel').then(newDrop); }, 2000);
+    else setTimeout(newDrop, 2000);
   }
 
-  function choose(btn) {
-    if (answered) return;
-    answered = true;
-    settle(btn.dataset.odd === '1', btn);
+  // ---- controls ----
+  function moveToClientX(clientX) {
+    var r = $('field').getBoundingClientRect();
+    basketX = clamp(clientX - r.left, laneW * 0.5, fieldW - laneW * 0.5);
+    placeBasket();
   }
-
-  function timeUp() {
-    if (answered) return;
-    answered = true;
-    settle(false, null);
-  }
+  var field = $('field'), basket = $('basket');
+  field.addEventListener('pointerdown', function (e) {
+    if (judged) return;
+    dragging = true; try { field.setPointerCapture(e.pointerId); } catch (x) {}
+    moveToClientX(e.clientX);
+  });
+  field.addEventListener('pointermove', function (e) { if (dragging && !judged) moveToClientX(e.clientX); });
+  field.addEventListener('pointerup', function () { dragging = false; });
+  field.addEventListener('pointercancel', function () { dragging = false; });
+  basket.addEventListener('pointerdown', function (e) { e.stopPropagation(); if (!judged) judge(true); });
+  document.addEventListener('keydown', function (e) {
+    if ($('game').classList.contains('hidden') || judged) return;
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') { basketX = clamp(laneCenter(basketLane() - 1), laneW*0.5, fieldW-laneW*0.5); placeBasket(); e.preventDefault(); }
+    else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') { basketX = clamp(laneCenter(basketLane() + 1), laneW*0.5, fieldW-laneW*0.5); placeBasket(); e.preventDefault(); }
+    else if (e.key === ' ' || e.key === 'Enter') { judge(true); e.preventDefault(); }
+  });
 
   function finish() {
+    items.forEach(function (it){ if (it.el.parentNode) it.el.parentNode.removeChild(it.el); });
     $('game').classList.add('hidden');
     $('final').classList.remove('hidden');
     $('finalScore').textContent = score;
     $('finalEmoji').textContent = nCorrect >= 10 ? '👵🏆' : nCorrect >= 6 ? '👵🍎' : '👵🤨';
-    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' impostors spotted. ' +
+    $('finalLine').textContent = grade.label + ' — ' + nCorrect + '/' + ROUNDS + ' impostors caught. ' +
       (nCorrect >= 10 ? 'Granny Smith bakes you a victory pie!' :
        nCorrect >= 6 ? 'The orchard is mostly impostor-free.' :
        'The impostors have started a book club in basket four.');
@@ -298,7 +353,8 @@
     $('scoreVal').textContent = '0';
     $('start').classList.add('hidden'); $('final').classList.add('hidden');
     $('game').classList.remove('hidden');
-    newQuestion();
+    measure(); basketX = laneCenter(1);
+    newDrop();
   }
 
   Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
@@ -308,6 +364,7 @@
   $('changeBtn').addEventListener('click', function () {
     $('final').classList.add('hidden'); $('start').classList.remove('hidden');
   });
+  window.addEventListener('resize', function () { if (!$('game').classList.contains('hidden')) { measure(); placeBasket(); } });
 
   $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
   EduSDK.begin({ game: 'odd-one-out-orchard' });

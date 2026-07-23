@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="robots" content="noindex" />
+<title>Number Muncher — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="math" data-seed="number-muncher"></script>
+
+<style>
+  :root{ --ink:#eafff2; --muted:#9fe6c0; --good:#5be08a; --bad:#ff6b81; --gold:#ffd15a; --enemy:#ff5b6e; }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;overflow:hidden;background:#04140c;
+    font-family:"Baloo 2",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);user-select:none;}
+  #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+  #stage{position:relative;width:100%;max-width:177.78vh;max-height:100vh;aspect-ratio:16/9;}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block;border-radius:14px;touch-action:none;
+    box-shadow:0 0 0 2px rgba(255,255,255,.06),0 30px 80px rgba(0,0,0,.6);}
+
+  .hud{position:absolute;inset:0;pointer-events:none;font-weight:800;}
+  .hud .row{position:absolute;left:0;right:0;top:0;display:flex;align-items:flex-start;
+    justify-content:space-between;padding:14px 18px;gap:12px;}
+  .pill{background:rgba(6,26,16,.6);backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,.16);
+    border-radius:999px;padding:7px 15px;font-size:clamp(13px,2.2vh,20px);display:flex;align-items:center;gap:8px;
+    text-shadow:0 2px 8px rgba(0,0,0,.5);white-space:nowrap;}
+  .pill .lbl{color:var(--muted);font-weight:600;font-size:.8em;}
+  #hearts{letter-spacing:2px;font-size:clamp(15px,2.6vh,24px);}
+  #ruleWrap{position:absolute;top:8%;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;}
+  #ruleWrap .cap{font-size:clamp(11px,1.9vh,16px);color:var(--muted);letter-spacing:3px;font-weight:700;}
+  #rule{font-size:clamp(26px,7vh,64px);line-height:1.05;font-weight:800;
+    background:linear-gradient(180deg,#fff,#7bf0ac);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 16px rgba(90,224,138,.5));}
+  #rule.pop{animation:pop .4s ease;}
+  @keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.22)}100%{transform:scale(1)}}
+  #combo{position:absolute;top:20%;left:50%;transform:translateX(-50%);font-size:clamp(14px,2.6vh,22px);
+    color:var(--gold);font-weight:800;opacity:0;transition:opacity .2s;text-shadow:0 2px 10px rgba(0,0,0,.6);}
+  #timerBar{position:absolute;left:0;bottom:0;height:7px;width:100%;transform-origin:left;border-radius:0 0 14px 14px;
+    background:linear-gradient(90deg,var(--good),var(--gold));box-shadow:0 0 16px rgba(91,224,138,.7);transition:transform .1s linear;}
+
+  .screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;
+    background:radial-gradient(120% 120% at 50% 0%,rgba(10,40,24,.86),rgba(4,20,12,.96));}
+  .panel{width:min(680px,100%);text-align:center;background:rgba(9,32,20,.82);border:2px solid #2f7a4c;
+    border-radius:22px;padding:26px 28px;box-shadow:0 20px 60px rgba(0,0,0,.55);}
+  h1{margin:0 0 6px;font-size:clamp(28px,6vh,52px);font-weight:800;
+    background:linear-gradient(90deg,var(--gold),var(--good),#5ad8ff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);margin:0 0 18px;font-size:clamp(14px,2.3vh,18px);line-height:1.5;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;pointer-events:auto;
+    padding:14px 20px;border-radius:16px;color:#06210f;box-shadow:0 6px 0 rgba(0,0,0,.4);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.4);}
+  .g1{background:var(--good);} .g2{background:#5ad8ff;} .g3{background:var(--gold);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+  .big{font-size:clamp(46px,12vh,84px);font-weight:800;color:var(--good);margin:6px 0;}
+  .actions{display:flex;gap:12px;justify-content:center;margin-top:14px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;pointer-events:auto;
+    padding:13px 28px;border-radius:14px;color:#06210f;background:var(--good);box-shadow:0 5px 0 rgba(0,0,0,.4);}
+  .btn.ghost{background:#2b5c3c;color:var(--ink);} .btn:active{transform:translateY(3px);}
+  #saveMsg{color:var(--muted);margin:10px 0 0;min-height:22px;} .pb{color:var(--good);font-weight:800;}
+  .hidden{display:none!important;}
+  .sdknote{position:absolute;left:0;right:0;bottom:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#4f9c6e;pointer-events:none;}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <canvas id="cv"></canvas>
+
+    <div class="hud" id="hud">
+      <div class="row">
+        <span class="pill"><span class="lbl">SCORE</span><span id="score">0</span></span>
+        <span class="pill" id="hearts">❤️❤️❤️</span>
+      </div>
+      <div id="ruleWrap"><div class="cap">MUNCH ONLY</div><div id="rule">even</div></div>
+      <div id="combo"></div>
+      <div id="timerBar"></div>
+    </div>
+
+    <!-- START -->
+    <div class="screen" id="start">
+      <div class="panel">
+        <h1>🟢 Number Muncher</h1>
+        <p class="sub">Steer Munch around the number garden and <b>gobble only the numbers that fit the rule</b> —
+          multiples, factors, primes. Eat a wrong one and you spit it out (and lose points). And watch out — the
+          <b style="color:var(--enemy)">Gremlin</b> is hunting you. Get chomped and you lose a heart!<br>
+          <span style="color:var(--muted)">Drag / move the mouse, or use WASD / arrow keys.</span></p>
+        <div class="grades">
+          <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>even &amp; odd</small></button>
+          <button class="gradeBtn g2" data-grade="1">Grade 3<small>multiples</small></button>
+          <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>factors &amp; primes</small></button>
+        </div>
+        <p class="sub" style="margin:6px 0 0">Survive the timer · build a munch-streak for combo points</p>
+      </div>
+    </div>
+
+    <!-- FINAL -->
+    <div class="screen hidden" id="final">
+      <div class="panel">
+        <div style="font-size:64px" id="finalEmoji">🟢</div>
+        <p class="sub" id="finalLine" style="margin:4px 0"></p>
+        <div class="big" id="finalScore">0</div>
+        <p class="sub" id="finalStats" style="margin:0"></p>
+        <p id="saveMsg">Saving your score…</p>
+        <div class="actions">
+          <button class="btn" id="againBtn">Play again ▸</button>
+          <button class="btn ghost" id="changeBtn">Change grade</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var W = 960, H = 540;                 // logical play field
+  var ROUNDS_TIME = 80;                 // seconds per run
+  var RULE_EATS = 5;                    // correct munches before the rule changes
+  var N_TOKENS = 9;
+
+  // ---- difficulty bands: one game, grade chosen inside (PLAN.md §5.1) ----
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', enemy: 0.50, rules: ['even', 'odd'] },
+    { id: 3, label: 'Grade 3',   enemy: 0.62, rules: ['even', 'odd', 'mult'] },
+    { id: 4, label: 'Grade 4–5', enemy: 0.74, rules: ['mult', 'factor', 'prime'] }
+  ];
+
+  function isPrime(n){ if(n<2)return false; for(var i=2;i*i<=n;i++) if(n%i===0)return false; return true; }
+  function rint(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+
+  // Build a fresh rule for the current grade. Returns {label, test, lo, hi}.
+  function makeRule(g) {
+    var kind = pick(g.rules);
+    if (kind === 'even')  return { label: 'even numbers',   test: function(n){return n%2===0;}, lo: 1, hi: 20 };
+    if (kind === 'odd')   return { label: 'odd numbers',    test: function(n){return n%2===1;}, lo: 1, hi: 20 };
+    if (kind === 'prime') return { label: 'prime numbers',  test: isPrime,                     lo: 2, hi: 50 };
+    if (kind === 'factor'){ var m = pick([12,16,18,24,36]);
+      return { label: 'factors of ' + m, test: function(n){return m%n===0;}, lo: 1, hi: m }; }
+    var k = pick(g.id >= 4 ? [3,4,6,7,8,9] : [2,3,4,5,10]);
+    return { label: 'multiples of ' + k, test: function(n){return n%k===0;}, lo: k, hi: Math.min(60, k*9) };
+  }
+
+  // ---- audio (tiny bleeps, same pattern as the other games) ----
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f,d,t,slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),gg=actx.createGain();
+    o.type=t||'sine'; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    gg.gain.setValueAtTime(.08,actx.currentTime); gg.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(gg); gg.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function sfxEat(){ tone(520,.09,'sine',880); }
+  function sfxBad(){ tone(180,.22,'sawtooth',90); }
+  function sfxHit(){ tone(120,.4,'square',60); }
+
+  // ---- canvas ----
+  var cv = document.getElementById('cv'), ctx = cv.getContext('2d'), scaleX = 1, scaleY = 1;
+  function fit() {
+    var r = cv.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.max(2, Math.round(r.width * dpr));
+    cv.height = Math.max(2, Math.round(r.height * dpr));
+    scaleX = cv.width / W; scaleY = cv.height / H;
+  }
+  window.addEventListener('resize', fit);
+
+  // ---- state ----
+  var $ = function (id){ return document.getElementById(id); };
+  var grade = GRADES[0], rule = null;
+  var player, enemy, tokens, particles, pops;
+  var score = 0, hearts = 3, combo = 0, nRight = 0, nWrong = 0;
+  var timeLeft = 0, ruleEats = 0, roundNo = 0, invuln = 0;
+  var running = false, lastT = 0, target = null, keys = {};
+
+  function spawnToken() {
+    // keep at least 3 edible numbers on the field so the rule is always satisfiable
+    var goods = tokens.filter(function(t){ return t.good; }).length;
+    var wantGood = goods < 3 ? true : (tokens.length - goods < 2 ? false : Math.random() < 0.5);
+    var n, tries = 0;
+    do { n = rint(rule.lo, rule.hi); tries++; } while (tries < 40 && rule.test(n) !== wantGood);
+    return {
+      n: n, good: rule.test(n), r: 25,
+      x: rint(70, W - 70), y: rint(120, H - 60),
+      vx: (Math.random() * 2 - 1) * 55, vy: (Math.random() * 2 - 1) * 55,
+      born: 0
+    };
+  }
+
+  function newRule(first) {
+    rule = makeRule(grade);
+    ruleEats = 0; roundNo++;
+    $('rule').textContent = rule.label;
+    $('rule').classList.remove('pop'); void $('rule').offsetWidth; $('rule').classList.add('pop');
+    if (!first) EduSDK.finishLesson(roundNo - 1, {});
+    EduSDK.startLesson(roundNo, { rule: rule.label });
+    // reclassify existing tokens under the new rule, replace a few
+    tokens.forEach(function(t){ t.good = rule.test(t.n); });
+    for (var i = 0; i < 3 && tokens.length; i++) tokens[rint(0, tokens.length - 1)] = spawnToken();
+    while (tokens.length < N_TOKENS) tokens.push(spawnToken());
+  }
+
+  function startGame(idx) {
+    grade = GRADES[idx];
+    score = 0; hearts = 3; combo = 0; nRight = 0; nWrong = 0; timeLeft = ROUNDS_TIME;
+    ruleEats = 0; roundNo = 0; invuln = 0;
+    player = { x: W/2, y: H/2, r: 22, vx: 0, vy: 0, speed: 330 };
+    enemy = { x: 80, y: 80, r: 22 };
+    tokens = []; particles = []; pops = []; target = { x: W/2, y: H/2 };
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('score').textContent = '0'; drawHearts();
+    fit(); newRule(true);
+    running = true; lastT = performance.now();
+    requestAnimationFrame(loop);
+  }
+
+  function drawHearts(){ $('hearts').textContent = hearts > 0 ? '❤️'.repeat(hearts) : '💀'; }
+
+  function popText(x, y, txt, color){ pops.push({ x:x, y:y, txt:txt, color:color, age:0 }); }
+  function burst(x, y, color){ for (var i=0;i<10;i++){ var a=Math.random()*6.28,s=60+Math.random()*140;
+    particles.push({ x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,age:0,life:.5,color:color }); } }
+
+  // ---- input ----
+  function toLogic(e){ var r=cv.getBoundingClientRect(); return { x:(e.clientX-r.left)/r.width*W, y:(e.clientY-r.top)/r.height*H }; }
+  cv.addEventListener('pointerdown', function(e){ if(running){ target = toLogic(e); try{cv.setPointerCapture(e.pointerId);}catch(x){} } });
+  cv.addEventListener('pointermove', function(e){ if(running && (e.buttons || e.pointerType==='mouse')) target = toLogic(e); });
+  document.addEventListener('keydown', function(e){ keys[e.key.toLowerCase()] = true;
+    if(['arrowup','arrowdown','arrowleft','arrowright'].indexOf(e.key.toLowerCase())>=0) e.preventDefault(); });
+  document.addEventListener('keyup', function(e){ keys[e.key.toLowerCase()] = false; });
+
+  // ---- main loop ----
+  function loop(now) {
+    if (!running) return;
+    var dt = Math.min(0.033, (now - lastT) / 1000); lastT = now;
+    update(dt); render();
+    requestAnimationFrame(loop);
+  }
+
+  function update(dt) {
+    timeLeft -= dt;
+    $('timerBar').style.transform = 'scaleX(' + Math.max(0, timeLeft / ROUNDS_TIME) + ')';
+    if (timeLeft <= 0) return gameOver('time');
+
+    // player movement: keyboard overrides pointer-follow
+    var kx = (keys['arrowright']||keys['d']?1:0) - (keys['arrowleft']||keys['a']?1:0);
+    var ky = (keys['arrowdown']||keys['s']?1:0) - (keys['arrowup']||keys['w']?1:0);
+    if (kx || ky) { var l = Math.hypot(kx,ky)||1; player.vx = kx/l*player.speed; player.vy = ky/l*player.speed; }
+    else if (target) {
+      var dx = target.x-player.x, dy = target.y-player.y, d = Math.hypot(dx,dy);
+      if (d > 4) { var sp = Math.min(player.speed, d*6); player.vx = dx/d*sp; player.vy = dy/d*sp; }
+      else { player.vx = 0; player.vy = 0; }
+    }
+    player.x = Math.max(player.r, Math.min(W-player.r, player.x + player.vx*dt));
+    player.y = Math.max(player.r+30, Math.min(H-player.r, player.y + player.vy*dt));
+
+    // enemy chases; speed scales with grade + round, ramps a touch as time runs out
+    var espeed = player.speed * (grade.enemy + roundNo*0.015 + (1-timeLeft/ROUNDS_TIME)*0.12);
+    var ex = player.x-enemy.x, ey = player.y-enemy.y, ed = Math.hypot(ex,ey)||1;
+    enemy.x += ex/ed*espeed*dt; enemy.y += ey/ed*espeed*dt;
+
+    if (invuln > 0) invuln -= dt;
+    if (ed < player.r + enemy.r - 6 && invuln <= 0) {
+      hearts--; combo = 0; invuln = 1.4; sfxHit(); drawHearts();
+      burst(player.x, player.y, '#ff5b6e'); shake();
+      // knock the gremlin away so you get a breath
+      enemy.x -= ex/ed*140; enemy.y -= ey/ed*140;
+      if (hearts <= 0) return gameOver('chomped');
+    }
+
+    // tokens drift + bounce; check munches
+    for (var i = tokens.length-1; i >= 0; i--) {
+      var t = tokens[i]; t.born += dt;
+      t.x += t.vx*dt; t.y += t.vy*dt;
+      if (t.x < t.r || t.x > W-t.r) { t.vx *= -1; t.x = Math.max(t.r, Math.min(W-t.r, t.x)); }
+      if (t.y < t.r+30 || t.y > H-t.r) { t.vy *= -1; t.y = Math.max(t.r+30, Math.min(H-t.r, t.y)); }
+      if (Math.hypot(t.x-player.x, t.y-player.y) < player.r + t.r - 8) munch(t, i);
+    }
+
+    for (var p = particles.length-1; p >= 0; p--) { var q = particles[p]; q.age += dt;
+      q.x += q.vx*dt; q.y += q.vy*dt; q.vy += 240*dt; if (q.age > q.life) particles.splice(p,1); }
+    for (var k = pops.length-1; k >= 0; k--) { pops[k].age += dt; pops[k].y -= 34*dt; if (pops[k].age > 1) pops.splice(k,1); }
+  }
+
+  function munch(t, i) {
+    if (t.good) {
+      combo++; nRight++; ruleEats++;
+      var mult = Math.min(2.5, 1 + combo*0.1);
+      var pts = Math.round(100 * mult);
+      score += pts; $('score').textContent = score;
+      sfxEat(); burst(t.x, t.y, '#5be08a'); popText(t.x, t.y, '+'+pts, '#7bf0ac');
+      if (combo >= 3) { var c = $('combo'); c.textContent = '🔥 ' + combo + '× combo!'; c.style.opacity = 1;
+        clearTimeout(c._t); c._t = setTimeout(function(){ c.style.opacity = 0; }, 900); }
+      tokens[i] = spawnToken();
+      if (ruleEats >= RULE_EATS) { if (roundNo % 3 === 0) EduSDK.adBreak('interlevel'); newRule(false); }
+    } else {
+      combo = 0; nWrong++;
+      var pen = EduSDK.applyPenalty(score, grade.id);   // wrong munch → −20 (Grade 3+), floored at 0
+      score = pen.score; $('score').textContent = score;
+      sfxBad(); burst(t.x, t.y, '#ff6b81'); popText(t.x, t.y, pen.delta ? pen.delta+'' : 'nope!', '#ff6b81'); shake();
+      tokens[i] = spawnToken();
+    }
+  }
+
+  var shakeAmt = 0;
+  function shake(){ shakeAmt = 8; }
+
+  // ---- render ----
+  function render() {
+    ctx.setTransform(scaleX,0,0,scaleY,0,0);
+    var sx = (Math.random()*2-1)*shakeAmt, sy = (Math.random()*2-1)*shakeAmt;
+    if (shakeAmt > 0) shakeAmt = Math.max(0, shakeAmt-0.6);
+    ctx.save(); ctx.translate(sx, sy);
+
+    // background
+    ctx.fillStyle = '#082817'; ctx.fillRect(-10,-10,W+20,H+20);
+    ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = 1;
+    for (var gx=0; gx<=W; gx+=48){ ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+    for (var gy=0; gy<=H; gy+=48){ ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+
+    // tokens (all look the same — you must KNOW which fit the rule)
+    tokens.forEach(function(t){
+      var pp = Math.min(1, t.born*4);
+      ctx.save(); ctx.translate(t.x, t.y); ctx.scale(pp, pp);
+      var g = ctx.createRadialGradient(0,-6,4,0,0,t.r);
+      g.addColorStop(0,'#fff'); g.addColorStop(1,'#cdeede');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0,0,t.r,0,6.2832); ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,.18)'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = '#0c3a20'; ctx.font = '800 ' + (t.n>9?24:28) + 'px "Baloo 2",sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(t.n, 0, 2);
+      ctx.restore();
+    });
+
+    // particles
+    particles.forEach(function(q){ ctx.globalAlpha = Math.max(0,1-q.age/q.life);
+      ctx.fillStyle = q.color; ctx.beginPath(); ctx.arc(q.x,q.y,4,0,6.2832); ctx.fill(); });
+    ctx.globalAlpha = 1;
+
+    drawEnemy(enemy.x, enemy.y, enemy.r);
+    drawPlayer();
+
+    // floating score pops
+    pops.forEach(function(pp){ ctx.globalAlpha = Math.max(0,1-pp.age);
+      ctx.fillStyle = pp.color; ctx.font = '800 22px "Baloo 2",sans-serif'; ctx.textAlign='center';
+      ctx.fillText(pp.txt, pp.x, pp.y); });
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  function drawPlayer() {
+    if (invuln > 0 && Math.floor(invuln*12) % 2 === 0) return; // blink while invulnerable
+    var a = Math.atan2(player.vy, player.vx), mouth = 0.35 + 0.15*Math.sin(performance.now()/90);
+    ctx.save(); ctx.translate(player.x, player.y); ctx.rotate(a);
+    ctx.fillStyle = '#5be08a';
+    ctx.beginPath(); ctx.arc(0,0,player.r, mouth, 6.2832-mouth); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#0c3a20'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.rotate(-a); // eye upright
+    ctx.fillStyle = '#0c3a20'; ctx.beginPath(); ctx.arc(4,-9,4,0,6.2832); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(5,-10,1.6,0,6.2832); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawEnemy(x, y, r) {
+    var t = performance.now()/140;
+    ctx.save(); ctx.translate(x, y);
+    ctx.fillStyle = '#ff5b6e';
+    ctx.beginPath();
+    for (var i=0;i<10;i++){ var ang=i/10*6.2832, rad = r*(i%2?0.78:1.05);
+      ctx[i?'lineTo':'moveTo'](Math.cos(ang+t*0.3)*rad, Math.sin(ang+t*0.3)*rad); }
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#7a1420'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(-6,-3,5,0,6.2832); ctx.fill();
+    ctx.beginPath(); ctx.arc(7,-3,5,0,6.2832); ctx.fill();
+    ctx.fillStyle = '#2a0008';
+    ctx.beginPath(); ctx.arc(-5,-2,2.4,0,6.2832); ctx.fill();
+    ctx.beginPath(); ctx.arc(8,-2,2.4,0,6.2832); ctx.fill();
+    ctx.restore();
+  }
+
+  function gameOver(reason) {
+    if (!running) return;
+    running = false;
+    var acc = nRight + nWrong ? Math.round(nRight/(nRight+nWrong)*100) : 100;
+    EduSDK.finishLesson(roundNo, {});
+    $('final').classList.remove('hidden');
+    $('finalEmoji').textContent = score >= 1500 ? '🏆' : reason === 'chomped' ? '👾' : '🟢';
+    $('finalLine').textContent = reason === 'chomped'
+      ? 'The Gremlin got you! Final munch tally —'
+      : 'Time! You survived the number garden —';
+    $('finalScore').textContent = score;
+    $('finalStats').textContent = nRight + ' correct munches · ' + acc + '% accuracy';
+    EduSDK.submitScore(score, { grade: grade.id, right: nRight, accuracy: acc })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) el.innerHTML = res.isPersonalBest
+          ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>' : 'Score saved to the leaderboard.';
+        else if (res && res.offline) el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        else el.textContent = (res && res.error === 'not_authenticated') ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(Number(b.dataset.grade)); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(GRADES.indexOf(grade)); });
+  $('changeBtn').addEventListener('click', function () { $('final').classList.add('hidden'); $('start').classList.remove('hidden'); });
+
+  fit();
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'number-muncher' });
+})();
+</script>
+</body>
+</html>

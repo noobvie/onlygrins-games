@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="robots" content="noindex" />
+<title>Spell Flyer — OnlyGrins</title>
+
+<script src="/sdk/arcade-sdk.js"></script>
+<script src="edu-sdk.js"></script>
+<script src="bgm.js" data-cat="language" data-seed="spell-flyer"></script>
+
+<style>
+  :root{ --ink:#eef7ff; --muted:#a9d3ff; --good:#7be08a; --bad:#ff6b81; --gold:#ffd15a; --sky:#8fd4ff; }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;overflow:hidden;background:#071427;
+    font-family:"Baloo 2",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);user-select:none;}
+  #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+  #stage{position:relative;width:100%;max-width:177.78vh;max-height:100vh;aspect-ratio:16/9;}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block;border-radius:14px;touch-action:none;
+    box-shadow:0 0 0 2px rgba(255,255,255,.06),0 30px 80px rgba(0,0,0,.6);}
+
+  .hud{position:absolute;inset:0;pointer-events:none;font-weight:800;}
+  .hud .row{position:absolute;left:0;right:0;top:0;display:flex;align-items:flex-start;
+    justify-content:space-between;padding:14px 18px;gap:12px;}
+  .pill{background:rgba(9,22,44,.6);backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,.16);
+    border-radius:999px;padding:7px 15px;font-size:clamp(13px,2.2vh,20px);display:flex;align-items:center;gap:8px;
+    text-shadow:0 2px 8px rgba(0,0,0,.5);white-space:nowrap;}
+  .pill .lbl{color:var(--muted);font-weight:600;font-size:.8em;}
+  #hearts{letter-spacing:2px;font-size:clamp(15px,2.6vh,24px);}
+  #promptWrap{position:absolute;top:7%;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;}
+  #promptWrap .cap{font-size:clamp(11px,1.9vh,16px);color:var(--muted);letter-spacing:3px;font-weight:700;}
+  #prompt{font-size:clamp(20px,4.4vh,38px);line-height:1.05;font-weight:800;
+    background:linear-gradient(180deg,#fff,#9fe0ff);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 16px rgba(143,212,255,.5));}
+  #combo{position:absolute;top:19%;left:50%;transform:translateX(-50%);font-size:clamp(14px,2.6vh,22px);
+    color:var(--gold);font-weight:800;opacity:0;transition:opacity .2s;text-shadow:0 2px 10px rgba(0,0,0,.6);}
+
+  .screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;
+    background:radial-gradient(120% 120% at 50% 0%,rgba(14,40,74,.86),rgba(6,18,38,.96));}
+  .panel{width:min(680px,100%);text-align:center;background:rgba(11,28,54,.84);border:2px solid #2f5f9a;
+    border-radius:22px;padding:26px 28px;box-shadow:0 20px 60px rgba(0,0,0,.55);}
+  h1{margin:0 0 6px;font-size:clamp(28px,6vh,52px);font-weight:800;
+    background:linear-gradient(90deg,var(--gold),var(--good),var(--sky));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{color:var(--muted);margin:0 0 18px;font-size:clamp(14px,2.3vh,18px);line-height:1.5;}
+  .grades{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
+  .gradeBtn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:17px;pointer-events:auto;
+    padding:14px 20px;border-radius:16px;color:#06210f;box-shadow:0 6px 0 rgba(0,0,0,.4);}
+  .gradeBtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.4);}
+  .g1{background:var(--good);} .g2{background:var(--sky);} .g3{background:var(--gold);}
+  .gradeBtn small{display:block;font-weight:700;font-size:12px;opacity:.75;}
+  .big{font-size:clamp(46px,12vh,84px);font-weight:800;color:var(--sky);margin:6px 0;}
+  .actions{display:flex;gap:12px;justify-content:center;margin-top:14px;}
+  .btn{cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;pointer-events:auto;
+    padding:13px 28px;border-radius:14px;color:#06210f;background:var(--sky);box-shadow:0 5px 0 rgba(0,0,0,.4);}
+  .btn.ghost{background:#284a72;color:var(--ink);} .btn:active{transform:translateY(3px);}
+  #saveMsg{color:var(--muted);margin:10px 0 0;min-height:22px;} .pb{color:var(--good);font-weight:800;}
+  .hidden{display:none!important;}
+  .sdknote{position:absolute;left:0;right:0;bottom:12px;text-align:center;font:12px ui-monospace,Consolas,monospace;color:#4f7c9c;pointer-events:none;}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <canvas id="cv"></canvas>
+
+    <div class="hud" id="hud">
+      <div class="row">
+        <span class="pill"><span class="lbl">SCORE</span><span id="score">0</span></span>
+        <span class="pill" id="hearts">❤️❤️❤️</span>
+      </div>
+      <div id="promptWrap"><div class="cap">FLY THROUGH THE</div><div id="prompt">correct spelling</div></div>
+      <div id="combo"></div>
+    </div>
+
+    <!-- START -->
+    <div class="screen" id="start">
+      <div class="panel">
+        <h1>🐤 Spell Flyer</h1>
+        <p class="sub">Tap, click, or press <b>Space</b> to flap. Every wall has <b>two openings</b> — one shows a word
+          spelled <b>right</b>, the other a sneaky <b>misspelling</b>. Flap through the correctly spelled gap to score.
+          Fly through the wrong word or smack a wall and you lose a heart!<br>
+          <span style="color:var(--muted)">Tap / click / Space to flap · ↑ works too.</span></p>
+        <div class="grades">
+          <button class="gradeBtn g1" data-grade="0">Grade 1–2<small>everyday words</small></button>
+          <button class="gradeBtn g2" data-grade="1">Grade 3<small>tricky words</small></button>
+          <button class="gradeBtn g3" data-grade="2">Grade 4–5<small>spelling demons</small></button>
+        </div>
+        <p class="sub" style="margin:6px 0 0">Fly far · build a flap-streak for combo points</p>
+      </div>
+    </div>
+
+    <!-- FINAL -->
+    <div class="screen hidden" id="final">
+      <div class="panel">
+        <div style="font-size:64px" id="finalEmoji">🐤</div>
+        <p class="sub" id="finalLine" style="margin:4px 0"></p>
+        <div class="big" id="finalScore">0</div>
+        <p class="sub" id="finalStats" style="margin:0"></p>
+        <p id="saveMsg">Saving your score…</p>
+        <div class="actions">
+          <button class="btn" id="againBtn">Fly again ▸</button>
+          <button class="btn ghost" id="changeBtn">Change grade</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sdknote" id="sdknote"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var W = 960, H = 540;
+  var BIRD_X = 300;                    // bird's fixed screen column (flappy style)
+
+  // ---- word banks: {ok: correct spelling, no: common misspelling} ----
+  var WORDS = [
+    // Grade 1–2 — everyday high-frequency words
+    [
+      {ok:'friend',no:'frend'},{ok:'because',no:'becuse'},{ok:'people',no:'peeple'},
+      {ok:'little',no:'littel'},{ok:'pretty',no:'prity'},{ok:'water',no:'watar'},
+      {ok:'happy',no:'hapy'},{ok:'school',no:'skool'},{ok:'again',no:'agen'},
+      {ok:'said',no:'sed'},{ok:'many',no:'meny'},{ok:'family',no:'famly'}
+    ],
+    // Grade 3 — tricky but common
+    [
+      {ok:'beautiful',no:'beutiful'},{ok:'believe',no:'beleive'},{ok:'different',no:'diffrent'},
+      {ok:'favorite',no:'favrite'},{ok:'tomorrow',no:'tomorow'},{ok:'finally',no:'finaly'},
+      {ok:'probably',no:'probly'},{ok:'together',no:'togather'},{ok:'remember',no:'remeber'},
+      {ok:'surprise',no:'suprise'},{ok:'special',no:'speshal'},{ok:'thought',no:'thaught'}
+    ],
+    // Grade 4–5 — classic spelling demons
+    [
+      {ok:'receive',no:'recieve'},{ok:'separate',no:'seperate'},{ok:'necessary',no:'neccessary'},
+      {ok:'definitely',no:'definately'},{ok:'embarrass',no:'embarass'},{ok:'occasion',no:'ocasion'},
+      {ok:'rhythm',no:'rythm'},{ok:'privilege',no:'privilage'},{ok:'environment',no:'enviroment'},
+      {ok:'weird',no:'wierd'},{ok:'argument',no:'arguement'},{ok:'grammar',no:'grammer'}
+    ]
+  ];
+
+  // ---- difficulty bands: one game, grade chosen inside (PLAN.md §5.1) ----
+  var GRADES = [
+    { id: 1, label: 'Grade 1–2', bank: 0, speed: 150, gap: 148, spacing: 430 },
+    { id: 3, label: 'Grade 3',   bank: 1, speed: 175, gap: 138, spacing: 400 },
+    { id: 4, label: 'Grade 4–5', bank: 2, speed: 205, gap: 130, spacing: 380 }
+  ];
+
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+
+  // ---- audio ----
+  var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+  function tone(f,d,t,slide){ try{ actx=actx||new AC(); var o=actx.createOscillator(),gg=actx.createGain();
+    o.type=t||'sine'; o.frequency.value=f; if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+d);
+    gg.gain.setValueAtTime(.08,actx.currentTime); gg.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);
+    o.connect(gg); gg.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+  function sfxFlap(){ tone(360,.08,'sine',520); }
+  function sfxGood(){ tone(560,.1,'triangle',900); }
+  function sfxBad(){ tone(150,.3,'sawtooth',80); }
+
+  // ---- canvas ----
+  var cv = document.getElementById('cv'), ctx = cv.getContext('2d'), scaleX = 1, scaleY = 1;
+  function fit() {
+    var r = cv.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.max(2, Math.round(r.width * dpr));
+    cv.height = Math.max(2, Math.round(r.height * dpr));
+    scaleX = cv.width / W; scaleY = cv.height / H;
+  }
+  window.addEventListener('resize', fit);
+
+  // ---- state ----
+  var $ = function (id){ return document.getElementById(id); };
+  var grade = GRADES[0];
+  var bird, walls, particles, pops, deck, deckI;
+  var score = 0, hearts = 3, combo = 0, nRight = 0, nWrong = 0, passed = 0;
+  var running = false, lastT = 0, spawnX = 0, speed = 150, started = false;
+
+  function nextWord(){
+    if (!deck || deckI >= deck.length) { deck = shuffle(WORDS[grade.bank].slice()); deckI = 0; }
+    return deck[deckI++];
+  }
+
+  function spawnWall() {
+    var pair = nextWord();
+    var g = grade.gap;
+    // two openings: one upper, one lower; correct word randomly assigned to one
+    var yTop = 90 + Math.random()*90 + g/2;         // centre of upper gap
+    var yBot = H - 70 - Math.random()*90 - g/2;      // centre of lower gap
+    if (yBot - yTop < g + 90) yBot = yTop + g + 90;  // keep a solid divider between them
+    var okTop = Math.random() < 0.5;
+    walls.push({
+      x: W + 60, w: 92, scored: false,
+      gapH: g, yTop: yTop, yBot: yBot,
+      topWord: okTop ? pair.ok : pair.no,
+      botWord: okTop ? pair.no : pair.ok,
+      okIsTop: okTop
+    });
+  }
+
+  function startGame(idx) {
+    grade = GRADES[idx];
+    score = 0; hearts = 3; combo = 0; nRight = 0; nWrong = 0; passed = 0;
+    speed = grade.speed; started = false;
+    bird = { x: BIRD_X, y: H/2, vy: 0, r: 20, flap: 0, invuln: 0 };
+    walls = []; particles = []; pops = []; deck = null; deckI = 0;
+    spawnX = 0;
+    $('start').classList.add('hidden'); $('final').classList.add('hidden');
+    $('prompt').textContent = 'the correct spelling';
+    $('score').textContent = '0'; drawHearts();
+    fit();
+    EduSDK.startLesson(1, { grade: grade.id });
+    running = true; lastT = performance.now();
+    requestAnimationFrame(loop);
+  }
+
+  function drawHearts(){ $('hearts').textContent = hearts > 0 ? '❤️'.repeat(hearts) : '💀'; }
+  function popText(x, y, txt, color){ pops.push({ x:x, y:y, txt:txt, color:color, age:0 }); }
+  function burst(x, y, color){ for (var i=0;i<12;i++){ var a=Math.random()*6.28,s=60+Math.random()*160;
+    particles.push({ x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,age:0,life:.55,color:color }); } }
+
+  function flap(){
+    if (!running) return;
+    started = true;
+    bird.vy = -430; bird.flap = 1; sfxFlap();
+  }
+
+  // ---- input ----
+  cv.addEventListener('pointerdown', function(){ flap(); });
+  document.addEventListener('keydown', function(e){
+    var k = e.key.toLowerCase();
+    if (k === ' ' || k === 'arrowup' || k === 'w') { e.preventDefault(); flap(); }
+  });
+
+  // ---- main loop ----
+  function loop(now) {
+    if (!running) return;
+    var dt = Math.min(0.033, (now - lastT) / 1000); lastT = now;
+    update(dt); render();
+    requestAnimationFrame(loop);
+  }
+
+  function update(dt) {
+    // bird physics (idle-hover before the first flap so kids can read the prompt)
+    if (started) {
+      bird.vy += 1500 * dt;
+      bird.y += bird.vy * dt;
+    } else {
+      bird.y = H/2 + Math.sin(performance.now()/300) * 10;
+    }
+    if (bird.flap > 0) bird.flap = Math.max(0, bird.flap - dt*3);
+    if (bird.invuln > 0) bird.invuln -= dt;
+
+    // floor / ceiling = a heart
+    if (bird.y > H - bird.r) { bird.y = H - bird.r; if (bird.invuln<=0) hit(bird.x, bird.y, 'floor'); bird.vy = -260; }
+    if (bird.y < bird.r)     { bird.y = bird.r; bird.vy = 0; }
+
+    // scroll speed ramps very gently the further you fly
+    speed = grade.speed + Math.min(90, passed * 3);
+
+    // spawn walls by distance
+    if (started) {
+      spawnX -= speed * dt;
+      if (spawnX <= 0) { spawnWall(); spawnX = grade.spacing; }
+    }
+
+    for (var i = walls.length-1; i >= 0; i--) {
+      var wl = walls[i];
+      if (started) wl.x -= speed * dt;
+
+      // collision with the solid parts of the wall
+      if (bird.invuln <= 0 && bird.x + bird.r > wl.x && bird.x - bird.r < wl.x + wl.w) {
+        var topGapLo = wl.yTop - wl.gapH/2, topGapHi = wl.yTop + wl.gapH/2;
+        var botGapLo = wl.yBot - wl.gapH/2, botGapHi = wl.yBot + wl.gapH/2;
+        var inTopGap = bird.y > topGapLo && bird.y < topGapHi;
+        var inBotGap = bird.y > botGapLo && bird.y < botGapHi;
+        if (!inTopGap && !inBotGap) { hit(bird.x, bird.y, 'wall'); wl.scored = true; }
+      }
+
+      // scored when the bird fully clears the wall
+      if (!wl.scored && wl.x + wl.w < bird.x - bird.r) {
+        var throughTop = bird.y < (wl.yTop + wl.yBot) / 2;
+        var wentCorrect = throughTop === wl.okIsTop;
+        judgePass(wl, wentCorrect);
+        wl.scored = true;
+      }
+      if (wl.x + wl.w < -80) walls.splice(i, 1);
+    }
+
+    for (var p = particles.length-1; p >= 0; p--) { var q = particles[p]; q.age += dt;
+      q.x += q.vx*dt; q.y += q.vy*dt; q.vy += 300*dt; if (q.age > q.life) particles.splice(p,1); }
+    for (var k = pops.length-1; k >= 0; k--) { pops[k].age += dt; pops[k].y -= 34*dt; if (pops[k].age > 1) pops.splice(k,1); }
+  }
+
+  function judgePass(wl, correct) {
+    passed++;
+    var okY = wl.okIsTop ? wl.yTop : wl.yBot;
+    if (correct) {
+      combo++; nRight++;
+      var mult = Math.min(2.5, 1 + combo*0.1);
+      var pts = Math.round(100 * mult);
+      score += pts; $('score').textContent = score;
+      sfxGood(); burst(bird.x+30, okY, '#7be08a'); popText(bird.x+40, okY, '+'+pts, '#9fe6a8');
+      if (combo >= 3) { var c = $('combo'); c.textContent = '🔥 ' + combo + '× combo!'; c.style.opacity = 1;
+        clearTimeout(c._t); c._t = setTimeout(function(){ c.style.opacity = 0; }, 900); }
+    } else {
+      combo = 0; nWrong++;
+      var pen = EduSDK.applyPenalty(score, grade.id);   // wrong spelling → −20 (Grade 3+), floored at 0
+      score = pen.score; $('score').textContent = score;
+      sfxBad(); burst(bird.x, bird.y, '#ff6b81'); popText(bird.x, bird.y-30, pen.delta ? pen.delta+'' : 'wrong word!', '#ff6b81'); shake();
+      if (bird.invuln <= 0) loseHeart(false);
+    }
+  }
+
+  function hit(x, y, kind) {
+    if (bird.invuln > 0) return;
+    combo = 0; sfxBad(); burst(x, y, '#ff6b81'); shake();
+    loseHeart(true);
+  }
+
+  function loseHeart(fromCrash) {
+    hearts--; drawHearts(); bird.invuln = 1.2;
+    if (fromCrash) { bird.vy = -200; }
+    if (hearts <= 0) return gameOver();
+  }
+
+  var shakeAmt = 0;
+  function shake(){ shakeAmt = 9; }
+
+  // ---- render ----
+  function render() {
+    ctx.setTransform(scaleX,0,0,scaleY,0,0);
+    var sx = (Math.random()*2-1)*shakeAmt, sy = (Math.random()*2-1)*shakeAmt;
+    if (shakeAmt > 0) shakeAmt = Math.max(0, shakeAmt-0.7);
+    ctx.save(); ctx.translate(sx, sy);
+
+    // sky
+    var sky = ctx.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,'#123c6b'); sky.addColorStop(1,'#0a1f3c');
+    ctx.fillStyle = sky; ctx.fillRect(-10,-10,W+20,H+20);
+    drawClouds();
+
+    walls.forEach(drawWall);
+
+    particles.forEach(function(q){ ctx.globalAlpha = Math.max(0,1-q.age/q.life);
+      ctx.fillStyle = q.color; ctx.beginPath(); ctx.arc(q.x,q.y,4,0,6.2832); ctx.fill(); });
+    ctx.globalAlpha = 1;
+
+    drawBird();
+
+    pops.forEach(function(pp){ ctx.globalAlpha = Math.max(0,1-pp.age);
+      ctx.fillStyle = pp.color; ctx.font = '800 24px "Baloo 2",sans-serif'; ctx.textAlign='center';
+      ctx.fillText(pp.txt, pp.x, pp.y); });
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  var cloudSeed = [[120,90,60],[380,70,44],[640,120,54],[860,80,40]];
+  function drawClouds(){
+    var off = (performance.now()/60) % (W+200);
+    ctx.fillStyle = 'rgba(255,255,255,.06)';
+    cloudSeed.forEach(function(c){
+      var x = ((c[0]-off) % (W+200) + (W+200)) % (W+200) - 100;
+      ctx.beginPath(); ctx.arc(x,c[1],c[2],0,6.2832); ctx.arc(x+c[2],c[1]+8,c[2]*0.8,0,6.2832);
+      ctx.arc(x-c[2],c[1]+8,c[2]*0.7,0,6.2832); ctx.fill();
+    });
+  }
+
+  function drawWall(wl) {
+    var topLo = wl.yTop - wl.gapH/2, topHi = wl.yTop + wl.gapH/2;
+    var botLo = wl.yBot - wl.gapH/2, botHi = wl.yBot + wl.gapH/2;
+    // three solid pillars
+    ctx.fillStyle = '#2a6e4a';
+    roundRect(wl.x, -10, wl.w, topLo + 10, 8);
+    roundRect(wl.x, topHi, wl.w, botLo - topHi, 8);
+    roundRect(wl.x, botHi, wl.w, H - botHi + 10, 8);
+    // pillar highlight
+    ctx.fillStyle = 'rgba(255,255,255,.08)';
+    ctx.fillRect(wl.x, -10, 6, H+20);
+
+    // word plaques floating in each opening
+    drawPlaque(wl.x + wl.w/2, wl.yTop, wl.topWord);
+    drawPlaque(wl.x + wl.w/2, wl.yBot, wl.botWord);
+  }
+
+  function drawPlaque(cx, cy, word) {
+    ctx.font = '800 26px "Baloo 2",sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    var tw = ctx.measureText(word).width, pw = tw + 34, ph = 40;
+    ctx.fillStyle = '#fff';
+    roundRect(cx - pw/2, cy - ph/2, pw, ph, 12);
+    ctx.strokeStyle = 'rgba(0,0,0,.15)'; ctx.lineWidth = 2;
+    rr(cx - pw/2, cy - ph/2, pw, ph, 12); ctx.stroke();
+    ctx.fillStyle = '#123c6b'; ctx.fillText(word, cx, cy+1);
+  }
+
+  function drawBird() {
+    if (bird.invuln > 0 && Math.floor(bird.invuln*12) % 2 === 0) return;
+    var tilt = Math.max(-0.5, Math.min(0.9, bird.vy/700));
+    ctx.save(); ctx.translate(bird.x, bird.y); ctx.rotate(tilt);
+    // body
+    ctx.fillStyle = '#ffd15a';
+    ctx.beginPath(); ctx.arc(0,0,bird.r,0,6.2832); ctx.fill();
+    ctx.strokeStyle = '#a9781a'; ctx.lineWidth = 2; ctx.stroke();
+    // wing (flaps)
+    ctx.fillStyle = '#ffb838';
+    var wf = -6 - bird.flap*10;
+    ctx.beginPath(); ctx.ellipse(-4, wf*0.3+4, 12, 8, -0.4, 0, 6.2832); ctx.fill();
+    // beak
+    ctx.fillStyle = '#ff8a3c';
+    ctx.beginPath(); ctx.moveTo(bird.r-2,-3); ctx.lineTo(bird.r+12,0); ctx.lineTo(bird.r-2,5); ctx.closePath(); ctx.fill();
+    // eye
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(7,-7,6,0,6.2832); ctx.fill();
+    ctx.fillStyle = '#1a2a1a'; ctx.beginPath(); ctx.arc(9,-7,3,0,6.2832); ctx.fill();
+    ctx.restore();
+  }
+
+  function rr(x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+  function roundRect(x,y,w,h,r){ if (h<=0) return; rr(x,y,w,h,r); ctx.fill(); }
+
+  function gameOver() {
+    if (!running) return;
+    running = false;
+    var acc = nRight + nWrong ? Math.round(nRight/(nRight+nWrong)*100) : 100;
+    EduSDK.finishLesson(1, { right: nRight, accuracy: acc });
+    $('final').classList.remove('hidden');
+    $('finalEmoji').textContent = score >= 1500 ? '🏆' : '🐤';
+    $('finalLine').textContent = 'Down you come! Your spelling flight —';
+    $('finalScore').textContent = score;
+    $('finalStats').textContent = nRight + ' correct words · ' + acc + '% accuracy';
+    EduSDK.submitScore(score, { grade: grade.id, right: nRight, accuracy: acc })
+      .then(function (res) {
+        var el = $('saveMsg');
+        if (res && res.success) el.innerHTML = res.isPersonalBest
+          ? '<span class="pb">🏆 New personal best — on the leaderboard!</span>' : 'Score saved to the leaderboard.';
+        else if (res && res.offline) el.textContent = 'Standalone mode — play on OnlyGrins to earn GP!';
+        else el.textContent = (res && res.error === 'not_authenticated') ? 'Sign in on OnlyGrins to save your score.' : 'Could not save score.';
+      })
+      .then(function () { return EduSDK.end({ score: score }); });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gradeBtn'), function (b) {
+    b.addEventListener('click', function () { startGame(Number(b.dataset.grade)); });
+  });
+  $('againBtn').addEventListener('click', function () { startGame(GRADES.indexOf(grade)); });
+  $('changeBtn').addEventListener('click', function () { $('final').classList.add('hidden'); $('start').classList.remove('hidden'); });
+
+  fit();
+  $('sdknote').textContent = EduSDK.isHosted() ? 'SDK: connected' : 'SDK: standalone (scoring no-ops)';
+  EduSDK.begin({ game: 'spell-flyer' });
+})();
+</script>
+</body>
+</html>

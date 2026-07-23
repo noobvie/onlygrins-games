@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="'Baloo 2','Segoe UI',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="space" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#150e38"/><stop offset="1" stop-color="#08061a"/>
+    </linearGradient>
+    <linearGradient id="title" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd15a"/><stop offset="0.5" stop-color="#66e6a8"/><stop offset="1" stop-color="#8f7bff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#space)"/>
+  <!-- stars -->
+  <g fill="#cfc8ff">
+    <rect x="80" y="90" width="2" height="2" opacity=".7"/><rect x="220" y="200" width="2.4" height="2.4" opacity=".8"/>
+    <rect x="400" y="70" width="1.6" height="1.6" opacity=".6"/><rect x="560" y="150" width="2" height="2" opacity=".7"/>
+    <rect x="720" y="60" width="2.4" height="2.4" opacity=".8"/><rect x="880" y="180" width="2" height="2" opacity=".6"/>
+    <rect x="300" y="300" width="2" height="2" opacity=".5"/><rect x="640" y="330" width="2.4" height="2.4" opacity=".7"/>
+  </g>
+  <!-- invaders -->
+  <g>
+    <g transform="translate(240,180)"><rect x="-34" y="-28" width="68" height="62" rx="12" fill="#8f7bff"/><rect x="-30" y="32" width="10" height="8" fill="#8f7bff"/><rect x="20" y="32" width="10" height="8" fill="#8f7bff"/><circle cx="-11" cy="-6" r="6" fill="#0a081c"/><circle cx="11" cy="-6" r="6" fill="#0a081c"/><text x="0" y="24" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">12</text></g>
+    <g transform="translate(420,180)"><rect x="-34" y="-28" width="68" height="62" rx="12" fill="#8f7bff"/><rect x="-30" y="32" width="10" height="8" fill="#8f7bff"/><rect x="20" y="32" width="10" height="8" fill="#8f7bff"/><circle cx="-11" cy="-6" r="6" fill="#0a081c"/><circle cx="11" cy="-6" r="6" fill="#0a081c"/><text x="0" y="24" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">7</text></g>
+    <g transform="translate(600,180)"><rect x="-34" y="-28" width="68" height="62" rx="12" fill="#8f7bff"/><rect x="-30" y="32" width="10" height="8" fill="#8f7bff"/><rect x="20" y="32" width="10" height="8" fill="#8f7bff"/><circle cx="-11" cy="-6" r="6" fill="#0a081c"/><circle cx="11" cy="-6" r="6" fill="#0a081c"/><text x="0" y="24" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">18</text></g>
+    <g transform="translate(720,270)"><rect x="-34" y="-28" width="68" height="62" rx="12" fill="#8f7bff"/><rect x="-30" y="32" width="10" height="8" fill="#8f7bff"/><rect x="20" y="32" width="10" height="8" fill="#8f7bff"/><circle cx="-11" cy="-6" r="6" fill="#0a081c"/><circle cx="11" cy="-6" r="6" fill="#0a081c"/><text x="0" y="24" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">24</text></g>
+  </g>
+  <!-- bullet -->
+  <rect x="417" y="360" width="6" height="18" rx="2" fill="#ffe27a"/>
+  <rect x="417" y="330" width="6" height="18" rx="2" fill="#ffe27a" opacity="0.6"/>
+  <!-- cannon -->
+  <g transform="translate(420,430)">
+    <rect x="-37" y="-10" width="74" height="26" rx="8" fill="#66e6a8"/>
+    <rect x="-6" y="-30" width="12" height="24" fill="#66e6a8"/>
+  </g>
+  <rect x="0" y="466" width="960" height="74" fill="#08061a" fill-opacity="0.55"/>
+  <text x="480" y="62" text-anchor="middle" font-size="58" font-weight="800" fill="url(#title)">👾 Times Invaders</text>
+  <text x="480" y="512" text-anchor="middle" font-size="30" font-weight="700" fill="#b7aeff">Blast only the multiples · factors · primes before they land!</text>
+</svg>

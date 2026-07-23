@@ -1,0 +1,20 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "times-invaders",
+  "title": "Times Invaders",
+  "category": "math",
+  "short_description": "A free online Space-Invaders-style math game: blast only the numbers that fit the rule before they land.",
+  "description": "A real arcade shooter with the maths built into the trigger. Rows of number-invaders march down the screen and you slide your blaster along the bottom to defend. But there's a catch — you may only shoot the numbers that fit the changing rule: even, odd, multiples, factors, or primes. Zap a correct invader to score and build a combo; blast a wrong number and your cannon jams and you lose points. Let a correct invader slip past the line and you lose a heart. Each wave brings a new rule and a faster march. Pick a grade band (Grade 1–2 even/odd, Grade 3 multiples, Grade 4–5 factors & primes) and see how many waves you can survive. Times tables become target practice. Great for kids in grades 1–5 practising multiples, factors and prime numbers. Finishing posts a score to the leaderboard for GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 540,
+  "controls": "Move your blaster with the mouse / drag, or A and D / arrow keys. Fire with tap, click, or Space. Only shoot the numbers that match the rule at the top.",
+  "tags": ["grin", "education", "math", "arcade", "shooter", "space-invaders", "multiples", "factors", "primes", "grade-1", "grade-2", "grade-3", "grade-4", "grade-5"],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:times-invaders"
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "number-muncher",
+  "title": "Number Muncher",
+  "category": "math",
+  "short_description": "A free online arcade math game: steer Munch to gobble only the multiples, factors or primes while dodging the Gremlin.",
+  "description": "A real arcade game with the maths built into the mechanic — no quizzes. Steer Munch around the number garden and eat only the numbers that fit the changing rule: even, odd, multiples, factors, or primes. Every correct munch scores and builds a combo; eat a wrong number and you spit it out and lose points. All the while a hungry Gremlin hunts you across the field — get chomped and you lose a heart. Pick a grade band (Grade 1–2 even/odd, Grade 3 multiples, Grade 4–5 factors & primes) and survive the timer for the biggest score. Number sense becomes pure reflex. Great for kids in grades 1–5 practising times tables, multiples, factors and prime numbers. Finishing posts a score to the leaderboard for GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 540,
+  "controls": "Move the mouse or drag to steer Munch (glides toward your pointer); or use WASD / arrow keys. Eat numbers that fit the rule, avoid the Gremlin.",
+  "tags": ["grin", "education", "math", "arcade", "multiples", "factors", "primes", "grade-1", "grade-2", "grade-3", "grade-4", "grade-5"],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:number-muncher"
+}

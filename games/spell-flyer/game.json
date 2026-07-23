@@ -1,0 +1,20 @@
+{
+  "$schema": "../../deploy/games-manifest.schema.json",
+  "slug": "spell-flyer",
+  "title": "Spell Flyer",
+  "category": "language",
+  "short_description": "A free online Flappy-Bird-style spelling arcade game: flap through the correctly spelled word, dodge the misspelling.",
+  "description": "A real arcade game with the spelling built right into the flying. Tap, click or press Space to flap your bird through a sky of walls. Every wall has two openings — one shows a word spelled correctly, the other a sneaky common misspelling — and you have to steer through the correct one. Flap through the right word to score and build a combo; fly through the misspelling or crash into a wall and you lose a heart. Pick a grade band (Grade 1–2 everyday words, Grade 3 tricky words, Grade 4–5 spelling demons like receive, separate and necessary) and fly as far as you can. Reading and spelling become split-second reflexes instead of a worksheet. Great for kids in grades 1–5 practising sight words and commonly misspelled words. Finishing posts a score to the leaderboard for GP.",
+  "game_type": "html5",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "width": 960,
+  "height": 540,
+  "controls": "Tap, click, or press Space (or the Up arrow) to flap. Steer your bird up and down to fly through the opening that shows the correctly spelled word.",
+  "tags": ["grin", "education", "language", "spelling", "arcade", "flappy", "words", "grade-1", "grade-2", "grade-3", "grade-4", "grade-5"],
+  "is_mobile_compatible": true,
+  "api_enabled": true,
+  "is_active": true,
+  "is_featured": false,
+  "import_id": "edu:spell-flyer"
+}
